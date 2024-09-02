@@ -51,7 +51,8 @@ class MyApp extends StatelessWidget {
               supportedLocales: const [
                 Locale('en', ''),
               ],
-              initialRoute: AppRoutes.startScreen,
+              // initialRoute: AppRoutes.startScreen,
+              initialRoute: AppRoutes.dashboardScreen,
               routes: AppRoutes.routes,
             );
           },)

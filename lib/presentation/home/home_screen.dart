@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Text(
-                          "Stefani Wong",
+                          "Judy",
                           style: TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 20,
@@ -956,6 +956,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ListView.builder(
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
+
                     shrinkWrap: true,
                     itemCount: lastWorkoutArr.length,
                     itemBuilder: (context, index) {

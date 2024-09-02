@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../core/utils/app_colors.dart';
@@ -54,11 +52,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: _widgetOptions,
       ),
       bottomNavigationBar: BottomAppBar(
-        height: Platform.isIOS ? 70 : 65,
         color: Colors.transparent,
         padding: const EdgeInsets.all(0),
         child: Container(
-          height: Platform.isIOS ? 70 : 65,
           decoration: const BoxDecoration(
               color: AppColors.whiteColor,
               boxShadow: [
