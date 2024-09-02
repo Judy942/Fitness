@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
@@ -17,11 +19,13 @@ void main() {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
   ]).then((value) {
     PrefUtils().init();
-    runApp(MyApp());
+    runApp(const MyApp());
   });
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Sizer(
@@ -47,7 +51,7 @@ class MyApp extends StatelessWidget {
               supportedLocales: const [
                 Locale('en', ''),
               ],
-              initialRoute: AppRoutes.initialRoute,
+              initialRoute: AppRoutes.startScreen,
               routes: AppRoutes.routes,
             );
           },)

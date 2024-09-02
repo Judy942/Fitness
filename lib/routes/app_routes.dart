@@ -1,9 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart';
+import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
+import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
+import 'package:flutter_application_fitness/presentation/onboarding_screen/onboarding_screen.dart';
+import 'package:flutter_application_fitness/presentation/onboarding_screen/start_screen.dart';
+import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
+import 'package:flutter_application_fitness/presentation/signup/signup_screen.dart';
+import 'package:flutter_application_fitness/presentation/welcome/welcome_screen.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 
 class AppRoutes {
-  static const String initialRoute = '/initialRoute';
+  // static const String initialRoute = '/initialRoute';
+  static const String startScreen = '/startScreen';
+  static const String onboardingScreen = '/onboardingScreen';
+  static const String homeScreen = '/homeScreen';
+  static const String loginScreen = '/loginScreen';
+  static const String signUpScreen = '/signUpScreen';
+  static const String completeProfileScreen = '/completeProfileScreen';
+  static const String notificationScreen = '/notificationScreen';
+  static const String activityTrackerScreen = '/activityTrackerScreen';
+  static const String finishWorkoutScreen = '/finishWorkoutScreen';
+  static const String welcomeScreen = '/welcomeScreen';
+  static const String goalsScreen = '/goalsScreen';
+  static const String workoutScheduleView = '/workoutScheduleView';
+  static const String dashboardScreen = '/dashboardScreen';
 
-  static Map<String, WidgetBuilder> get routes => {
-    initialRoute: (context) => Container(),
+  static Map<String, WidgetBuilder> routes = {
+    // initialRoute: (context) => const StartScreen(),
+    startScreen: (context) => const StartScreen(),
+    onboardingScreen: (context) => const OnboardingScreen(),
+    loginScreen: (context) => const LoginScreen(),
+    signUpScreen: (context) => const SignupScreen(),
+    completeProfileScreen: (context) => const CompleteProfileScreen(),
+    notificationScreen: (context) => const NotificationScreen(),
+    activityTrackerScreen: (context) => const ActivityTrackerScreen(),
+    finishWorkoutScreen: (context) => const ActivityTrackerScreen(),
+    welcomeScreen: (context) => const WelcomeScreen(),
+    goalsScreen: (context) => const GoalsScreen(),
+    workoutScheduleView: (context) => const WorkoutScheduleView(),
+    dashboardScreen: (context) => const DashboardScreen(),
+
   };
 }

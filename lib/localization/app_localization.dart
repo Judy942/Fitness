@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
-
+import 'dart:async';
 
 extension LocalizationExtension on String {
   String get tr => AppLocalization.of().getString(this);

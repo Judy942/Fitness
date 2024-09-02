@@ -10,6 +10,22 @@ class NavigatorService {
   return navigatorKey.currentState?.pop();
   }
 
+  static Future<dynamic> pushNameAndRemoveUntil(
+    String routeName, {
+      bool routePredicate = false,
+      dynamic arguments,
+    }) async {
+    return navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      routeName,
+      (route) => routePredicate,
+      arguments: arguments,
+    );
+  }
+
+  static Future<dynamic> popAndPushNamed(String routeName, {dynamic arguments}) async {
+    return navigatorKey.currentState?.popAndPushNamed(routeName, arguments: arguments);
+  }
+
 
 }
 
