@@ -1,5 +1,8 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
@@ -14,6 +17,46 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   bool isCheck = false;
+  String email = "";
+  String password = "";
+  String firstName = "";
+  String lastName = "";
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+
+
+
+  void fetchData() async {
+  // var url = Uri.parse('http://162.248.102.236:8055/auth/login');
+  String url = "http://162.248.102.236:8055/users/register";
+  print("Email: $email");
+  print("Password: $password");
+  
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      "email": email,
+      "password": password,
+    }),
+  );
+    print(jsonDecode(response.body));
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      Navigator.pushNamed(context, '/completeProfileScreen');
+    } else if(response.statusCode == 400) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid email or password'),
+        ),
+      );
+    }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +93,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged: (value) {
+                    setState(() {
+                      email = value;
+                    });
+                  },
                   hintText: "First Name",
                   icon: "assets/icons/profile_icon.png",
                   textInputType: TextInputType.name,
@@ -58,14 +106,18 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged: (p0) {
+                  },
                     hintText: "Last Name",
                     icon: "assets/icons/profile_icon.png",
                     textInputType: TextInputType.name),
                 const SizedBox(
                   height: 15,
                 ),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged: (p0) {
+                  },
                     hintText: "Email",
                     icon: "assets/icons/message_icon.png",
                     textInputType: TextInputType.emailAddress),
@@ -73,6 +125,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 15,
                 ),
                 RoundTextField(
+                  onChanged: (p0) {
+                  },
                   hintText: "Password",
                   icon: "assets/icons/lock_icon.png",
                   textInputType: TextInputType.text,

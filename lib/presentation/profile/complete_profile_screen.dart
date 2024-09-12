@@ -76,19 +76,28 @@ class CompleteProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 15),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged: (p0) {
+                    
+                  },
                   hintText: "Date of Birth",
                   icon: "assets/icons/calendar_icon.png",
                   textInputType: TextInputType.text,
                 ),
                 const SizedBox(height: 15),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged:(p0) {
+                    
+                  },
                   hintText: "Your Weight",
                   icon: "assets/icons/weight_icon.png",
                   textInputType: TextInputType.text,
                 ),
                 const SizedBox(height: 15),
-                const RoundTextField(
+                 RoundTextField(
+                  onChanged: (p0) {
+                    
+                  },
                   hintText: "Your Height",
                   icon: "assets/icons/swap_icon.png",
                   textInputType: TextInputType.text,

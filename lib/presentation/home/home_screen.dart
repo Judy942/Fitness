@@ -256,7 +256,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 35,
                                     width: 100,
                                     child: RoundButton(
-                                        title: "View More", onPressed: () {}),
+                                        title: "View More", onPressed: () {
+                                      Navigator.pushNamed(context, '/howToCalculateBmi');
+                                        }),
                                   ),
                                 )
                               ],
@@ -323,156 +325,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: AppColors.blackColor,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: media.width * 0.02),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Container(
-                    height: media.width * 0.4,
-                    width: media.width,
-                    decoration: BoxDecoration(
-                        color: AppColors.primaryColor2.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Stack(
-                      alignment: Alignment.topLeft,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Heart Rate",
-                                style: TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(height: media.width * 0.01),
-                              ShaderMask(
-                                blendMode: BlendMode.srcIn,
-                                shaderCallback: (bounds) {
-                                  return LinearGradient(
-                                          colors: AppColors.primary,
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight)
-                                      .createShader(Rect.fromLTRB(
-                                          0, 0, bounds.width, bounds.height));
-                                },
-                                child: const Text(
-                                  "78 BPM",
-                                  style: TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        LineChart(
-                          LineChartData(
-                            showingTooltipIndicators:
-                                showingTooltipOnSpots.map((index) {
-                              return ShowingTooltipIndicators([
-                                LineBarSpot(
-                                  tooltipsOnBar,
-                                  lineBarsData.indexOf(tooltipsOnBar),
-                                  tooltipsOnBar.spots[index],
-                                ),
-                              ]);
-                            }).toList(),
-                            lineTouchData: LineTouchData(
-                              enabled: true,
-                              handleBuiltInTouches: false,
-                              touchCallback: (FlTouchEvent event,
-                                  LineTouchResponse? response) {
-                                if (response == null ||
-                                    response.lineBarSpots == null) {
-                                  return;
-                                }
-                                if (event is FlTapUpEvent) {
-                                  final spotIndex =
-                                      response.lineBarSpots!.first.spotIndex;
-                                  showingTooltipOnSpots.clear();
-                                  setState(() {
-                                    showingTooltipOnSpots.add(spotIndex);
-
-                                    // if (showingTooltipOnSpots
-                                    //     .contains(spotIndex)) {
-                                    //   showingTooltipOnSpots.remove(spotIndex);
-                                    // } else {
-                                    //   showingTooltipOnSpots.add(spotIndex);
-                                    // }
-                                  });
-                                }
-                              },
-                              mouseCursorResolver: (FlTouchEvent event,
-                                  LineTouchResponse? response) {
-                                if (response == null ||
-                                    response.lineBarSpots == null) {
-                                  return SystemMouseCursors.basic;
-                                }
-                                return SystemMouseCursors.click;
-                              },
-                              getTouchedSpotIndicator:
-                                  (LineChartBarData barData,
-                                      List<int> spotIndexes) {
-                                return spotIndexes.map((index) {
-                                  return TouchedSpotIndicatorData(
-                                    const FlLine(
-                                      color: Colors.transparent,
-                                    ),
-                                    FlDotData(
-                                      show: true,
-                                      getDotPainter:
-                                          (spot, percent, barData, index) =>
-                                              FlDotCirclePainter(
-                                        radius: 3,
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                        strokeColor: AppColors.secondaryColor2,
-                                      ),
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                              touchTooltipData: LineTouchTooltipData(
-                                tooltipRoundedRadius: 20,
-                                getTooltipItems:
-                                    (List<LineBarSpot> lineBarsSpot) {
-                                  return lineBarsSpot.map((lineBarSpot) {
-                                    return LineTooltipItem(
-                                      //lineBarSpot.y.toString(),
-                                      "${lineBarSpot.x.toInt()} mins ago",
-                                      const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400),
-                                    );
-                                  }).toList();
-                                },
-                              ),
-                            ),
-                            lineBarsData: lineBarsData,
-                            minY: 0,
-                            maxY: 130,
-                            titlesData: const FlTitlesData(show: false),
-                            gridData: const FlGridData(show: false),
-                            borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                color: Colors.transparent,
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
                   ),
                 ),
                 SizedBox(height: media.width * 0.05),

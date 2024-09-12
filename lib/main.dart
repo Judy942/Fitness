@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
                 Locale('en', ''),
               ],
               // initialRoute: AppRoutes.startScreen,
-              initialRoute: AppRoutes.dashboardScreen,
+              initialRoute: AppRoutes.loginScreen,
               routes: AppRoutes.routes,
             );
           },)

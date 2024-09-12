@@ -272,7 +272,9 @@ class _UserProfileState extends State<UserProfile> {
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
-                                                colors: AppColors.secondary),
+                                                // colors: AppColors.secondary
+                                                colors: positive?AppColors.secondary:[AppColors.grayColor, AppColors.grayColor],
+                                                ),
                                             borderRadius:
                                             const BorderRadius.all(
                                                 Radius.circular(30.0)),

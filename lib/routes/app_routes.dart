@@ -11,6 +11,8 @@ import 'package:flutter_application_fitness/presentation/signup/signup_screen.da
 import 'package:flutter_application_fitness/presentation/welcome/welcome_screen.dart';
 import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 
+import '../presentation/home/how_to_calculate_bmi.dart';
+
 class AppRoutes {
   // static const String initialRoute = '/initialRoute';
   static const String startScreen = '/startScreen';
@@ -26,6 +28,7 @@ class AppRoutes {
   static const String goalsScreen = '/goalsScreen';
   static const String workoutScheduleView = '/workoutScheduleView';
   static const String dashboardScreen = '/dashboardScreen';
+  static const String howToCalculateBmi = '/howToCalculateBmi';
 
   static Map<String, WidgetBuilder> routes = {
     // initialRoute: (context) => const StartScreen(),
@@ -41,6 +44,8 @@ class AppRoutes {
     goalsScreen: (context) => const GoalsScreen(),
     workoutScheduleView: (context) => const WorkoutScheduleView(),
     dashboardScreen: (context) => const DashboardScreen(),
+    howToCalculateBmi: (context) =>  const HowToCalculateBmi(),
+
 
   };
 }

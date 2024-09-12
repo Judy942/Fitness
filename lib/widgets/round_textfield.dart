@@ -10,6 +10,8 @@ class RoundTextField extends StatelessWidget {
   final TextInputType textInputType;
   final bool isObscureText;
   final Widget? rightIcon;
+  final Function(String) onChanged;
+
 
   const RoundTextField(
       {Key? key,
@@ -18,7 +20,9 @@ class RoundTextField extends StatelessWidget {
       required this.icon,
       required this.textInputType,
       this.isObscureText = false,
-        this.rightIcon})
+        this.rightIcon,
+      required this.onChanged 
+      })
       : super(key: key);
 
   @override
@@ -31,6 +35,9 @@ class RoundTextField extends StatelessWidget {
         controller: textEditingController,
         keyboardType: textInputType,
         obscureText: isObscureText,
+        onChanged: (value) {
+          onChanged(value);
+        },
         decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
