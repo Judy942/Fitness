@@ -12,7 +12,7 @@ class TodayMealsRow extends StatefulWidget {
 
 class _TodayMealsRowState extends State<TodayMealsRow> {
 
-  bool positive = false;
+  bool positive = true;
   @override
   Widget build(BuildContext context) {
     return Container(

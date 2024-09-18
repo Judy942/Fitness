@@ -27,7 +27,7 @@ class FindStToEat extends StatelessWidget {
           AppColors.primaryColor2.withOpacity(0.3),
           AppColors.primaryColor1.withOpacity(0.3)
         ]),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
             topRight: Radius.circular(80),
             bottomRight: Radius.circular(20),
             topLeft: Radius.circular(20),

@@ -280,7 +280,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
       body: SafeArea(
         child: Container(
           height: media.height * 0.9,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -540,20 +540,38 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
-                SizedBox(
-                  height: media.width,
-                  width: media.width * 0.6,
-                  child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  
-                  shrinkWrap: true,
-                  itemCount: somethingToEat.length,
-                  itemBuilder: (context, index) {
-                    var wObj = somethingToEat[index] as Map? ?? {};
-                    return FindStToEat(wObj: wObj);
-                  }),
+                SingleChildScrollView(
+                  // scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: media.width * 0.5,
+                        width: media.width - 40,
+                        // child: ListView.builder(
+                        // padding: EdgeInsets.zero,
+                        // // physics: const NeverScrollableScrollPhysics(),
+                        // scrollDirection: Axis.horizontal,
+                        // shrinkWrap: true,
+                        // itemCount: somethingToEat.length,
+                        // itemBuilder: (context, index) {
+                        //   var wObj = somethingToEat[index] as Map? ?? {};
+                        //   return SizedBox(
+                        //       width: media.width * 0.5,
+                        //     child: FindStToEat(wObj: wObj));
+                        // }),
+
+                        // child: ListView.separated(
+                        //   itemBuilder: (context, position) {
+                        //     return ListItem();
+                        //   },
+                        //   separatorBuilder: (context, position) {
+                        //     return SeparatorItem();
+                        //   },
+                        //   itemCount: itemCount,
+                        // ),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),
