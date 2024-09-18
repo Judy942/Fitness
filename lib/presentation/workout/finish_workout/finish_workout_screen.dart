@@ -4,7 +4,6 @@ import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_gradient_button.dart';
 
 class FinishWorkoutScreen extends StatelessWidget {
-  static String routeName = "/FinishWorkoutScreen";
   const FinishWorkoutScreen({Key? key}) : super(key: key);
 
   @override

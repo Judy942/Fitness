@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart ';
+import 'package:flutter_application_fitness/widgets/round_button.dart';
 
 import '../../core/utils/app_colors.dart';
 
@@ -11,25 +12,17 @@ class HowToCalculateBmi extends StatelessWidget {
     return Container(
       width: media.width,
       height: media.height,
+      padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
                       gradient: LinearGradient(colors: AppColors.primary),),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // mainAxisAlignment: MainAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.close,
-              color: AppColors.blackColor,
-            ),
-          ),
           Image.asset('assets/images/body_mass_index_control.png',
               width: media.width, fit: BoxFit.fitWidth),
           const Padding(
-              padding: EdgeInsets.all(10.0),
+              padding: EdgeInsets.all(30.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -49,13 +42,27 @@ class HowToCalculateBmi extends StatelessWidget {
                       "BMI is calculated using your weight and height (your weight divided by your height squared). Healthy BMI range: 18.5 kg/m2 - 25 kg/m2",
                       style: TextStyle(
                         decoration: TextDecoration.none,
-                        color: AppColors.grayColor,
-                        fontSize: 14,
+                        color: AppColors.whiteColor,
+                        fontSize: 18,
                       ),
                     ),
                   ),
                 ],
-              )),
+              )
+              
+              ),
+              const Spacer(),
+            SizedBox(
+              width: media.width/4,
+              height: 40,
+              child: RoundButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                title: "Got it",
+                type: RoundButtonType.secondaryBG,
+              ),
+            ),
         ],
       ),
     );

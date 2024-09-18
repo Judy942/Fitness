@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../activity/activity_screen.dart';
-import '../camera/camera_screen.dart';
+import '../camera/progress_photo_screen.dart';
 import '../home/home_screen.dart';
 import '../profile/user_profile.dart';
+import '../workout/workout_tracker/workout_tracker_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
 
@@ -18,8 +18,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const ActivityScreen(),
-    const CameraScreen(),
+    const WorkoutTrackerScreen(),
+    const ProgressPhotoScreen(),
     const UserProfile()
   ];
 

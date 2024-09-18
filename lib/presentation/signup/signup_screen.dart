@@ -46,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if(password.length<6||!password.contains(RegExp(r'[0-9]'))||!password.contains(RegExp(r'[A-Z]'))||!password.contains(RegExp(r'[a-z]'))||!password.contains(RegExp(r'[!@#%^&*(),.?":{}|<>]'))){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password must contain at least 6 characters, including uppercase, lowercase, number and special character'),
+          content: Text('Password must contain at least 8 characters, including uppercase, lowercase, number and special character'),
         ),
       );
       return;
@@ -60,28 +60,42 @@ class _SignupScreenState extends State<SignupScreen> {
     String url = "http://162.248.102.236:8055/users/register";
     print("Email: $email");
     print("Password: $password");
+    print("First Name: $firstName");
+    print("Last Name: $lastName");
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        "email": email,
-        "password": password,
-      }),
-    );
-    print(jsonDecode(response.body));
-    print(response.statusCode);
-    if (response.statusCode == 200) {
-      Navigator.pushNamed(context, '/completeProfileScreen');
-    } else if (response.statusCode == 400) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email or password'),
-        ),
-      );
-    }
+    var response = await http.post(Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+          // "firstName": firstName,
+          // "lastName": lastName
+        }));
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+
+    // if (response.statusCode == 200) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Register successfully'),
+    //     ),
+    //   );
+    //   Navigator.pushNamed(context, '/loginScreen');
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Register failed'),
+    //     ),
+    //   );
+    // }
+
+
+
+
   }
 
   @override
@@ -208,8 +222,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 40,
+                 SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
                 RoundGradientButton(
                   title: "Register",

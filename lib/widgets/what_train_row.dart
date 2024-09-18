@@ -1,11 +1,24 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
+import '../presentation/workout/workour_detail_view/workour_detail_view.dart';
 import 'round_button.dart';
 
 class WhatTrainRow extends StatelessWidget {
   final Map wObj;
+  
   const WhatTrainRow({Key? key, required this.wObj}) : super(key: key);
+
+  void onViewMoreClick(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => WorkoutDetailView(
+                  dObj: wObj,
+                )));
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +54,7 @@ class WhatTrainRow extends StatelessWidget {
                       height: 4,
                     ),
                     Text(
-                      "${wObj["exercises"].toString()} | ${ wObj["time"].toString() }" ,
+                      "${wObj["exercises"].toString()} | ${wObj["time"].toString()}",
                       style: const TextStyle(
                         color: AppColors.grayColor,
                         fontSize: 12,
@@ -55,7 +68,9 @@ class WhatTrainRow extends StatelessWidget {
                       height: 30,
                       child: RoundButton(
                           title: "View More",
-                          onPressed: () {}),
+                          onPressed: () {
+                            onViewMoreClick( context);
+                          }),
                     )
                   ],
                 ),

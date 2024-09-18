@@ -6,6 +6,11 @@ class WorkoutRow extends StatelessWidget {
   final Map wObj;
   const WorkoutRow({super.key, required this.wObj});
 
+    void onButtonIconClick(BuildContext context) {
+     Navigator.pushNamed(context, '/finishWorkoutScreen');
+  }
+
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -68,7 +73,9 @@ class WorkoutRow extends StatelessWidget {
                   ],
                 )),
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  onButtonIconClick(context);
+                },
                 icon: Image.asset(
                   "assets/icons/next_icon.png",
                   width: 30,

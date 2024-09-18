@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_button.dart';
 
-class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key}) : super(key: key);
+class ProgressPhotoScreen extends StatefulWidget {
+  const ProgressPhotoScreen({Key? key}) : super(key: key);
 
   @override
-  State<CameraScreen> createState() => _CameraScreenState();
+  State<ProgressPhotoScreen> createState() => _ProgressPhotoScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
   List photoArr = [
     {
       "time": "2 June",

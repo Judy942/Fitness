@@ -4,7 +4,7 @@ import '../../../core/utils/app_colors.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
-import 'exercises_stpe_details.dart';
+import 'exercises_step_details.dart';
 
 class WorkoutDetailView extends StatefulWidget {
   final Map dObj;

@@ -9,8 +9,8 @@ import '../../../widgets/round_gradient_button.dart';
 
 
 class AddScheduleView extends StatefulWidget {
-  final DateTime date;
-  const AddScheduleView({super.key, required this.date});
+   DateTime date;
+   AddScheduleView({super.key, required this.date});
 
   @override
   State<AddScheduleView> createState() => _AddScheduleViewState();
@@ -51,26 +51,27 @@ class _AddScheduleViewState extends State<AddScheduleView> {
           style: TextStyle(
               color: AppColors.blackColor, fontSize: 16, fontWeight: FontWeight.w700),
         ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/more_icon.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
+        // actions: [
+        //   InkWell(
+        //     onTap: () {
+        //     },
+        //     child: Container(
+        //       margin: const EdgeInsets.all(8),
+        //       height: 40,
+        //       width: 40,
+        //       alignment: Alignment.center,
+        //       decoration: BoxDecoration(
+        //           color: AppColors.lightGrayColor,
+        //           borderRadius: BorderRadius.circular(10)),
+        //       child: Image.asset(
+        //         "assets/icons/more_icon.png",
+        //         width: 15,
+        //         height: 15,
+        //         fit: BoxFit.contain,
+        //       ),
+        //     ),
+        //   )
+        // ],
       ),
       backgroundColor: AppColors.whiteColor,
       body: Container(
@@ -103,11 +104,15 @@ class _AddScheduleViewState extends State<AddScheduleView> {
           SizedBox(
             height: media.width * 0.35,
             child: CupertinoDatePicker(
-              onDateTimeChanged: (newDate) {},
+              onDateTimeChanged: (newDate) {
+                widget.date = newDate;
+                print(widget.date);
+              },
               initialDateTime: DateTime.now(),
               use24hFormat: false,
               minuteInterval: 1,
               mode: CupertinoDatePickerMode.time,
+              
             ),
           ),
           const SizedBox(
@@ -126,7 +131,9 @@ class _AddScheduleViewState extends State<AddScheduleView> {
               title: "Choose Workout",
               time: "Upperbody",
               color: AppColors.lightGrayColor,
-              onPressed: () {}),
+              onPressed: () {
+                
+              }),
           const SizedBox(
             height: 10,
           ),
@@ -155,7 +162,10 @@ class _AddScheduleViewState extends State<AddScheduleView> {
               color: AppColors.lightGrayColor,
               onPressed: () {}),
           const Spacer(),
-          RoundGradientButton(title: "Save", onPressed: () {}),
+          RoundGradientButton(title: "Save", onPressed: () {
+            
+
+          }),
           const SizedBox(
             height: 20,
           ),

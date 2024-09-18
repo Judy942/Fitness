@@ -35,7 +35,7 @@ class RoundButton extends StatelessWidget {
         child: Text(
           title,
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             color: AppColors.whiteColor,
             fontFamily: "Poppins",
             fontWeight: FontWeight.w400,

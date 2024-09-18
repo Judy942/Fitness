@@ -1,20 +1,19 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/utils/app_colors.dart';
-import '../../widgets/round_button.dart';
-import '../../widgets/upcoming_workout_row.dart';
-import '../../widgets/what_train_row.dart';
-import '../workout/workour_detail_view/workour_detail_view.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../widgets/round_button.dart';
+import '../../../widgets/upcoming_workout_row.dart';
+import '../../../widgets/what_train_row.dart';
 
-class ActivityScreen extends StatefulWidget {
-  const ActivityScreen({Key? key}) : super(key: key);
+class WorkoutTrackerScreen extends StatefulWidget {
+  const WorkoutTrackerScreen({Key? key}) : super(key: key);
 
   @override
-  State<ActivityScreen> createState() => _ActivityScreenState();
+  State<WorkoutTrackerScreen> createState() => _WorkoutTrackerScreenState();
 }
 
-class _ActivityScreenState extends State<ActivityScreen> {
+class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
 
   List latestArr = [
     {
@@ -245,9 +244,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
                               fontWeight: FontWeight.w700),
                         ),
                         SizedBox(
-                          width: 70,
-                          height: 25,
+                          width: 80,
+                          height: 30,
                           child: RoundButton(
+                            type: RoundButtonType.primaryBG,
                             title: "Check",
                             onPressed: () {
                               // Navigator.push(
@@ -319,11 +319,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       itemCount: whatArr.length,
                       itemBuilder: (context, index) {
                         var wObj = whatArr[index] as Map? ?? {};
-                        return InkWell(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>  WorkoutDetailView( dObj: wObj, ) ));
-                            },
-                            child:  WhatTrainRow(wObj: wObj) );
+                        return WhatTrainRow(wObj: wObj,
+                        );
                       }),
                   SizedBox(
                     height: media.width * 0.1,

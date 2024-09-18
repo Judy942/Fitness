@@ -7,6 +7,7 @@ import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
+import 'how_to_calculate_bmi.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -257,7 +258,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 100,
                                     child: RoundButton(
                                         title: "View More", onPressed: () {
-                                      Navigator.pushNamed(context, '/howToCalculateBmi');
+                                          showDialog(context: context, builder: (context) {
+                                            return const AlertDialog(
+                                              title: Text("How to calculate BMI"),
+                                              content: HowToCalculateBmi(),
+                                            );
+
+
+                                          },);
                                         }),
                                   ),
                                 )
@@ -343,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ]),
                       child: Row(children: [
                         SimpleAnimationProgressBar(
-                          height: media.width * 0.9,
+                          height: media.width * 0.95,
                           width: media.width * 0.07,
                           backgroundColor: Colors.grey.shade100,
                           foregrondColor: Colors.purple,
@@ -414,9 +422,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           Container(
                                             margin: const EdgeInsets.symmetric(
-                                                vertical: 6),
-                                            width: 10,
-                                            height: 10,
+                                                vertical: 5),
+                                            width: 8,
+                                            height: 8,
                                             decoration: BoxDecoration(
                                                 color: AppColors.secondaryColor1
                                                     .withOpacity(0.5),
@@ -543,7 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: double.maxFinite,
                           height: media.width * 0.45,
                           padding: const EdgeInsets.symmetric(
-                              vertical: 25, horizontal: 20),
+                              vertical: 15, horizontal: 20),
                           decoration: BoxDecoration(
                               color: AppColors.whiteColor,
                               borderRadius: BorderRadius.circular(20),
@@ -580,41 +588,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                              const Spacer(),
-                              Container(
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  width: media.width * 0.2,
-                                  height: media.width * 0.2,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Container(
-                                        width: media.width * 0.16,
-                                        height: media.width * 0.16,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: AppColors.primary),
-                                            borderRadius: BorderRadius.circular(
-                                                media.width * 0.075)),
-                                        child: const Text("230kCal\nleft",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: AppColors.whiteColor,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                      ),
-                                      SimpleCircularProgressBar(
-                                        startAngle: -180,
-                                        progressStrokeWidth: 10,
-                                        backStrokeWidth: 10,
-                                        progressColors: AppColors.primary,
-                                        backColor: Colors.grey.shade100,
-                                        valueNotifier: ValueNotifier(60),
-                                      )
-                                    ],
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: SizedBox(
+                                    width: media.width * 0.2,
+                                    height: media.width * 0.2,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          width: media.width * 0.16,
+                                          height: media.width * 0.16,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  colors: AppColors.primary),
+                                              borderRadius: BorderRadius.circular(
+                                                  media.width * 0.075)),
+                                          child: const Text("230kCal\nleft",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: AppColors.whiteColor,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w400,
+                                              )),
+                                        ),
+                                        SimpleCircularProgressBar(
+                                          startAngle: -180,
+                                          progressStrokeWidth: 10,
+                                          backStrokeWidth: 10,
+                                          progressColors: AppColors.primary,
+                                          backColor: Colors.grey.shade100,
+                                          valueNotifier: ValueNotifier(60),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -813,11 +822,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: lastWorkoutArr.length,
                     itemBuilder: (context, index) {
                       var wObj = lastWorkoutArr[index] as Map? ?? {};
-                      return InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/finishWorkoutScreen');
-                          },
-                          child: WorkoutRow(wObj: wObj));
+                      return WorkoutRow(wObj: wObj);
                     }),
                 SizedBox(
                   height: media.width * 0.1,
