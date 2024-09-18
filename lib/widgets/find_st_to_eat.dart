@@ -20,95 +20,77 @@ class FindStToEat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          AppColors.primaryColor2.withOpacity(0.3),
-          AppColors.primaryColor1.withOpacity(0.3)
-        ]),
-        borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(80),
-            bottomRight: Radius.circular(20),
-            topLeft: Radius.circular(20),
-            bottomLeft: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Image.asset(
-                wObj["image"].toString(),
-                width: 80,
-                height: 80,
-              ),
-            ],
+    return Stack(
+      children: [
+        Container(
+          // padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              AppColors.primaryColor2.withOpacity(0.3),
+              AppColors.primaryColor1.withOpacity(0.3)
+            ]),
+            borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(100),
+                bottomRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20)),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.start,
-            
-            children: [
-              Text(
-                wObj["title"].toString(),
-                style: const TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(
-                "${wObj["countFoods"].toString()}",
-                style: const TextStyle(
-                  color: AppColors.grayColor,
-                  fontSize: 12,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Image.asset(
+                  wObj["image"].toString(),
+                  width: 120,
+                  height: 120,
                 ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20,bottom: 20),
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+              
+                children: [
+                  Text(
+                    wObj["title"].toString(),
+                    style: const TextStyle(
+                        color: AppColors.blackColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    wObj["countFoods"].toString(),
+                    style: const TextStyle(
+                      color: AppColors.grayColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: 120,
+                    height: 30,
+                    child: RoundButton(
+                        type: RoundButtonType.primaryBG,
+                        title: "Select",
+                        onPressed: () {
+                          onViewMoreClick(context);
+                        }),
+                  )
+                ],
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              SizedBox(
-                width: 80,
-                height: 30,
-                child: RoundButton(
-                    title: "Select",
-                    onPressed: () {
-                      onViewMoreClick(context);
-                    }),
-              )
-            ],
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-          // Stack(
-          //   alignment: Alignment.center,
-          //   children: [
-          //     Container(
-          //       width: 80,
-          //       height: 80,
-          //       decoration: BoxDecoration(
-          //         color: AppColors.whiteColor.withOpacity(0.54),
-          //         borderRadius: BorderRadius.circular(40),
-          //       ),
-          //     ),
-          //     ClipRRect(
-          //       borderRadius: BorderRadius.circular(30),
-          //       child: Image.asset(
-          //         wObj["image"].toString(),
-          //         width: 90,
-          //         height: 90,
-          //         fit: BoxFit.contain,
-          //       ),
-          //     ),
-          //   ],
-          // ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

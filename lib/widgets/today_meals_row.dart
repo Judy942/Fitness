@@ -59,7 +59,7 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
 
               InkWell(
                 child: ImageIcon(
-                  positive ? AssetImage("assets/icons/Icon_Bell.png") : AssetImage("assets/icons/Icon_Bell_off.png"),
+                  positive ? const AssetImage("assets/icons/Icon_Bell.png") : const AssetImage("assets/icons/Icon_Bell_off.png"),
                   color: positive ? Colors.purple : Colors.grey,
                   size: 30,
                 ),

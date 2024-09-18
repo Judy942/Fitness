@@ -98,7 +98,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
         ]),
         barWidth: 4,
         isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
+        dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
         spots: const [
           FlSpot(1, 65),
@@ -144,7 +144,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     }
 
     return Text(text,
-        style: TextStyle(
+        style: const TextStyle(
           color: AppColors.grayColor,
           fontSize: 12,
         ),
@@ -159,7 +159,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    var style = TextStyle(
+    var style = const TextStyle(
       color: AppColors.grayColor,
       fontSize: 12,
     );
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
             AppColors.primaryColor1.withOpacity(0.1),
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
         ),
-        dotData: FlDotData(show: false),
+        dotData: const FlDotData(show: false),
         gradient: LinearGradient(
           colors: AppColors.primary,
         ),
@@ -374,7 +374,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                               List<int> spotIndexes) {
                             return spotIndexes.map((index) {
                               return TouchedSpotIndicatorData(
-                                FlLine(
+                                const FlLine(
                                   color: Colors.transparent,
                                 ),
                                 FlDotData(
@@ -412,8 +412,8 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                         maxY: 110,
                         titlesData: FlTitlesData(
                             show: true,
-                            leftTitles: AxisTitles(),
-                            topTitles: AxisTitles(),
+                            leftTitles: const AxisTitles(),
+                            topTitles: const AxisTitles(),
                             bottomTitles: AxisTitles(
                               sideTitles: bottomTitles,
                             ),
@@ -547,18 +547,19 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                       SizedBox(
                         height: media.width * 0.5,
                         width: media.width - 40,
-                        // child: ListView.builder(
-                        // padding: EdgeInsets.zero,
-                        // // physics: const NeverScrollableScrollPhysics(),
-                        // scrollDirection: Axis.horizontal,
-                        // shrinkWrap: true,
-                        // itemCount: somethingToEat.length,
-                        // itemBuilder: (context, index) {
-                        //   var wObj = somethingToEat[index] as Map? ?? {};
-                        //   return SizedBox(
-                        //       width: media.width * 0.5,
-                        //     child: FindStToEat(wObj: wObj));
-                        // }),
+                        child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        // physics: const NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: somethingToEat.length,
+                        itemBuilder: (context, index) {
+                          var wObj = somethingToEat[index] as Map? ?? {};
+                          return Container(
+                            margin: const EdgeInsets.only(right: 20),
+                              width: media.width * 0.45,
+                            child: FindStToEat(wObj: wObj));
+                        }),
 
                         // child: ListView.separated(
                         //   itemBuilder: (context, position) {
