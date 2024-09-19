@@ -547,29 +547,31 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                       SizedBox(
                         height: media.width * 0.5,
                         width: media.width - 40,
-                        child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        // physics: const NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: somethingToEat.length,
-                        itemBuilder: (context, index) {
-                          var wObj = somethingToEat[index] as Map? ?? {};
-                          return Container(
-                            margin: const EdgeInsets.only(right: 20),
-                              width: media.width * 0.45,
-                            child: FindStToEat(wObj: wObj));
-                        }),
 
-                        // child: ListView.separated(
-                        //   itemBuilder: (context, position) {
-                        //     return ListItem();
-                        //   },
-                        //   separatorBuilder: (context, position) {
-                        //     return SeparatorItem();
-                        //   },
-                        //   itemCount: itemCount,
-                        // ),
+                        child: ListView.builder(
+                          itemBuilder: (context, position) {
+                            if (position % 2 == 0) {
+                              var wObj = somethingToEat[position] as Map? ?? {};
+                              return Container(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: media.width * 0.5,
+                                  child: FindStToEat(wObj: wObj));
+                            } else {
+                              var wObj = somethingToEat[position] as Map? ?? {};
+                              return Container(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: media.width * 0.45,
+                                  child: FindStToEat(
+                                      wObj: wObj,
+                                      type: RoundButtonType.secondaryBG));
+                            }
+                          },
+                          padding: EdgeInsets.zero,
+                          // physics: const NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: somethingToEat.length,
+                        ),
                       ),
                     ],
                   ),

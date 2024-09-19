@@ -6,6 +6,7 @@ import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart
 import 'package:flutter_application_fitness/presentation/home/home_screen.dart';
 import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner_detail/meal_planner_detail_screen.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
 import 'package:flutter_application_fitness/presentation/onboarding_screen/onboarding_screen.dart';
 import 'package:flutter_application_fitness/presentation/onboarding_screen/start_screen.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String addScheduleView = '/addScheduleView';
   static const String mealPlannerScreen = '/mealPlannerScreen';
   static const String foodRowWidget = '/foodRowWidget';
+  static const String mealPlannerDetailScreen = '/mealPlannerDetailScreen';
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -65,5 +67,6 @@ class AppRoutes {
     userProfile: (context) => const UserProfile(),
     addScheduleView : (context) => AddScheduleView(date: DateTime.now()),
     mealPlannerScreen: (context) => const MealPlannerScreen(),
+    mealPlannerDetailScreen: (context) =>  MealPlannerDetailScreen( title: "Meal Planner Detail"),
   };
 }

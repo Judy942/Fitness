@@ -6,8 +6,11 @@ import 'round_button.dart';
 
 class FindStToEat extends StatelessWidget {
   final Map wObj;
+  final RoundButtonType type;
 
-  const FindStToEat({Key? key, required this.wObj}) : super(key: key);
+  const FindStToEat(
+      {Key? key, required this.wObj, this.type = RoundButtonType.primaryBG})
+      : super(key: key);
 
   void onViewMoreClick(BuildContext context) {
     Navigator.push(
@@ -25,10 +28,9 @@ class FindStToEat extends StatelessWidget {
         Container(
           // padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppColors.primaryColor2.withOpacity(0.3),
-              AppColors.primaryColor1.withOpacity(0.3)
-            ]),
+            color:type == RoundButtonType.secondaryBG
+                  ? AppColors.secondaryColor2.withOpacity(0.2)
+                  : AppColors.primaryColor1.withOpacity(0.2),
             borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(100),
                 bottomRight: Radius.circular(20),
@@ -42,21 +44,20 @@ class FindStToEat extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 Image.asset(
                   wObj["image"].toString(),
-                  width: 120,
-                  height: 120,
+                  width: MediaQuery.of(context).size.width * 0.25,
+                  height: MediaQuery.of(context).size.width * 0.25,
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20,bottom: 20),
+              padding: const EdgeInsets.only(left: 20),
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-              
+
                 children: [
                   Text(
                     wObj["title"].toString(),
@@ -77,9 +78,9 @@ class FindStToEat extends StatelessWidget {
                   ),
                   SizedBox(
                     width: 120,
-                    height: 30,
+                    height: 32,
                     child: RoundButton(
-                        type: RoundButtonType.primaryBG,
+                        type: type,
                         title: "Select",
                         onPressed: () {
                           onViewMoreClick(context);
