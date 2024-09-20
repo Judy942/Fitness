@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../widgets/search_bar.dart';
 
 class MealPlannerDetailScreen  extends StatefulWidget {
   final String title;
@@ -74,6 +75,35 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
             ),
           )
         ],
+      ),
+      body: SafeArea(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          child: const SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 16,
+                ),
+                SearchBarRow(),
+                SizedBox(
+                  height: 16,
+                ),
+                Text(
+                  'Category',
+                  style: TextStyle(
+                      color: AppColors.blackColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
 
     );
