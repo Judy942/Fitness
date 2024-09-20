@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../widgets/category_container.dart';
+import '../../widgets/round_button.dart';
 import '../../widgets/search_bar.dart';
 
 class MealPlannerDetailScreen  extends StatefulWidget {
@@ -13,6 +15,68 @@ class MealPlannerDetailScreen  extends StatefulWidget {
 
 class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
   late String title;
+  List<Map<String, String>> categoryArr = [
+    {
+      "name": "Salad",
+      "image": "assets/images/salad.png",
+    },
+    {
+      "name": "Cake",
+      "image": "assets/images/cake.png",
+    },
+    {
+      "name": "Pie",
+      "image": "assets/images/pie.png",
+    },
+    {
+      "name": "Pasta",
+      "image": "assets/images/pasta.png",
+    },
+    {
+      "name": "Pizza",
+      "image": "assets/images/pizza.png",
+    },
+    {
+      "name": "Burger",
+      "image": "assets/images/burger.png",
+    },
+    {
+      "name": "Sandwich",
+      "image": "assets/images/sandwich.png",
+    },
+    {
+      "name": "Pancake",
+      "image": "assets/images/pancake.png",
+    },
+    {
+      "name": "Bread",
+      "image": "assets/images/bread.png",
+    },
+    {
+      "name": "Soup",
+      "image": "assets/images/soup.png",
+    }
+
+  ];
+
+  List<Map<String, String>> recommendationArr = [
+    {
+      "name": "Honey Pancake",
+      "image": "assets/images/honey_pancake.png",
+      "difficulty": "Easy",
+      "time": "30 mins",
+      "calories": "180kCal",
+    },
+    {
+      "name": "Canai Bread",
+      "image": "assets/images/canai_bread.png",
+      "difficulty": "Easy",
+      "time": "20 mins",
+      "calories": "200kCal",
+    }
+
+
+  ];
 
   @override
   void initState() {
@@ -52,7 +116,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
           title,
           style: const TextStyle(
               color: AppColors.blackColor,
-              fontSize: 16,
+              fontSize: 20,
               fontWeight: FontWeight.w700),
         ),
         actions: [
@@ -80,24 +144,77 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          child: const SingleChildScrollView(
+          child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 16,
+                const SizedBox(
+                  height: 20,
                 ),
-                SearchBarRow(),
-                SizedBox(
-                  height: 16,
+                const SearchBarRow(),
+                const SizedBox(
+                  height: 20,
                 ),
-                Text(
+                const Text(
                   'Category',
                   style: TextStyle(
                       color: AppColors.blackColor,
-                      fontSize: 16,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                 SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.18,
+                        width: MediaQuery.of(context).size.width* 0.9,
+
+                        child: ListView.builder(
+                          itemBuilder: (context, position) {
+                            if (position % 2 == 0) {
+                              var wObj = categoryArr[position] as Map? ?? {};
+                              return Container(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  child: CategoryContainer(wObj: wObj));
+                            } else {
+                              var wObj = categoryArr[position] as Map? ?? {};
+                              return Container(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  child: CategoryContainer(
+                                      wObj: wObj,
+                                      type: RoundButtonType.secondaryBG));
+                            }
+                          },
+                          padding: EdgeInsets.zero,
+                          // physics: const NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: categoryArr.length,
+                        ),
+                      ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  'Recommendation for Diet',
+                  style: TextStyle(
+                      color: AppColors.blackColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                const Text(
+                  'Popular',
+                  style: TextStyle(
+                      color: AppColors.blackColor,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700),
                 ),
               ],

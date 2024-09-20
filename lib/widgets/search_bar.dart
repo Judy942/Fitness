@@ -21,34 +21,35 @@ class SearchBarRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: 64,
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.search,
-                  ),
-
-                  hintText: 'Search Pancake',
-                  // focusedBorder: OutlineInputBorder(
-                  //   borderRadius: BorderRadius.circular(12)),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.whiteColor),
-                  ),
-
-                  // filled: true,
-                  // fillColor: ColorStyles.f2f2f3,
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.search,
+                ),
+                hintText: 'Search Pancake',
+                hintStyle: TextStyle(
+                  color: AppColors.blackColor.withOpacity(0.2),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.whiteColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.whiteColor),
                 ),
               ),
             ),
           ),
           // HorizontalSpace(value: 16, ctx: context),
-          InkWell(
-            onTap: () {},
-            child: Icon(
-              Icons.tune,
-              color: AppColors.blackColor,
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: InkWell(
+              onTap: () {},
+              child: Icon(
+                Icons.tune,
+                color: AppColors.blackColor,
+              ),
             ),
           ),
         ],

@@ -13,12 +13,12 @@ class FindStToEat extends StatelessWidget {
       : super(key: key);
 
   void onViewMoreClick(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => WorkoutDetailView(
-                  dObj: wObj,
-                )));
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) => WorkoutDetailView(
+    //               dObj: wObj,
+    //             )));
   }
 
   @override
