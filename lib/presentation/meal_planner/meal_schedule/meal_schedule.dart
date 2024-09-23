@@ -3,7 +3,9 @@ import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
+import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/round_gradient_button.dart';
+import '../../workout/workour_detail_view/exercises_step_details.dart';
 
 class MealSchedule extends StatefulWidget {
   const MealSchedule({Key? key}) : super(key: key);
@@ -476,6 +478,7 @@ class _MealScheduleState extends State<MealSchedule> {
                 // scrollDirection: Axis.horizontal,
                 child: SizedBox(
                   width: media.width * 1,
+                  height: media.height * 0.8,
                   child: ListView.builder(
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
@@ -484,32 +487,103 @@ class _MealScheduleState extends State<MealSchedule> {
                           return (wObj["set"] as List).isNotEmpty;
                         }).toList();
 
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          // height: 40,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                slotArr[index]["title"],
-                                style: const TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              Spacer(),
-                              Text(
-                                "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
-                                style: const TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: slotArr.length <= index
+                                ? [
+                                    const Text(
+                                      "No meal schedule",
+                                      style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ]
+                                : [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          slotArr[index]["title"],
+                                          style: const TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                          style: const TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                    // SizedBox(
+                                    //   height: media.width * 0.5,
+                                    //   child: ListView.builder(
+                                    //       padding: EdgeInsets.zero,
+                                    //       physics:
+                                    //           const NeverScrollableScrollPhysics(),
+                                    //       shrinkWrap: true,
+                                    //       itemCount: slotArr[index]["set"].length,
+                                    //       itemBuilder: (context, index) {
+                                    //         var yObj =
+                                    //             slotArr[index]["set"][index];
+                                    //         return Container(
+                                    //             margin: const EdgeInsets.all(8),
+                                    //             child: Column(
+                                    //               crossAxisAlignment:
+                                    //                   CrossAxisAlignment.start,
+                                    //               children: [
+                                    //                 Container(
+                                    //                   height:
+                                    //                       media.width * 0.15,
+                                    //                   width: media.width * 0.15,
+                                    //                   decoration: BoxDecoration(
+                                    //                       color: AppColors
+                                    //                           .lightGrayColor,
+                                    //                       borderRadius:
+                                    //                           BorderRadius
+                                    //                               .circular(
+                                    //                                   15)),
+                                    //                   alignment:
+                                    //                       Alignment.center,
+                                    //                   child: Image.asset(
+                                    //                     yObj["image"]
+                                    //                         .toString(),
+                                    //                     width:
+                                    //                         media.width * 0.15,
+                                    //                     height:
+                                    //                         media.width * 0.15,
+                                    //                     fit: BoxFit.contain,
+                                    //                   ),
+                                    //                 ),
+                                    //                 Padding(
+                                    //                   padding:
+                                    //                       const EdgeInsets.all(
+                                    //                           8.0),
+                                    //                   child: Text(
+                                    //                     yObj["name"].toString(),
+                            
+                                    //                     style: const TextStyle(
+                                    //                         color: AppColors
+                                    //                             .blackColor,
+                                    //                         fontSize: 12),
+                                    //                   ),
+                                    //                 )
+                                    //               ],
+                                    //             ));
+                                    //       }),
+                                    // ),
+                                  ],
                           ),
                         );
                       },
-                      itemCount: 3),
+                      itemCount: 4),
                 ),
               ),
             ),
