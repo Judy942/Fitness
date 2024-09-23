@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 
 import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/date_and_time.dart';
+import '../../../widgets/round_gradient_button.dart';
 
 class MealSchedule extends StatefulWidget {
   const MealSchedule({Key? key}) : super(key: key);
@@ -21,19 +23,25 @@ class _MealScheduleState extends State<MealSchedule> {
       "set": [
         {
           "name": "Honey Pancakes",
-          "time": "7:00 AM",
+          "time": "21/09/2024 7:00 AM",
           "image": "assets/images/cake.png",
-          "nutrition": [
-            {"calories": "350", "protein": "10", "carbs": "50", "fat": "15"},
-          ]
+          "nutrition": {
+            "calories": "350",
+            "protein": "10",
+            "carbs": "50",
+            "fat": "15"
+          },
         },
         {
           "name": "coffee",
-          "time": "8:00 AM",
+          "time": "21/09/2024 8:00 AM",
           "image": "assets/images/coffee.png",
-          "nutrition": [
-            {"calories": "100", "protein": "5", "carbs": "20", "fat": "5"},
-          ]
+          "nutrition": {
+            "calories": "100",
+            "protein": "5",
+            "carbs": "20",
+            "fat": "5"
+          },
         },
       ],
     },
@@ -42,19 +50,25 @@ class _MealScheduleState extends State<MealSchedule> {
       "set": [
         {
           "name": "Steak",
-          "time": "11:00 AM",
+          "time": "21/09/2024 11:00 AM",
           "image": "assets/images/steak.png",
-          "nutrition": [
-            {"calories": "500", "protein": "20", "carbs": "30", "fat": "25"},
-          ]
+          "nutrition": {
+            "calories": "500",
+            "protein": "20",
+            "carbs": "30",
+            "fat": "25"
+          },
         },
         {
           "name": "milk",
-          "time": "12:00 PM",
+          "time": "21/09/2024 12:00 PM",
           "image": "assets/images/milk.png",
-          "nutrition": [
-            {"calories": "150", "protein": "10", "carbs": "20", "fat": "5"},
-          ]
+          "nutrition": {
+            "calories": "150",
+            "protein": "10",
+            "carbs": "20",
+            "fat": "5"
+          },
         },
       ]
     },
@@ -63,19 +77,25 @@ class _MealScheduleState extends State<MealSchedule> {
       "set": [
         {
           "name": "Orange",
-          "time": "3:00 PM",
+          "time": "21/09/2024 3:00 PM",
           "image": "assets/images/orange.png",
-          "nutrition": [
-            {"calories": "50", "protein": "2", "carbs": "10", "fat": "1"},
-          ]
+          "nutrition": {
+            "calories": "50",
+            "protein": "2",
+            "carbs": "10",
+            "fat": "1"
+          },
         },
         {
           "name": "Apple Pie",
-          "time": "4:00 PM",
+          "time": "21/09/2024 4:00 PM",
           "image": "assets/images/apple_pie.png",
-          "nutrition": [
-            {"calories": "200", "protein": "5", "carbs": "30", "fat": "10"},
-          ]
+          "nutrition": {
+            "calories": "200",
+            "protein": "5",
+            "carbs": "30",
+            "fat": "10"
+          },
         },
       ]
     },
@@ -84,23 +104,259 @@ class _MealScheduleState extends State<MealSchedule> {
       "set": [
         {
           "name": "Salad",
-          "time": "7:00 PM",
+          "time": "21/09/2024 7:00 PM",
           "image": "assets/images/salad.png",
-          "nutrition": [
-            {"calories": "200", "protein": "5", "carbs": "20", "fat": "10"},
-          ]
+          "nutrition": {
+            "calories": "200",
+            "protein": "5",
+            "carbs": "20",
+            "fat": "10"
+          },
         },
         {
           "name": "oatmeal",
-          "time": "8:00 PM",
+          "time": "21/09/2024 8:00 PM",
           "image": "assets/images/oatmeal.png",
-          "nutrition": [
-            {"calories": "300", "protein": "10", "carbs": "40", "fat": "15"},
-          ]
+          "nutrition": {
+            "calories": "300",
+            "protein": "10",
+            "carbs": "40",
+            "fat": "15"
+          },
         },
       ]
     },
+    {
+      "title": "Breakfast",
+      "set": [
+        {
+          "name": "Honey Pancakes",
+          "time": "22/09/2024 7:00 AM",
+          "image": "assets/images/cake.png",
+          "nutrition": {
+            "calories": "350",
+            "protein": "10",
+            "carbs": "50",
+            "fat": "15"
+          },
+        },
+        {
+          "name": "coffee",
+          "time": "22/09/2024 8:00 AM",
+          "image": "assets/images/coffee.png",
+          "nutrition": {
+            "calories": "100",
+            "protein": "5",
+            "carbs": "20",
+            "fat": "5"
+          },
+        },
+      ],
+    },
+    {
+      "title": "Lunch",
+      "set": [
+        {
+          "name": "Steak",
+          "time": "22/09/2024 11:00 AM",
+          "image": "assets/images/steak.png",
+          "nutrition": {
+            "calories": "500",
+            "protein": "20",
+            "carbs": "30",
+            "fat": "25"
+          },
+        },
+        {
+          "name": "milk",
+          "time": "22/09/2024 12:00 PM",
+          "image": "assets/images/milk.png",
+          "nutrition": {
+            "calories": "150",
+            "protein": "10",
+            "carbs": "20",
+            "fat": "5"
+          },
+        },
+      ]
+    },
+    {
+      "title": "Snack",
+      "set": [
+        {
+          "name": "Orange",
+          "time": "22/09/2024 3:00 PM",
+          "image": "assets/images/orange.png",
+          "nutrition": {
+            "calories": "50",
+            "protein": "2",
+            "carbs": "10",
+            "fat": "1"
+          },
+        },
+        {
+          "name": "Apple Pie",
+          "time": "22/09/2024 4:00 PM",
+          "image": "assets/images/apple_pie.png",
+          "nutrition": {
+            "calories": "200",
+            "protein": "5",
+            "carbs": "30",
+            "fat": "10"
+          },
+        },
+      ]
+    },
+    {
+      "title": "Dinner",
+      "set": [
+        {
+          "name": "Salad",
+          "time": "22/09/2024 7:00 PM",
+          "image": "assets/images/salad.png",
+          "nutrition": {
+            "calories": "200",
+            "protein": "5",
+            "carbs": "20",
+            "fat": "10"
+          },
+        },
+        {
+          "name": "oatmeal",
+          "time": "22/09/2024 8:00 PM",
+          "image": "assets/images/oatmeal.png",
+          "nutrition": {
+            "calories": "300",
+            "protein": "10",
+            "carbs": "40",
+            "fat": "15"
+          },
+        },
+      ]
+    },
+    {
+      "title": "Breakfast",
+      "set": [
+        {
+          "name": "Honey Pancakes",
+          "time": "23/09/2024 7:00 AM",
+          "image": "assets/images/cake.png",
+          "nutrition": {
+            "calories": "350",
+            "protein": "10",
+            "carbs": "50",
+            "fat": "15"
+          },
+        },
+        {
+          "name": "coffee",
+          "time": "23/09/2024 8:00 AM",
+          "image": "assets/images/coffee.png",
+          "nutrition": {
+            "calories": "100",
+            "protein": "5",
+            "carbs": "20",
+            "fat": "5"
+          },
+        },
+      ],
+    },
+    {
+      "title": "Lunch",
+      "set": [
+        {
+          "name": "Steak",
+          "time": "23/09/2024 11:00 AM",
+          "image": "assets/images/steak.png",
+          "nutrition": {
+            "calories": "500",
+            "protein": "20",
+            "carbs": "30",
+            "fat": "25"
+          },
+        },
+        {
+          "name": "milk",
+          "time": "23/09/2024 12:00 PM",
+          "image": "assets/images/milk.png",
+          "nutrition": {
+            "calories": "150",
+            "protein": "10",
+            "carbs": "20",
+            "fat": "5"
+          },
+        },
+      ]
+    },
+    {
+      "title": "Snack",
+      "set": [
+        {
+          "name": "Orange",
+          "time": "23/09/2024 3:00 PM",
+          "image": "assets/images/orange.png",
+          "nutrition": {
+            "calories": "50",
+            "protein": "2",
+            "carbs": "10",
+            "fat": "1"
+          },
+        },
+        {
+          "name": "Apple Pie",
+          "time": "23/09/2024 4:00 PM",
+          "image": "assets/images/apple_pie.png",
+          "nutrition": {
+            "calories": "200",
+            "protein": "5",
+            "carbs": "30",
+            "fat": "10"
+          },
+        },
+      ]
+    }
   ];
+
+  List selectDayEventArr = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDateAppBBar = DateTime.now();
+    setDayEventMealSchedule();
+  }
+
+  void setDayEventMealSchedule() {
+    var date = dateToStartDate(_selectedDateAppBBar);
+    selectDayEventArr = mealScheduleArr.map((wObj) {
+      return {
+        "title": wObj["title"],
+        "set": wObj["set"].map((sObj) {
+          return {
+            "name": sObj["name"],
+            "start_time": stringToDate(sObj["time"].toString(),
+                formatStr: "dd/MM/yyyy hh:mm aa"),
+            "image": sObj["image"],
+            "nutrition": sObj["nutrition"]
+          };
+        }).toList(),
+      };
+    }).where((wObj) {
+      return dateToStartDate(wObj["set"][0]["start_time"]) == date;
+    }).toList();
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  int getCalories(List setArr) {
+    int calories = 0;
+    setArr.forEach((sObj) {
+      calories += int.parse(sObj["nutrition"]["calories"]);
+    });
+    return calories;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +456,7 @@ class _MealScheduleState extends State<MealSchedule> {
 
             onDateSelected: (date) {
               _selectedDateAppBBar = date;
-              // setDayEventWorkoutList();
+              setDayEventMealSchedule();
             },
             selectedDayLogo: Container(
               width: double.maxFinite,
@@ -216,32 +472,46 @@ class _MealScheduleState extends State<MealSchedule> {
           ),
           Expanded(
             child: Container(
-              margin: const EdgeInsets.all(20),
               child: SingleChildScrollView(
-                  child: Column(
-                children: [
-                                        ListView.builder(
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: mealScheduleArr.length,
-                          itemBuilder: (context, index) {
-                            var sObj = mealScheduleArr[index] as Map? ?? {};
-                            // return ExercisesSetSection(
-                            //   sObj: sObj,
-                            //   onPressed: (obj) {
-                            //     Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //         builder: (context) => ExercisesStepDetails(eObj: obj,),
-                            //       ),
-                            //     );
-                            //   },
-                            // );
-                          }),
-            
-                ],
-              )),
+                // scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: media.width * 1,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        var slotArr = selectDayEventArr.where((wObj) {
+                          // return (wObj["date"] as DateTime).hour == index;
+                          return (wObj["set"] as List).isNotEmpty;
+                        }).toList();
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          // height: 40,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                slotArr[index]["title"],
+                                style: const TextStyle(
+                                    color: AppColors.blackColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                              Spacer(),
+                              Text(
+                                "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                style: const TextStyle(
+                                    color: AppColors.blackColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      itemCount: 3),
+                ),
+              ),
             ),
           ),
         ],
