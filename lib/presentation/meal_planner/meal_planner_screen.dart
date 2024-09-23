@@ -18,7 +18,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
 
   List mealArr = [
     {
-      "image": "assets/images/SalmonNigiri.png",
+      "image": "assets/images/salmon_nigiri.png",
       "title": "SalMon Nigiri",
       "time": "Today, 07:00am"
     },
@@ -33,7 +33,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     {
       "title": "Breakfast",
       "countFoods": "120+ Foods",
-      "image": "assets/images/pie_cake.png"
+      "image": "assets/images/pie.png"
     },
     {
       "title": "Lunch",

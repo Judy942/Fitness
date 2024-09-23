@@ -1,10 +1,12 @@
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../model/user.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import 'how_to_calculate_bmi.dart';
@@ -17,6 +19,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  Future<User> getCurrentUser() async {
+    String url = "http://162.248.102.236:8055/users/me";
+    final response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization ': 'Bearer 1|1',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return User.fromJson(response.body as Map<String, dynamic>);
+    } else {
+      throw Exception('Failed to load album');
+    }
+    
+  }
+  Future<String> Bmi() async {
+    String url = "http://162.248.102.236:8055/api/users/bmi";
+     final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization ': 'Bearer 1|1',
+      },
+      // body: jsonEncode(<String, String>{
+      //   'weight': '70',
+      //   'height': '1.70',
+      // }),
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return "?";
+      // throw Exception('Failed to load album');
+    }
+    
+      
+  }
 
   List<int> showingTooltipOnSpots = [21];
 

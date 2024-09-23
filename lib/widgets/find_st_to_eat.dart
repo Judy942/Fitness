@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
-import '../presentation/workout/workour_detail_view/workour_detail_view.dart';
 import 'round_button.dart';
 
 class FindStToEat extends StatelessWidget {

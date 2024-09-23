@@ -23,7 +23,7 @@ class SearchBarRow extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                prefixIcon: Icon(
+                prefixIcon: const Icon(
                   Icons.search,
                 ),
                 hintText: 'Search Pancake',
@@ -32,11 +32,11 @@ class SearchBarRow extends StatelessWidget {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.whiteColor),
+                  borderSide: const BorderSide(color: AppColors.whiteColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.whiteColor),
+                  borderSide: const BorderSide(color: AppColors.whiteColor),
                 ),
               ),
             ),
@@ -46,7 +46,7 @@ class SearchBarRow extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: InkWell(
               onTap: () {},
-              child: Icon(
+              child: const Icon(
                 Icons.tune,
                 color: AppColors.blackColor,
               ),

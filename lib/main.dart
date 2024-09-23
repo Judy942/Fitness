@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             Locale('en', ''),
           ],
           // initialRoute: AppRoutes.startScreen,
-          initialRoute: AppRoutes.mealPlannerDetailScreen,
+          initialRoute: AppRoutes.mealScheduleScreen,
           routes: AppRoutes.routes,
         );
       },)

@@ -20,25 +20,25 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
       "no": "01",
       "title": "Spread Your Arms",
       "detail":
-      "To make the gestures feel more relaxed, stretch your arms as you start this movement. No bending of hands."
+          "To make the gestures feel more relaxed, stretch your arms as you start this movement. No bending of hands."
     },
     {
       "no": "02",
       "title": "Rest at The Toe",
       "detail":
-      "The basis of this movement is jumping. Now, what needs to be considered is that you have to use the tips of your feet"
+          "The basis of this movement is jumping. Now, what needs to be considered is that you have to use the tips of your feet"
     },
     {
       "no": "03",
       "title": "Adjust Foot Movement",
       "detail":
-      "Jumping Jack is not just an ordinary jump. But, you also have to pay close attention to leg movements."
+          "Jumping Jack is not just an ordinary jump. But, you also have to pay close attention to leg movements."
     },
     {
       "no": "04",
       "title": "Clapping Both Hands",
       "detail":
-      "This cannot be taken lightly. You see, without realizing it, the clapping of your hands helps you to keep your rhythm while doing the Jumping Jack"
+          "This cannot be taken lightly. You see, without realizing it, the clapping of your hands helps you to keep your rhythm while doing the Jumping Jack"
     },
   ];
 
@@ -173,10 +173,16 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 trimExpandedText: ' Read Less',
                 style: TextStyle(
                   color: AppColors.grayColor,
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
-                moreStyle:
-                TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                moreStyle: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryColor1),
+                lessStyle: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryColor1),
               ),
               const SizedBox(
                 height: 15,
@@ -195,7 +201,8 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     onPressed: () {},
                     child: Text(
                       "${stepArr.length} Sets",
-                      style: const TextStyle(color: AppColors.grayColor, fontSize: 12),
+                      style: const TextStyle(
+                          color: AppColors.grayColor, fontSize: 12),
                     ),
                   )
                 ],
@@ -229,9 +236,12 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     height: 40,
                     decoration: BoxDecoration(
                       border: Border(
-                        top: BorderSide(color: AppColors.grayColor.withOpacity(0.2), width: 1),
+                        top: BorderSide(
+                            color: AppColors.grayColor.withOpacity(0.2),
+                            width: 1),
                         bottom: BorderSide(
-                            color: AppColors.grayColor.withOpacity(0.2), width: 1),
+                            color: AppColors.grayColor.withOpacity(0.2),
+                            width: 1),
                       ),
                     ),
                   ),
@@ -249,7 +259,8 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         ),
                         Text(
                           " ${(index + 1) * 15} Calories Burn",
-                          style: const TextStyle(color: AppColors.grayColor, fontSize: 10),
+                          style: const TextStyle(
+                              color: AppColors.grayColor, fontSize: 10),
                         ),
                         Text(
                           " ${index + 1} ",
@@ -260,7 +271,8 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         ),
                         const Text(
                           " times",
-                          style: TextStyle(color: AppColors.grayColor, fontSize: 16),
+                          style: TextStyle(
+                              color: AppColors.grayColor, fontSize: 16),
                         )
                       ],
                     );

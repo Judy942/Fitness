@@ -1,14 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
-import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import '../../../widgets/round_gradient_button.dart';
 import 'add_schedule_view.dart';
 
 class WorkoutScheduleView extends StatefulWidget {
-  static String routeName = "/WorkoutScheduleView";
   const WorkoutScheduleView({Key? key}) : super(key: key);
 
   @override
@@ -21,42 +20,42 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   CalendarAgendaController();
   late DateTime _selectedDateAppBBar;
 
-  List eventArr = [
+List eventArr = [
     {
       "name": "Ab Workout",
-      "start_time": "22/06/2023 07:30 AM",
+      "start_time": "20/09/2024 07:30 AM",
     },
     {
       "name": "Upperbody Workout",
-      "start_time": "07/06/2023 09:00 AM",
+      "start_time": "20/09/2024 09:00 AM",
     },
     {
       "name": "Lowerbody Workout",
-      "start_time": "07/06/2023 03:00 PM",
+      "start_time": "20/09/2024 03:00 PM",
     },
     {
       "name": "Ab Workout",
-      "start_time": "08/06/2023 10:30 AM",
+      "start_time": "21/09/2024 07:30 AM",
     },
     {
       "name": "Upperbody Workout",
-      "start_time": "08/06/2023 09:00 AM",
+      "start_time": "21/09/2024 09:00 AM",
     },
     {
       "name": "Lowerbody Workout",
-      "start_time": "08/06/2023 03:00 PM",
+      "start_time": "21/09/2024 03:00 PM",
     },
     {
       "name": "Ab Workout",
-      "start_time": "09/06/2023 07:30 AM",
+      "start_time": "22/09/2024 07:30 AM",
     },
     {
       "name": "Upperbody Workout",
-      "start_time": "09/06/2023 09:00 AM",
+      "start_time": "22/09/2024 09:00 AM",
     },
     {
       "name": "Lowerbody Workout",
-      "start_time": "09/06/2023 03:00 PM",
+      "start_time": "22/09/2024 03:00 PM",
     }
   ];
 
