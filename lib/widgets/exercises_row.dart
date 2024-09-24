@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
+import 'round_button.dart';
 
 class ExercisesRow extends StatelessWidget {
   final Map eObj;
   final VoidCallback onPressed;
-  const ExercisesRow({Key? key, required this.eObj, required this.onPressed}) : super(key: key);
+    final RoundButtonType type;
+    final double ImagePadding;
+
+  const ExercisesRow({Key? key, required this.eObj, required this.onPressed, this.type = RoundButtonType.primaryBG, this.ImagePadding = 0}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +17,22 @@ class ExercisesRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: Image.asset(
-              eObj["image"].toString(),
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
+          Container(
+            decoration: BoxDecoration(
+              color: type == RoundButtonType.secondaryBG?AppColors.secondaryColor1.withOpacity(0.2):AppColors.primaryColor1.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            padding: EdgeInsets.all(ImagePadding),
+            width: 60,
+            height: 60,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Image.asset(
+                eObj["image"].toString(),
+                // width: 60,
+                // height: 60,
+                fit: BoxFit.fill,
+              ),
             ),
           ),
           const SizedBox(

@@ -294,7 +294,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                           yObj["title"].toString(),
                                           style: const TextStyle(
                                               color: AppColors.blackColor,
-                                              fontSize: 12),
+                                              fontSize: 16),
                                         ),
                                       )
                                     ],

@@ -243,7 +243,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                                         showDialog(
                                           context: context,
                                           builder: (context) {
-                                            return ShowLog(eObj: sObj);
+                                            return ShowLog(eObj: sObj, title: "Workout Schedule",);
                                           },
                                         );
                                       },

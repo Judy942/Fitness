@@ -7,7 +7,8 @@ import 'round_gradient_button.dart';
 
 class ShowLog extends StatelessWidget {
   final Map eObj;
-  const ShowLog({Key? key, required this.eObj}) : super(key: key);
+  final String title;
+  const ShowLog({Key? key, required this.eObj, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +48,8 @@ class ShowLog extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Text(
-                  "Workout Schedule",
+                 Text(
+                   title,
                   style: TextStyle(
                       color: AppColors.blackColor,
                       fontSize: 16,

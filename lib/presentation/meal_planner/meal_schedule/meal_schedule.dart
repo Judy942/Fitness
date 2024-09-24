@@ -1,9 +1,11 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
+import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
 
 class MealSchedule extends StatefulWidget {
@@ -389,7 +391,7 @@ class _MealScheduleState extends State<MealSchedule> {
           ),
         ),
         title: const Text(
-          "Workout Schedule",
+          "Meal Schedule",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -474,11 +476,13 @@ class _MealScheduleState extends State<MealSchedule> {
           Expanded(
             child: Container(
               child: SingleChildScrollView(
-                // scrollDirection: Axis.horizontal,
                 child: SizedBox(
-                  width: media.width * 1,
-                  height: media.height * 0.8,
+                  width: media.width,
+                  height: media.height * 0.75,
                   child: ListView.builder(
+                    // scrollDirection: Axis.vertical,
+                    // physics: AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.only(bottom: 20),
                     itemCount: 4,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -486,19 +490,13 @@ class _MealScheduleState extends State<MealSchedule> {
                         // return (wObj["date"] as DateTime).hour == index;
                         return (wObj["set"] as List).isNotEmpty;
                       }).toList();
-
                       return Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         child: Column(
                           children: slotArr.length <= index
                               ? [
-                                  const Text(
-                                    "No meal schedule",
-                                    style: TextStyle(
-                                        color: AppColors.blackColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
+                                  SizedBox()
                                 ]
                               : [
                                   Row(
@@ -533,16 +531,31 @@ class _MealScheduleState extends State<MealSchedule> {
                                       itemBuilder: (context, itemIndex) {
                                         var yObj =
                                             slotArr[index]["set"][itemIndex];
-                                        return MealRow(
-                                          eObj: yObj,
+                                        return ExercisesRow(
+                                          ImagePadding: 10,
+                                          eObj: yObj
+                                            ..addAll({
+                                              "title": yObj["name"],
+                                              "value": DateFormat("hh:mm a")
+                                                  .format(yObj["start_time"]),
+                                            }),
                                           onPressed: () {
-                                            // onPressed(eObj);
-                                        //     showDialog(
-                                        //   context: context,
-                                        //   builder: (context) {
-                                        //     return ShowLog(eObj: yObj);
-                                        //   },
-                                        // );
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return ShowLog(
+                                                  eObj: yObj
+                                                    ..addAll({
+                                                      "name": yObj["title"],
+                                                      "start_time": DateFormat(
+                                                              "dd/MM/yyyy hh:mm a")
+                                                          .format(yObj[
+                                                              "start_time"])
+                                                    }),
+                                                  title: "Meal Schedule",
+                                                );
+                                              },
+                                            );
                                           },
                                         );
                                       }),
@@ -583,68 +596,6 @@ class _MealScheduleState extends State<MealSchedule> {
             color: AppColors.whiteColor,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class MealRow extends StatelessWidget {
-  final Map eObj;
-  final VoidCallback onPressed;
-  const MealRow({Key? key, required this.eObj, required this.onPressed})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.width * 0.15,
-            width: MediaQuery.of(context).size.width * 0.15,
-            decoration: BoxDecoration(
-                color: AppColors.lightGrayColor,
-                borderRadius: BorderRadius.circular(15)),
-            alignment: Alignment.center,
-            child: Image.asset(
-              eObj["image"].toString(),
-              width: MediaQuery.of(context).size.width * 0.12,
-              height: MediaQuery.of(context).size.width * 0.12,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                eObj["name"].toString(),
-                style:
-                    const TextStyle(color: AppColors.blackColor, fontSize: 18),
-              ),
-
-              //time
-              Text(
-                DateFormat("hh:mm a").format(eObj["start_time"]),
-                style:
-                    const TextStyle(color: AppColors.grayColor, fontSize: 14),
-              ),
-            ],
-          ),
-          Spacer(),
-          IconButton(
-              onPressed: onPressed,
-              icon: Image.asset(
-                "assets/icons/next_go.png",
-                width: 20,
-                height: 20,
-                fit: BoxFit.contain,
-              ))
-        ],
       ),
     );
   }
