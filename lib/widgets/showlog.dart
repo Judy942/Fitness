@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
@@ -8,7 +7,8 @@ import 'round_gradient_button.dart';
 class ShowLog extends StatelessWidget {
   final Map eObj;
   final String title;
-  const ShowLog({Key? key, required this.eObj, required this.title}) : super(key: key);
+  const ShowLog({Key? key, required this.eObj, required this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class ShowLog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 InkWell(
                   onTap: () {
@@ -48,31 +48,13 @@ class ShowLog extends StatelessWidget {
                     ),
                   ),
                 ),
-                 Text(
-                   title,
-                  style: TextStyle(
+                Text(
+                  title,
+                  style: const TextStyle(
                       color: AppColors.blackColor,
                       fontSize: 16,
                       fontWeight: FontWeight.w700),
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: AppColors.lightGrayColor,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset(
-                      "assets/icons/more_icon.png",
-                      width: 15,
-                      height: 15,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                )
               ],
             ),
             const SizedBox(

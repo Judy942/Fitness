@@ -1,4 +1,3 @@
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import 'package:intl/intl.dart';
@@ -375,50 +374,50 @@ class _MealScheduleState extends State<MealSchedule> {
 
   int getCalories(List setArr) {
     int calories = 0;
-    setArr.forEach((sObj) {
+    for (var sObj in setArr) {
       calories += int.parse(sObj["nutrition"]["calories"]);
-    });
+    }
     return calories;
   }
 
   int sumCalories() {
     int calories = 0;
-    selectDayEventArr.forEach((wObj) {
+    for (var wObj in selectDayEventArr) {
       wObj["set"].forEach((sObj) {
         calories += int.parse(sObj["nutrition"]["calories"]);
         print(calories);
       });
-    });
+    }
     return calories;
   }
 
   int sumProtein() {
     int protein = 0;
-    selectDayEventArr.forEach((wObj) {
+    for (var wObj in selectDayEventArr) {
       wObj["set"].forEach((sObj) {
         protein += int.parse(sObj["nutrition"]["protein"]);
       });
-    });
+    }
     return protein;
   }
 
   int sumCarbs() {
     int carbs = 0;
-    selectDayEventArr.forEach((wObj) {
+    for (var wObj in selectDayEventArr) {
       wObj["set"].forEach((sObj) {
         carbs += int.parse(sObj["nutrition"]["carbs"]);
       });
-    });
+    }
     return carbs;
   }
 
   int sumFat() {
     int fat = 0;
-    selectDayEventArr.forEach((wObj) {
+    for (var wObj in selectDayEventArr) {
       wObj["set"].forEach((sObj) {
         fat += int.parse(sObj["nutrition"]["fat"]);
       });
-    });
+    }
     return fat;
   }
 
@@ -681,7 +680,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                         //text: calories icon: fire
                                         Text(
                                           nutritionGoalArr[index]["title"],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: AppColors.blackColor,
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700),
@@ -694,7 +693,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                         const Spacer(),
                                         Text(
                                           nutritionGoalArr[index]["value"],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: AppColors.grayColor,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),

@@ -190,7 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   RoundGradientButton(
                     title: "Login",
                     onPressed: () {
-                      _onLoginButtonPressed(email, context, password);
+                      // _onLoginButtonPressed(email, context, password);
+                      Navigator.pushNamed(context, '/completeProfileScreen');
                     },
                   ),
                   SizedBox(height: media.width * 0.01),
@@ -297,13 +298,5 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               )),
         )));
-  }
-
-  void setEmail() {
-    email = emailController.text;
-  }
-
-  void setPassword() {
-    password = passwordController.text;
   }
 }

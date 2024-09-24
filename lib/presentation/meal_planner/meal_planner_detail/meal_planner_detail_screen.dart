@@ -261,7 +261,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.width * 0.25*popularArr.length,
-                  width: MediaQuery.of(context).size.width * 0.9,
+                  width: MediaQuery.of(context).size.width * 0.95,
                   child: ListView.builder(
 
                     itemBuilder: (context, position) {

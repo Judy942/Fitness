@@ -48,8 +48,8 @@ class MyApp extends StatelessWidget {
           supportedLocales: const [
             Locale('en', ''),
           ],
-          // initialRoute: AppRoutes.startScreen,
-          initialRoute: AppRoutes.mealScheduleScreen,
+          initialRoute: AppRoutes.startScreen,
+          // initialRoute: AppRoutes.mealScheduleScreen,
           routes: AppRoutes.routes,
         );
       },)

@@ -191,7 +191,9 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: MaterialButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/mealPlannerScreen');
+                                },
                                 padding: EdgeInsets.zero,
                                 height: 30,
                                 shape: RoundedRectangleBorder(

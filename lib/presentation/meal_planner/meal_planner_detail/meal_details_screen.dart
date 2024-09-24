@@ -319,7 +319,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                       ),
 
                       SizedBox(
-                        height: media.width * 0.4,
+                        height: media.width * 0.5,
                         child: ListView.builder(
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.horizontal,

@@ -259,7 +259,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         ],
                       ),
                       SizedBox(
-                        height: media.width * 0.5,
+                        height: media.width * 0.6,
                         child: ListView.builder(
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.horizontal,

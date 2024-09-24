@@ -20,7 +20,7 @@ class PopularContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 10, 20),
-      margin: const EdgeInsets.only(right: 20),
+      // margin: const EdgeInsets.only(right: 20),
       decoration: BoxDecoration(
           color: AppColors.whiteColor,
           borderRadius: const BorderRadius.all(Radius.circular(15)),

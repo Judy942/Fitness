@@ -23,7 +23,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
       "time": "Today, 07:00am"
     },
     {
-      "image": "assets/images/LowfatMilk.png",
+      "image": "assets/images/milk.png",
       "title": "Lowfat Milk",
       "time": "Today, 08:00am"
     },
@@ -43,7 +43,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     {
       "title": "Dinner",
       "countFoods": "120+ Foods",
-      "image": "assets/images/pie_cake.png"
+      "image": "assets/images/pie.png"
     },
     {
       "title": "Snacks",
@@ -462,6 +462,9 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                           type: RoundButtonType.primaryBG,
                           title: "Check",
                           onPressed: () {
+                            Navigator.pushNamed(context, '/mealScheduleScreen');
+
+
                             // Navigator.push(
                             //   context,
                             //   MaterialPageRoute(

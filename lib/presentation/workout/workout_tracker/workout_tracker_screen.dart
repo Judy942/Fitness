@@ -250,6 +250,8 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                             type: RoundButtonType.primaryBG,
                             title: "Check",
                             onPressed: () {
+                                Navigator.pushNamed(context, '/workoutScheduleView');
+
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(

@@ -69,7 +69,7 @@ class AppRoutes {
     userProfile: (context) => const UserProfile(),
     addScheduleView : (context) => AddScheduleView(date: DateTime.now()),
     mealPlannerScreen: (context) => const MealPlannerScreen(),
-    mealPlannerDetailScreen: (context) =>  const MealPlannerDetailScreen( title: "Meal Planner Detail"),
+    mealPlannerDetailScreen: (context) =>  const MealPlannerDetailScreen( title: "title",),
     mealScheduleScreen: (context) =>  const MealSchedule(),
 
 
