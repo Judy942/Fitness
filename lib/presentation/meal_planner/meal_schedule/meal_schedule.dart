@@ -2,6 +2,7 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import 'package:intl/intl.dart';
+import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
@@ -320,6 +321,25 @@ class _MealScheduleState extends State<MealSchedule> {
     }
   ];
 
+  List nutritionGoalArr = [
+    {
+      "title": "Calories",
+      "value": "2000 kcal",
+    },
+    {
+      "title": "Protein",
+      "value": "100 g",
+    },
+    {
+      "title": "Carbs",
+      "value": "200 g",
+    },
+    {
+      "title": "Fat",
+      "value": "50 g",
+    },
+  ];
+
   List selectDayEventArr = [];
 
   @override
@@ -360,6 +380,59 @@ class _MealScheduleState extends State<MealSchedule> {
     });
     return calories;
   }
+
+  int sumCalories() {
+    int calories = 0;
+    selectDayEventArr.forEach((wObj) {
+      wObj["set"].forEach((sObj) {
+        calories += int.parse(sObj["nutrition"]["calories"]);
+        print(calories);
+      });
+    });
+    return calories;
+  }
+
+  int sumProtein() {
+    int protein = 0;
+    selectDayEventArr.forEach((wObj) {
+      wObj["set"].forEach((sObj) {
+        protein += int.parse(sObj["nutrition"]["protein"]);
+      });
+    });
+    return protein;
+  }
+
+  int sumCarbs() {
+    int carbs = 0;
+    selectDayEventArr.forEach((wObj) {
+      wObj["set"].forEach((sObj) {
+        carbs += int.parse(sObj["nutrition"]["carbs"]);
+      });
+    });
+    return carbs;
+  }
+
+  int sumFat() {
+    int fat = 0;
+    selectDayEventArr.forEach((wObj) {
+      wObj["set"].forEach((sObj) {
+        fat += int.parse(sObj["nutrition"]["fat"]);
+      });
+    });
+    return fat;
+  }
+
+  List getNutrition = [0,0,0,0];
+
+  void getNutritionData() {
+    getNutrition = [
+      sumCalories(), //calories
+      sumProtein(), //protein
+      sumCarbs(), //carbs
+      sumFat(), //fat
+    ];
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -460,6 +533,7 @@ class _MealScheduleState extends State<MealSchedule> {
             onDateSelected: (date) {
               _selectedDateAppBBar = date;
               setDayEventMealSchedule();
+              getNutritionData();
             },
             selectedDayLogo: Container(
               width: double.maxFinite,
@@ -476,28 +550,30 @@ class _MealScheduleState extends State<MealSchedule> {
           Expanded(
             child: Container(
               child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: media.width,
-                      height: media.height * 0.75,
-                      child: ListView.builder(
-                        // scrollDirection: Axis.vertical,
-                        // physics: AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.only(bottom: 20),
-                        itemCount: 4,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          var slotArr = selectDayEventArr.where((wObj) {
-                            // return (wObj["date"] as DateTime).hour == index;
-                            return (wObj["set"] as List).isNotEmpty;
-                          }).toList();
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            child: Column(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    // verticalDirection: VerticalDirection.up,
+                    children: [
+                      SizedBox(
+                        width: media.width,
+                        // height: media.height * 0.6,
+                        child: ListView.builder(
+                          // scrollDirection: Axis.vertical,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 20),
+                          itemCount: 4,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            var slotArr = selectDayEventArr.where((wObj) {
+                              // return (wObj["date"] as DateTime).hour == index;
+                              return (wObj["set"] as List).isNotEmpty;
+                            }).toList();
+                            return Column(
                               children: slotArr.length <= index
-                                  ? [SizedBox()]
+                                  ? [const SizedBox()]
                                   : [
                                       Row(
                                         mainAxisAlignment:
@@ -510,7 +586,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w700),
                                           ),
-                                          Spacer(),
+                                          const Spacer(),
                                           Text(
                                             "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
                                             style: const TextStyle(
@@ -563,42 +639,89 @@ class _MealScheduleState extends State<MealSchedule> {
                                             );
                                           }),
                                     ],
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const Text(
-                      "Today Meal Nutritions",
-                      style: TextStyle(
-                          color: AppColors.blackColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ListView.builder(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: 4,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            width: media.width,
-                            height: 100,
-                            decoration: BoxDecoration(
-                                color: AppColors.grayColor,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2))
-                                ]),
-                          );
-                        }),
-                  ],
+                      const Text(
+                        "Today Meal Nutritions",
+                        style: TextStyle(
+                            color: AppColors.blackColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: 4,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                width: media.width,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 2))
+                                    ]),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        //text: calories icon: fire
+                                        Text(
+                                          nutritionGoalArr[index]["title"],
+                                          style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                        Image.asset(
+                                          "assets/images/fire.png",
+                                          width: 20,
+                                          height: 20,
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          nutritionGoalArr[index]["value"],
+                                          style: TextStyle(
+                                              color: AppColors.grayColor,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                    SimpleAnimationProgressBar(
+                                      height: 15,
+                                      width: media.width * 0.5,
+                                      backgroundColor: Colors.grey.shade100,
+                                      foregrondColor: Colors.purple,
+                                      // ratio: wObj["progress"] as double? ?? 0.0,
+                                      ratio: getNutrition[index] / int.parse(nutritionGoalArr[index]["value"].split(" ")[0]),
+                                      direction: Axis.horizontal,
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      duration: const Duration(seconds: 3),
+                                      borderRadius: BorderRadius.circular(7.5),
+                                      gradientColor: LinearGradient(
+                                          colors: AppColors.primary,
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight),
+                                    ),
+                                  ],
+                                ));
+                          }),
+                    ],
+                  ),
                 ),
               ),
             ),

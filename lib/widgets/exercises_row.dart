@@ -31,7 +31,7 @@ class ExercisesRow extends StatelessWidget {
                 eObj["image"].toString(),
                 // width: 60,
                 // height: 60,
-                fit: BoxFit.fill,
+                // fit: BoxFit.fill,
               ),
             ),
           ),
