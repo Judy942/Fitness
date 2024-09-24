@@ -476,94 +476,129 @@ class _MealScheduleState extends State<MealSchedule> {
           Expanded(
             child: Container(
               child: SingleChildScrollView(
-                child: SizedBox(
-                  width: media.width,
-                  height: media.height * 0.75,
-                  child: ListView.builder(
-                    // scrollDirection: Axis.vertical,
-                    // physics: AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.only(bottom: 20),
-                    itemCount: 4,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      var slotArr = selectDayEventArr.where((wObj) {
-                        // return (wObj["date"] as DateTime).hour == index;
-                        return (wObj["set"] as List).isNotEmpty;
-                      }).toList();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          children: slotArr.length <= index
-                              ? [
-                                  SizedBox()
-                                ]
-                              : [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        slotArr[index]["title"],
-                                        style: const TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: media.width,
+                      height: media.height * 0.75,
+                      child: ListView.builder(
+                        // scrollDirection: Axis.vertical,
+                        // physics: AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.only(bottom: 20),
+                        itemCount: 4,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          var slotArr = selectDayEventArr.where((wObj) {
+                            // return (wObj["date"] as DateTime).hour == index;
+                            return (wObj["set"] as List).isNotEmpty;
+                          }).toList();
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: Column(
+                              children: slotArr.length <= index
+                                  ? [SizedBox()]
+                                  : [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            slotArr[index]["title"],
+                                            style: const TextStyle(
+                                                color: AppColors.blackColor,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          Spacer(),
+                                          Text(
+                                            "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                            style: const TextStyle(
+                                                color: AppColors.blackColor,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
                                       ),
-                                      Spacer(),
-                                      Text(
-                                        "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
-                                        style: const TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400),
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  ListView.builder(
-                                      padding: EdgeInsets.zero,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: slotArr[index]["set"].length,
-                                      itemBuilder: (context, itemIndex) {
-                                        var yObj =
-                                            slotArr[index]["set"][itemIndex];
-                                        return ExercisesRow(
-                                          ImagePadding: 10,
-                                          eObj: yObj
-                                            ..addAll({
-                                              "title": yObj["name"],
-                                              "value": DateFormat("hh:mm a")
-                                                  .format(yObj["start_time"]),
-                                            }),
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return ShowLog(
-                                                  eObj: yObj
-                                                    ..addAll({
-                                                      "name": yObj["title"],
-                                                      "start_time": DateFormat(
-                                                              "dd/MM/yyyy hh:mm a")
-                                                          .format(yObj[
-                                                              "start_time"])
-                                                    }),
-                                                  title: "Meal Schedule",
+                                      ListView.builder(
+                                          padding: EdgeInsets.zero,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount:
+                                              slotArr[index]["set"].length,
+                                          itemBuilder: (context, itemIndex) {
+                                            var yObj = slotArr[index]["set"]
+                                                [itemIndex];
+                                            return ExercisesRow(
+                                              ImagePadding: 10,
+                                              eObj: yObj
+                                                ..addAll({
+                                                  "title": yObj["name"],
+                                                  "value": DateFormat("hh:mm a")
+                                                      .format(
+                                                          yObj["start_time"]),
+                                                }),
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return ShowLog(
+                                                      eObj: yObj
+                                                        ..addAll({
+                                                          "name": yObj["title"],
+                                                          "start_time": DateFormat(
+                                                                  "dd/MM/yyyy hh:mm a")
+                                                              .format(yObj[
+                                                                  "start_time"])
+                                                        }),
+                                                      title: "Meal Schedule",
+                                                    );
+                                                  },
                                                 );
                                               },
                                             );
-                                          },
-                                        );
-                                      }),
-                                ],
-                        ),
-                      );
-                    },
-                  ),
+                                          }),
+                                    ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const Text(
+                      "Today Meal Nutritions",
+                      style: TextStyle(
+                          color: AppColors.blackColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ListView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 4,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            width: media.width,
+                            height: 100,
+                            decoration: BoxDecoration(
+                                color: AppColors.grayColor,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
+                                  BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 2))
+                                ]),
+                          );
+                        }),
+                  ],
                 ),
               ),
             ),
