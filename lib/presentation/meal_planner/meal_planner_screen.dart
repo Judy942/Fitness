@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/widgets/find_st_to_eat.dart';
@@ -5,6 +7,8 @@ import 'package:flutter_application_fitness/widgets/round_button.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/today_meals_row.dart';
+import '../onboarding_screen/start_screen.dart';
+import 'package:http/http.dart' as http;
 
 class MealPlannerScreen extends StatefulWidget {
   const MealPlannerScreen({Key? key}) : super(key: key);
@@ -15,7 +19,7 @@ class MealPlannerScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<MealPlannerScreen> {
   List<int> showingTooltipOnSpots = [21];
-
+  bool isLoading = false;
   List mealArr = [
     {
       "image": "assets/images/salmon_nigiri.png",
@@ -29,28 +33,67 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     },
   ];
 
-  List somethingToEat = [
-    {
-      "title": "Breakfast",
-      "countFoods": "120+ Foods",
-      "image": "assets/images/pie.png"
-    },
-    {
-      "title": "Lunch",
-      "countFoods": "120+ Foods",
-      "image": "assets/images/canai_bread.png"
-    },
-    {
-      "title": "Dinner",
-      "countFoods": "120+ Foods",
-      "image": "assets/images/pie.png"
-    },
-    {
-      "title": "Snacks",
-      "countFoods": "120+ Foods",
-      "image": "assets/images/canai_bread.png"
-    },
-  ];
+  // List somethingToEat = [
+  //   {
+  //     "title": "Breakfast",
+  //     "countFoods": "120+ Foods",
+  //     "image": "assets/images/pie.png"
+  //   },
+  //   {
+  //     "title": "Lunch",
+  //     "countFoods": "120+ Foods",
+  //     "image": "assets/images/canai_bread.png"
+  //   },
+  //   {
+  //     "title": "Dinner",
+  //     "countFoods": "120+ Foods",
+  //     "image": "assets/images/pie.png"
+  //   },
+  //   {
+  //     "title": "Snacks",
+  //     "countFoods": "120+ Foods",
+  //     "image": "assets/images/canai_bread.png"
+  //   },
+  // ];
+
+  List somethingToEat = [];
+
+  Future<void> getSomethingToEat() async {
+    setState(() {
+      isLoading = true;
+    });
+    String? token = await getToken();
+    final response = await http.get(
+      Uri.parse('http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
+          headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      setState(() {
+        somethingToEat = (jsonResponse['data'] as List).map((item) {
+          return {
+            'id': item['id'],
+            'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+            "title": item['name'],
+            "countFoods": "${item['dishes']} Foods",
+          };
+        }).toList();
+        isLoading = false;
+      });
+    } else {
+      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSomethingToEat();
+  }
+
   List<FlSpot> get allSpots => const [
         FlSpot(0, 20),
         FlSpot(1, 25),
@@ -223,7 +266,9 @@ class _HomeScreenState extends State<MealPlannerScreen> {
 
     final tooltipsOnBar = lineBarsData[0];
 
-    return Scaffold(
+    return isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    :Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -464,7 +509,6 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                           onPressed: () {
                             Navigator.pushNamed(context, '/mealScheduleScreen');
 
-
                             // Navigator.push(
                             //   context,
                             //   MaterialPageRoute(
@@ -550,7 +594,6 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                       SizedBox(
                         height: media.width * 0.5,
                         width: media.width - 40,
-
                         child: ListView.builder(
                           itemBuilder: (context, position) {
                             if (position % 2 == 0) {

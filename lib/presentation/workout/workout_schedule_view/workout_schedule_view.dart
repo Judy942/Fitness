@@ -28,7 +28,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
     final response = await http.get(
       Uri.parse(
-          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
+          'http://162.248.102.236:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=2024-10-06T00:00:00%2B07:00&filter[_and][0][_and][3][scheduled_execution_time][_lte]=2024-10-06T23:59:00%2B07:00'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -37,6 +37,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       eventArr = jsonResponse["data"];
     }
   }
+
 
   // List eventArr = [
   //   {
@@ -84,6 +85,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
     setDayEventWorkoutList();
+    getWorkoutSchedule();
   }
 
   void setDayEventWorkoutList() {
@@ -310,7 +312,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       floatingActionButton: InkWell(
         onTap: () {
           // chờ 3giây
-          Navigator.push(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => AddScheduleView(

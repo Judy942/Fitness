@@ -1,25 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../main.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
 import '../onboarding_screen/start_screen.dart';
-import 'user_profile.dart';
-
-// Future<Map<String, dynamic>> getUserData() async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   return {
-//     'first_name': prefs.getString('first_name') ?? '',
-//     'last_name': prefs.getString('last_name') ?? '',
-//     'email': prefs.getString('email') ?? '',
-//     'height': prefs.getDouble('height') ?? 0.0,
-//     'weight': prefs.getDouble('weight') ?? 0.0,
-//     'birthday': prefs.getString('birthday') ?? '',
-//     'gender': prefs.getString('gender') ?? '',
-//   };
-// }
 
 class CompleteProfileScreen extends StatefulWidget {
   bool isBackToProfile;
@@ -31,19 +21,51 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
-  Map<String, dynamic> allData = {};
-
-  @override
-  void initState() {
-    super.initState();
-    allUserData.then((value) {
-      allData = value;
-      print('giá trị alldata$allData');
-    });
+  // Map<String, dynamic> allData = {};
+  Future<void> updateUserData(Map<String, String> data) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = await getToken();
+    try {
+    String json = jsonEncode(data);
+    print(json);
+      final response = await http.patch(
+          Uri.parse('http://162.248.102.236:8055/users/me'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: json);
+      if (response.statusCode == 200) {
+        print('Update user data success');
+        print(response.body);
+        if (widget.isBackToProfile) {
+          Navigator.pop(context);
+        } else {
+          Navigator.pushNamed(context, '/goalsScreen');
+        }
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   loadUserData();
+  // }
+
+  // Future<void> loadUserData() async {
+  //   allData = await getAllData() as Map<String, dynamic>;
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
+        final prefsNotifier = Provider.of<PreferencesNotifier>(context);
+        Map<String, dynamic> usetData = prefsNotifier.userData;
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -114,15 +136,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                   )))
                               .toList(),
                           onChanged: (value) {
-                            setState(() {
-                              // usetData['gender'] = value;
-                              SharedPreferences.getInstance().then((prefs) {
-                                prefs.setString('gender', value!);
-                              });
-                            });
+                            usetData['gender'] = value!.toUpperCase();
+                            setState(() {});
                           },
                           isExpanded: true,
-                          hint: Text(allData['gender'] ?? '',
+                          hint: Text(usetData['gender'] ?? (usetData['gender'] == ''? 'Choose Gender': 'Choose gender'),
 
                               // usetData['gender'] ?? '',
                               style: const TextStyle(
@@ -138,82 +156,57 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
+                    usetData['birthday'] = p0;
                     setState(() {
-                      // usetData['birthday'] = p0;
-                      SharedPreferences.getInstance().then((prefs) {
-                        prefs.setString('birthday', p0);
-                      });
+                      
                     });
                   },
-                  hintText: allData['birthday'] ?? '',
-                  //  usetData['birthday'] ?? "Your Birthday",
+                  hintText: 
+                   usetData['birthday'] ?? (usetData['birthday'] == ''? 'dd/mm/yyyy': 'dd/mm/yyyy'),
                   icon: "assets/icons/calendar_icon.png",
                   textInputType: TextInputType.datetime,
                 ),
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
-                    // usetData['weight'] = p0;
-                    SharedPreferences.getInstance().then((prefs) {
-                      prefs.setString('weight', p0);
-                    });
+                    usetData['weight'] = p0;
+                    setState(() {});
                   },
-                  hintText: allData['weight'] ?? '',
-                  //  usetData['weight'] == 0.0
-                  //     ? "Your Weight"
-                  //     : usetData['weight'].toString(),
+                  hintText: usetData['weight'] ?? (usetData['weight'] == ''? 'Weight': 'Weight'),
                   icon: "assets/icons/weight_icon.png",
                   textInputType: TextInputType.text,
                 ),
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
-                    // usetData['height'] = p0;
-                    SharedPreferences.getInstance().then((prefs) {
-                      prefs.setString('height', p0);
-                    });
+                    usetData['height'] = p0;
+                    setState(() {});
                   },
-                  hintText: allData['height'] ?? '',
-                  //  usetData['height'] == 0.0
-                  //     ? "Your Height"
-                  //     : usetData['height'].toString(),
+                  hintText: usetData['height'] ?? (usetData['height'] == ''? 'Height': 'Height'),
                   icon: "assets/icons/swap_icon.png",
                   textInputType: TextInputType.text,
                 ),
                 const SizedBox(height: 15),
                 RoundGradientButton(
                   title: "Next >",
-                  onPressed: () async {
-                    // save data to server
-                    String? token = await getToken();
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    try {
-                      final response = await http.patch(
-                        Uri.parse('http://162.248.102.236:8055/users/me'),
-                        headers: {'Authorization': 'Bearer $token'},
-                        body: {
-                          'first_name': prefs.getString('first_name') ?? '',
-                          'last_name': prefs.getString('last_name') ?? '',
-                          'email': prefs.getString('email') ?? '',
-                          'height': prefs.getString('height') ?? '',
-                          'weight': prefs.getString('weight') ?? '',
-                          'birthday': prefs.getString('birthday') ?? '',
-                          'gender': prefs.getString('gender') ?? '',
-                        },
-                      );
-                      if (response.statusCode == 200) {
-                        if (widget.isBackToProfile) {
-                          Navigator.pop(context);
-                        } else {
-                          Navigator.pushNamed(context, '/goalsScreen');
-                        }
-                      } else {
-                        print(response.body);
-                      }
-                    } catch (e) {
-                      print(e);
-                    }
+                  onPressed: () {
+                    Map<String, String> data = {
+                      // 'first_name': usetData['first_name'],
+                      // 'last_name': usetData['last_name'],
+                      'gender': usetData['gender'],
+                      'height': usetData['height'],
+                      'weight': usetData['weight'],
+                      'birthday': usetData['birthday'],
+
+                    };
+                    updateUserData(
+                      data,
+                    );
+                     prefsNotifier.updateUserData('gender', data['gender']);
+                     prefsNotifier.updateUserData('birthday', data['birthday']);
+                      prefsNotifier.updateUserData('weight', data['weight']);
+                      prefsNotifier.updateUserData('height', data['height']);
+                      
                   },
                 )
               ],

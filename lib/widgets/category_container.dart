@@ -41,10 +41,15 @@ class CategoryContainer extends StatelessWidget {
                 decoration: BoxDecoration(
                     color:AppColors.whiteColor.withOpacity(0.4),
                     borderRadius: const BorderRadius.all(Radius.circular(80))),
-                child: Image.asset(
+                child: 
+                Image.network(
                   wObj["image"].toString(),
                   fit: BoxFit.contain,
                 ),
+                // Image.asset(
+                //   wObj["image"].toString(),
+                //   fit: BoxFit.contain,
+                // ),
               ),
               Text(
                 wObj["name"].toString(),

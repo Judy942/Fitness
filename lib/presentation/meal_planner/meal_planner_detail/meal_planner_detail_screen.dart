@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/widgets/recommendation_container.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/category_container.dart';
 import '../../../widgets/popular_container.dart';
 import '../../../widgets/round_button.dart';
 import '../../../widgets/search_bar.dart';
+import '../../onboarding_screen/start_screen.dart';
+
+
+
 
 class MealPlannerDetailScreen extends StatefulWidget {
   final String title;
@@ -19,24 +25,59 @@ class MealPlannerDetailScreen extends StatefulWidget {
 
 class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
   late String title;
-  List<Map<String, String>> categoryArr = [
-    {
-      "name": "Salad",
-      "image": "assets/images/salad.png",
-    },
-    {
-      "name": "Cake",
-      "image": "assets/images/cake.png",
-    },
-    {
-      "name": "Pie",
-      "image": "assets/images/pie.png",
-    },
-    {
-      "name": "Smoothies",
-      "image": "assets/images/orange.png",
-    },
-  ];
+    bool isLoading = true; // Biến để theo dõi trạng thái tải dữ liệu
+
+  // List<Map<String, String>> categoryArr = [
+  //   {
+  //     "name": "Salad",
+  //     "image": "assets/images/salad.png",
+  //   },
+  //   {
+  //     "name": "Cake",
+  //     "image": "assets/images/cake.png",
+  //   },
+  //   {
+  //     "name": "Pie",
+  //     "image": "assets/images/pie.png",
+  //   },
+  //   {
+  //     "name": "Smoothies",
+  //     "image": "assets/images/orange.png",
+  //   },
+  // ];
+
+  List categoryArr = [];
+
+  
+Future<void> getListCategory() async {
+  String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+
+  final response = await http.get(
+    Uri.parse('http://162.248.102.236:8055/items/dish_category?filter[status][_neq]=archived'),
+    headers: {'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    final jsonResponse = json.decode(response.body);
+    setState(() {
+      categoryArr = (jsonResponse['data'] as List).map((item) {
+        return {
+          'id': item['id'],
+          'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+          "name": item['name'],
+        };
+      }).toList();
+      isLoading = false; // Đánh dấu rằng dữ liệu đã được tải
+    });
+  } else {
+    // Xử lý lỗi
+    print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
+    setState(() {
+      isLoading = false; // Cũng đánh dấu là đã xong
+    });
+  }
+}
+
 
   List<Map<String, String>> recommendationArr = [
     {
@@ -86,16 +127,20 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
     },
     
   ];
+  
 
   @override
   void initState() {
     super.initState();
     title = widget.title;
+    getListCategory();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    :Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -178,6 +223,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                 const SizedBox(
                   height: 10,
                 ),
+                
                 SizedBox(
                   height: MediaQuery.of(context).size.width * 0.35,
                   width: MediaQuery.of(context).size.width * 0.9,

@@ -1,59 +1,56 @@
-import 'dart:convert';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../routes/app_routes.dart';
+import '../../main.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
-import '../login/login_screen.dart';
-import '../onboarding_screen/start_screen.dart';
 import 'complete_profile_screen.dart';
-import 'package:http/http.dart' as http;
 
 // Future<String?> getGoal() async {
 //   SharedPreferences prefs = await SharedPreferences.getInstance();
 //   return prefs.getString('goal');
 // }
 
-Future<void> loadDataFromserver() async {
-    String? token = await getToken();
-    if (token != null) {
-      // Gọi API để lấy thông tin người dùng
-      final response = await http.get(
-        Uri.parse('http://162.248.102.236:8055/users/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
+// Future<void> loadDataFromserver() async {
+//     String? token = await getToken();
+//     if (token != null) {
+//       // Gọi API để lấy thông tin người dùng
+//       final response = await http.get(
+//         Uri.parse('http://162.248.102.236:8055/users/me'),
+//         headers: {'Authorization': 'Bearer $token'},
+//       );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final userData = responseData['data'];
-        await saveUserData(userData);
-        await fetchAndSaveBmi(token);
-      } else {
-        // Xử lý lỗi nếu cần
-      }
-  }
-}
-
-  Future<Map<String, dynamic>> allUserData = getAllData();
+//       if (response.statusCode == 200) {
+//         final responseData = json.decode(response.body);
+//         final userData = responseData['data'];
+//         await saveUserData(userData);
+//         await fetchAndSaveBmi(token);
+//       } else {
+//         // Xử lý lỗi nếu cần
+//       }
+//   }
+// }
 
 
-Future<Map<String, dynamic>> getAllData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  // Future<Map<String, dynamic>> allUserData = getAllData();
+
+
+// Future<Map<String, dynamic>> getAllData() async {
+//     final SharedPreferences prefs = await SharedPreferences.getInstance();
     
-    // Lấy tất cả dữ liệu từ SharedPreferences
-    Map<String, dynamic> allData = {};
+//     // Lấy tất cả dữ liệu từ SharedPreferences
+//     Map<String, dynamic> allData = {};
     
-    // Lấy từng loại dữ liệu
-    for (String key in prefs.getKeys()) {
-      allData[key] = prefs.get(key);
-    }
-    return allData;
-  }
+//     // Lấy từng loại dữ liệu
+//     for (String key in prefs.getKeys()) {
+//       allData[key] = prefs.get(key);
+//     }
+//     return allData;
+//   }
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -86,15 +83,17 @@ class _UserProfileState extends State<UserProfile> {
     }
   ];
 
-  @override
-   void initState() {
-    super.initState();
-    allUserData.then((value) {
-      allData = value;
-    });
-    print('giá trị alldata$allData');
-    setState(() {});
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   loadUserData();
+  // }
+
+  // Future<void> loadUserData() async {
+  //   allData = await getAllData() as Map<String, dynamic>;
+  //   print('giá trị alldata$allData');
+  //   setState(() {});
+  // }
 
   List otherArr = [
     {"image": "assets/icons/p_contact.png", "name": "Contact Us", "tag": "5"},
@@ -108,7 +107,7 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-// printAllStoredInfo();   
+    final prefsNotifier = Provider.of<PreferencesNotifier>(context);
  return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -148,8 +147,8 @@ class _UserProfileState extends State<UserProfile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          // usetData['last_name'] ?? "you",
-                          allData['last_name'] ?? "you",
+                          prefsNotifier.userData['last_name'] ?? "you",
+                          // allData['last_name'] ?? "you",
                           style: const TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 16,
@@ -157,7 +156,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                         ),
                         Text(
-                          allData['goal'] ?? "Goal",
+                          prefsNotifier.userData['goal'] ?? "Goal",
                           style: const TextStyle(
                             color: AppColors.grayColor,
                             fontSize: 12,
@@ -191,7 +190,7 @@ class _UserProfileState extends State<UserProfile> {
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: allData['height'] ?? "0",
+                      title: prefsNotifier.userData['height'] ?? "0",
                       subtitle: "Height",
                     ),
                   ),
@@ -200,7 +199,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: allData['weight'] ?? "0",
+                      title: prefsNotifier.userData['weight'] ?? "0",
                       subtitle: "Weight",
                     ),
                   ),
@@ -210,7 +209,7 @@ class _UserProfileState extends State<UserProfile> {
                   Expanded(
                     child: TitleSubtitleCell(
                       //now-usetData['birthday']
-                      title: allData['birthday'] ?? "0",
+                      title: prefsNotifier.userData['birthday'] ?? "0",
                       subtitle: "birthday",
                     ),
                   ),

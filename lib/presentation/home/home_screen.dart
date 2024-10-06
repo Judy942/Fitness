@@ -2,11 +2,13 @@
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../main.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import 'how_to_calculate_bmi.dart';
@@ -24,9 +26,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+    Map<String, dynamic> allData = {};
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    // allData = await getAllData() as Map<String, dynamic>;
+    setState(() {});
+  }
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
+    final prefsNotifier = Provider.of<PreferencesNotifier>(context);
 
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -37,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const TopBar(),
+                 TopBar(prefsNotifier.userData['last_name'] ?? ""),
                 SizedBox(height: media.width * 0.05),
                 const ContainerBmi(),
                 SizedBox(height: media.width * 0.05),
@@ -61,17 +75,18 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+  final String name;
+  const TopBar(this.name, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Welcome Back,",
               style: TextStyle(
                 color: AppColors.midGrayColor,
@@ -79,8 +94,8 @@ class TopBar extends StatelessWidget {
               ),
             ),
             Text(
-              "Judy",
-              style: TextStyle(
+              name,
+              style: const TextStyle(
                 color: AppColors.blackColor,
                 fontSize: 20,
                 fontFamily: "Poppins",
@@ -205,16 +220,8 @@ class ContainerBmi extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyBMI() {
-    return const Center(
-      child: Text(
-        'BMI not available',
-        style: TextStyle(color: AppColors.whiteColor),
-      ),
-    );
-  }
-
   Widget _buildBMIContent(String bmi, BuildContext context) {
+        final prefsNotifier = Provider.of<PreferencesNotifier>(context);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -243,7 +250,7 @@ class ContainerBmi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Enter your height and weight",
+                    prefsNotifier.userData['bmi'] ?? "Enter your height and weight",
                     style: TextStyle(
                       color: AppColors.whiteColor.withOpacity(0.7),
                       fontSize: 12,

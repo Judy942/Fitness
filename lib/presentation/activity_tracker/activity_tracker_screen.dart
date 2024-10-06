@@ -20,6 +20,14 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   String _status = '?', _steps = '0';
   int touchedIndex = -1;
 
+
+Future<void> requestLocationPermission() async {
+  var status = await Permission.location.status;
+  if (status.isDenied) {
+    await Permission.location.request();
+  }
+}
+
   List latestArr = [
     {
       "image": "assets/images/pic_4.png",
