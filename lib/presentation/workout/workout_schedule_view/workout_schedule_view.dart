@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import 'package:http/http.dart' as http;
+
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../widgets/showlog.dart';
@@ -22,6 +23,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   late DateTime _selectedDateAppBBar;
 
   List eventArr = [];
+  bool isLoading = true;
 
   Future<void> getWorkoutSchedule() async {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -34,8 +36,15 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
       eventArr = jsonResponse["data"];
+      print(eventArr);
+    }else{
+      print(response.body);
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
 
@@ -109,7 +118,14 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    return Scaffold(
+    return isLoading
+        ? const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        :
+     Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
