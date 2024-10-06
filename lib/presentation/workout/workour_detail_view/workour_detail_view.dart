@@ -1,90 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../core/utils/app_colors.dart';
+import '../../../model/workout.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
+import '../../onboarding_screen/start_screen.dart';
 import 'exercises_step_details.dart';
+
+
+  Future<Map<String, dynamic>> getExerciseDetail(int id) async {
+  String url =
+      'http://162.248.102.236:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+
+  String? token = await getToken();
+
+  try {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      // Kiểm tra xem dữ liệu có tồn tại không
+      if (data.containsKey('data')) {
+        return data['data']; // Trả về exerciseDetail
+      } else {
+        print('No data found');
+      }
+    } else {
+      print("Error: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Exception: $e");
+    
+  }
+  return {}; // Return an empty map if no data is found or an error occurs
+}
 
 class WorkoutDetailView extends StatefulWidget {
   final Map dObj;
-  const WorkoutDetailView({Key? key, required this.dObj}) : super(key: key);
+  final Workout workout;
+  const WorkoutDetailView({Key? key, required this.dObj, required this.workout}) : super(key: key);
+  
 
   @override
   State<WorkoutDetailView> createState() => _WorkoutDetailViewState();
 }
 
 class _WorkoutDetailViewState extends State<WorkoutDetailView> {
-  List latestArr = [
-    {
-      "image": "assets/images/Workout1.png",
-      "title": "Fullbody Workout",
-      "time": "Today, 03:00pm"
-    },
-    {
-      "image": "assets/images/Workout2.png",
-      "title": "Upperbody Workout",
-      "time": "June 05, 02:00pm"
-    },
-  ];
 
-  List youArr = [
-    {"image": "assets/icons/barbell.png", "title": "Barbell"},
-    {"image": "assets/icons/skipping_rope.png", "title": "Skipping Rope"},
-    {"image": "assets/icons/bottle.png", "title": "Bottle 1 Liters"},
-  ];
-
-  List exercisesArr = [
-    {
-      "name": "Set 1",
-      "set": [
-        {"image": "assets/images/img_1.png", "title": "Warm Up", "value": "05:00"},
-        {
-          "image": "assets/images/img_2.png",
-          "title": "Jumping Jack",
-          "value": "12x"
-        },
-        {"image": "assets/images/img_1.png", "title": "Skipping", "value": "15x"},
-        {"image": "assets/images/img_2.png", "title": "Squats", "value": "20x"},
-        {
-          "image": "assets/images/img_1.png",
-          "title": "Arm Raises",
-          "value": "00:53"
-        },
-        {
-          "image": "assets/images/img_2.png",
-          "title": "Rest and Drink",
-          "value": "02:00"
-        },
-      ],
-    },
-    {
-      "name": "Set 2",
-      "set": [
-        {"image": "assets/images/img_1.png", "title": "Warm Up", "value": "05:00"},
-        {
-          "image": "assets/images/img_2.png",
-          "title": "Jumping Jack",
-          "value": "12x"
-        },
-        {"image": "assets/images/img_1.png", "title": "Skipping", "value": "15x"},
-        {"image": "assets/images/img_2.png", "title": "Squats", "value": "20x"},
-        {
-          "image": "assets/images/img_1.png",
-          "title": "Arm Raises",
-          "value": "00:53"
-        },
-        {
-          "image": "assets/images/img_2.png",
-          "title": "Rest and Drink",
-          "value": "02:00"
-        },
-      ],
-    }
-  ];
 
   @override
   Widget build(BuildContext context) {
+    // List exercisesArr = widget.workout.exercises;
+    List<GroupedExercise> groupedExercises = widget.workout.groupExercisesBySetNumber();
+    List equipmentArr = widget.workout.equipments;
+
     var media = MediaQuery.of(context).size;
     return Container(
       decoration:
@@ -197,7 +173,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                       fontWeight: FontWeight.w700),
                                 ),
                                 Text(
-                                  "${widget.dObj["exercises"].toString()} | ${widget.dObj["time"].toString()} | 320 Calories Burn",
+                                  "${widget.dObj["exercises"].toString()} | ${widget.dObj["time"].toString()}",
                                   style: const TextStyle(
                                       color: AppColors.grayColor, fontSize: 12),
                                 ),
@@ -251,7 +227,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           TextButton(
                             onPressed: () {},
                             child: Text(
-                              "${youArr.length} Items",
+                              "${equipmentArr.length} Items",
                               style:
                               const TextStyle(color: AppColors.grayColor, fontSize: 12),
                             ),
@@ -259,14 +235,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         ],
                       ),
                       SizedBox(
-                        height: media.width * 0.6,
+                        height: media.width * 0.5,
                         child: ListView.builder(
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.horizontal,
                             shrinkWrap: true,
-                            itemCount: youArr.length,
+                            itemCount: equipmentArr.length,
                             itemBuilder: (context, index) {
-                              var yObj = youArr[index] as Map? ?? {};
+                              var yObj = equipmentArr[index].toMap();
                               return Container(
                                   margin: const EdgeInsets.all(8),
                                   child: Column(
@@ -281,17 +257,23 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                             borderRadius:
                                             BorderRadius.circular(15)),
                                         alignment: Alignment.center,
-                                        child: Image.asset(
-                                          yObj["image"].toString(),
+                                        child: Image.network(
+                                            yObj["image"].toString(),
                                           width: media.width * 0.2,
                                           height: media.width * 0.2,
                                           fit: BoxFit.contain,
                                         ),
+                                        // Image.asset(
+                                        //   yObj["image"].toString(),
+                                        //   width: media.width * 0.2,
+                                        //   height: media.width * 0.2,
+                                        //   fit: BoxFit.contain,
+                                        // ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          yObj["title"].toString(),
+                                          yObj["name"].toString(),
                                           style: const TextStyle(
                                               color: AppColors.blackColor,
                                               fontSize: 16),
@@ -300,9 +282,6 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                     ],
                                   ));
                             }),
-                      ),
-                      SizedBox(
-                        height: media.width * 0.05,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -317,7 +296,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           TextButton(
                             onPressed: () {},
                             child: Text(
-                              "${youArr.length} Sets",
+                              "${groupedExercises.length} Sets",
                               style:
                               const TextStyle(color: AppColors.grayColor, fontSize: 12),
                             ),
@@ -328,18 +307,19 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: exercisesArr.length,
+                          itemCount: groupedExercises.length,
                           itemBuilder: (context, index) {
-                            var sObj = exercisesArr[index] as Map? ?? {};
+                            var sObj = groupedExercises[index];
                             return ExercisesSetSection(
                               sObj: sObj,
                               onPressed: (obj) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ExercisesStepDetails(eObj: obj,),
-                                  ),
-                                );
+                                onExercisePressed(context, obj);
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => ExercisesStepDetails(eObj: obj,),
+                                //   ),
+                                // );
                               },
                             );
                           }),
@@ -365,4 +345,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       ),
     );
   }
+}
+
+Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
+  var exerciseDetail = await getExerciseDetail(obj.id);
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ExercisesStepDetails(eObj: obj, exerciseDetail: exerciseDetail,),
+    ),
+  );
 }

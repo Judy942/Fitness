@@ -16,7 +16,7 @@ class StepDetailRow extends StatelessWidget {
         SizedBox(
           width: 25,
           child: Text(
-            sObj["no"].toString(),
+            sObj["step_number"].toString(),
             style: const TextStyle(
               color: AppColors.secondaryColor1,
               fontSize: 18,
@@ -69,7 +69,7 @@ class StepDetailRow extends StatelessWidget {
                 ),
               ),
               Text(
-                sObj["detail"].toString(),
+                sObj["description"].toString(),
                 style: const TextStyle(color: AppColors.grayColor, fontSize: 16),
               ),
             ],

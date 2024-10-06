@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/model/workout.dart';
 
 import '../core/utils/app_colors.dart';
 import 'exercises_row.dart';
 
 class ExercisesSetSection extends StatelessWidget {
-  final Map sObj;
-  final Function(Map obj) onPressed;
+  final GroupedExercise sObj;
+  final Function(Exercise obj) onPressed;
   const ExercisesSetSection({Key? key, required this.sObj, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var exercisesArr = sObj["set"] as List? ?? [];
+    // var exercisesArr = sObj["set"] as List? ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          sObj["name"].toString(),
+          // sObj["name"].toString(),
+          'Set ${sObj.setNumber}',
           style: const TextStyle(
               color: AppColors.blackColor, fontSize: 12, fontWeight: FontWeight.w500),
         ),
@@ -28,11 +30,13 @@ class ExercisesSetSection extends StatelessWidget {
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: exercisesArr.length,
+            itemCount: sObj.exercises.length,
             itemBuilder: (context, index) {
-              var eObj = exercisesArr[index] as Map? ?? {};
+              var eObj = sObj.exercises[index];
               return ExercisesRow(eObj: eObj, onPressed: (){
+                // onPressed(eObj);
                 onPressed(eObj);
+                
               },);
             }),
       ],

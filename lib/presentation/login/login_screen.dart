@@ -1,13 +1,34 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../routes/app_routes.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
+import '../onboarding_screen/start_screen.dart';
+
+Future<void> saveToken(String token) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('userToken', token);
+}
+
+Future<void> printAllStoredInfo() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // Lấy tất cả các key-value từ SharedPreferences
+  final keys = prefs.getKeys();
+  
+  for (String key in keys) {
+    final value = prefs.get(key);
+    print('$key: $value');
+  }
+}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -24,42 +45,51 @@ class _LoginScreenState extends State<LoginScreen> {
   String password = "";
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  // http.get(API_USER_LIST);
-
   void fetchData() async {
-    // var url = Uri.parse('http://162.248.102.236:8055/auth/login');
-    String url = "http://162.248.102.236:8055/auth/login";
-    print("Email: $email");
-    print("Password: $password");
+  String url = "http://162.248.102.236:8055/auth/login";
+  print("Email: $email");
+  print("Password: $password");
+  
+  try {
     final response = await http.post(
       Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        "email": email,
-        "password": password,
-      }),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({'email': email, 'password': password}),
     );
-    print(jsonDecode(response.body));
-    print(response.statusCode);
-    // code: INVALID_CREDENTIALS
-    if (response.body.contains("INVALID_CREDENTIALS")) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email or password'),
-        ),
-      );
-    } else if (response.statusCode == 200) {
-      Navigator.pushNamed(context, '/completeProfileScreen');
+
+    print('Response: ${response.body}');
+    print('Status Code: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody["data"] != null && responseBody["data"]["access_token"] != null) {
+    final accessToken = responseBody["data"]["access_token"];
+    await saveToken(accessToken);
+    // Lưu thông tin người dùng
+        await saveUserData(responseBody["data"]);
+        await printAllStoredInfo(); // In thông tin lưu trữ
+    Navigator.pushReplacementNamed(context, AppRoutes.completeProfileScreen);
+  } else {
+    // Xử lý trường hợp không có access_token
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Access token not found')),
+    );
+  }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred'),
-        ),
+        const SnackBar(content: Text('Invalid email or password')),
       );
     }
+  } catch (e) {
+    print("Error details: $e"); 
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Network error occurred')),
+    );
   }
+}
+
+
+
 
   // Future<bool> loginWithGoogle() async {
   //   try {
@@ -190,8 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   RoundGradientButton(
                     title: "Login",
                     onPressed: () {
-                      // _onLoginButtonPressed(email, context, password);
-                      Navigator.pushNamed(context, '/completeProfileScreen');
+                      _onLoginButtonPressed(email, context, password);
+                      // Navigator.pushNamed(context, '/completeProfileScreen');
                     },
                   ),
                   SizedBox(height: media.width * 0.01),

@@ -54,7 +54,7 @@ class AppRoutes {
     onboardingScreen: (context) => const OnboardingScreen(),
     loginScreen: (context) => const LoginScreen(),
     signUpScreen: (context) => const SignupScreen(),
-    completeProfileScreen: (context) => const CompleteProfileScreen(),
+    completeProfileScreen: (context) =>  CompleteProfileScreen(isBackToProfile: false,),
     notificationScreen: (context) => const NotificationScreen(),
     activityTrackerScreen: (context) => const ActivityTrackerScreen(),
     finishWorkoutScreen: (context) => const FinishWorkoutScreen(),

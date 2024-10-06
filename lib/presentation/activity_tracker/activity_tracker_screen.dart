@@ -17,7 +17,7 @@ class ActivityTrackerScreen extends StatefulWidget {
 class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
-  String _status = '?', _steps = '?';
+  String _status = '?', _steps = '0';
   int touchedIndex = -1;
 
   List latestArr = [
@@ -83,6 +83,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     bool granted = await _checkActivityRecognitionPermission();
     if (!granted) {
       // tell user, the app will not work
+      
     }
 
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;

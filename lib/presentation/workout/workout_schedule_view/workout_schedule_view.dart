@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
-
+import 'package:http/http.dart' as http;
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../widgets/showlog.dart';
+import '../../onboarding_screen/start_screen.dart';
 import 'add_schedule_view.dart';
 
 class WorkoutScheduleView extends StatefulWidget {
@@ -18,44 +21,61 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       CalendarAgendaController();
   late DateTime _selectedDateAppBBar;
 
-  List eventArr = [
-    {
-      "name": "Ab Workout",
-      "start_time": "20/09/2024 07:30 AM",
-    },
-    {
-      "name": "Upperbody Workout",
-      "start_time": "20/09/2024 09:00 AM",
-    },
-    {
-      "name": "Lowerbody Workout",
-      "start_time": "20/09/2024 03:00 PM",
-    },
-    {
-      "name": "Ab Workout",
-      "start_time": "21/09/2024 07:30 AM",
-    },
-    {
-      "name": "Upperbody Workout",
-      "start_time": "21/09/2024 09:00 AM",
-    },
-    {
-      "name": "Lowerbody Workout",
-      "start_time": "21/09/2024 03:00 PM",
-    },
-    {
-      "name": "Ab Workout",
-      "start_time": "22/09/2024 07:30 AM",
-    },
-    {
-      "name": "Upperbody Workout",
-      "start_time": "22/09/2024 09:00 AM",
-    },
-    {
-      "name": "Lowerbody Workout",
-      "start_time": "22/09/2024 03:00 PM",
+  List eventArr = [];
+
+  Future<void> getWorkoutSchedule() async {
+    String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+
+    final response = await http.get(
+      Uri.parse(
+          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      eventArr = jsonResponse["data"];
     }
-  ];
+  }
+
+  // List eventArr = [
+  //   {
+  //     "name": "Ab Workout",
+  //     "start_time": "20/09/2024 07:30 AM",
+  //   },
+  //   {
+  //     "name": "Upperbody Workout",
+  //     "start_time": "20/09/2024 09:00 AM",
+  //   },
+  //   {
+  //     "name": "Lowerbody Workout",
+  //     "start_time": "20/09/2024 03:00 PM",
+  //   },
+  //   {
+  //     "name": "Ab Workout",
+  //     "start_time": "21/09/2024 07:30 AM",
+  //   },
+  //   {
+  //     "name": "Upperbody Workout",
+  //     "start_time": "21/09/2024 09:00 AM",
+  //   },
+  //   {
+  //     "name": "Lowerbody Workout",
+  //     "start_time": "21/09/2024 03:00 PM",
+  //   },
+  //   {
+  //     "name": "Ab Workout",
+  //     "start_time": "22/09/2024 07:30 AM",
+  //   },
+  //   {
+  //     "name": "Upperbody Workout",
+  //     "start_time": "22/09/2024 09:00 AM",
+  //   },
+  //   {
+  //     "name": "Lowerbody Workout",
+  //     "start_time": "22/09/2024 03:00 PM",
+  //   }
+  // ];
 
   List selectDayEventArr = [];
 
@@ -289,6 +309,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       ),
       floatingActionButton: InkWell(
         onTap: () {
+          // chờ 3giây
           Navigator.push(
               context,
               MaterialPageRoute(

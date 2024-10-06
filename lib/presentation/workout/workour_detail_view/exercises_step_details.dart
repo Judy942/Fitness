@@ -1,49 +1,67 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/model/workout.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../core/utils/app_colors.dart';
-import '../../../widgets/round_gradient_button.dart';
 import '../../../widgets/step_detail_row.dart';
 
+// Future<void> updateExerciseDetail(int id, Map<String, dynamic> exercise) async {
+//   String url =
+//       'http://162.248.102.236:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+
+//   String? token = await getToken();
+
+//   try {
+//     final response = await http.put(Uri.parse(url), headers: <String, String>{
+//       'Content-Type': 'application/json; charset=UTF-8',
+//       'Authorization': 'Bearer $token'
+//     }, body: <String, dynamic>{
+//       "description": exercise["description"],
+//       "process_steps": exercise["process_steps"],
+//       "exercise_difficulties": [
+//         {
+//           "difficulty_id": {"code": "EASY"},
+//           "value": exercise["difficulty"],
+//           "calories_burn": exercise["caloriesBurned"],
+//           "excercise_time": exercise["excerciseTime"]
+//         }
+//       ]
+//     });
+//     if (response.statusCode == 200) {
+//       print("Update exercise detail success");
+//     } else {
+//       print("Update exercise detail failed");
+//       print(response.body);
+//     }
+//   } catch (e) {
+//     print("Update exercise detail failed $e");
+//   }
+// }
+
 class ExercisesStepDetails extends StatefulWidget {
-  final Map eObj;
-  const ExercisesStepDetails({Key? key, required this.eObj}) : super(key: key);
+  final Exercise eObj;
+  final Map<String, dynamic> exerciseDetail;
+  const ExercisesStepDetails(
+      {Key? key, required this.eObj, required this.exerciseDetail})
+      : super(key: key);
 
   @override
   State<ExercisesStepDetails> createState() => _ExercisesStepDetailsState();
 }
 
 class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
-  List stepArr = [
-    {
-      "no": "01",
-      "title": "Spread Your Arms",
-      "detail":
-          "To make the gestures feel more relaxed, stretch your arms as you start this movement. No bending of hands."
-    },
-    {
-      "no": "02",
-      "title": "Rest at The Toe",
-      "detail":
-          "The basis of this movement is jumping. Now, what needs to be considered is that you have to use the tips of your feet"
-    },
-    {
-      "no": "03",
-      "title": "Adjust Foot Movement",
-      "detail":
-          "Jumping Jack is not just an ordinary jump. But, you also have to pay close attention to leg movements."
-    },
-    {
-      "no": "04",
-      "title": "Clapping Both Hands",
-      "detail":
-          "This cannot be taken lightly. You see, without realizing it, the clapping of your hands helps you to keep your rhythm while doing the Jumping Jack"
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    int difficulty;
+    try {
+      difficulty =
+          int.parse(widget.exerciseDetail["exercise_difficulties"][0]["value"]);
+    } catch (e) {
+      print("Lỗi khi phân tích: $e");
+      difficulty = 0; // Hoặc một giá trị mặc định nào đó
+    }
+// int difficulty = int.parse(widget.exerciseDetail["exercise_difficulties"]["value"]);
     var media = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -107,8 +125,14 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     decoration: BoxDecoration(
                         gradient: LinearGradient(colors: AppColors.primary),
                         borderRadius: BorderRadius.circular(20)),
-                    child: Image.asset(
-                      "assets/images/video_temp.png",
+                    // child: Image.asset(
+                    //   "assets/images/video_temp.png",
+                    //   width: media.width,
+                    //   height: media.width * 0.43,
+                    //   fit: BoxFit.contain,
+                    // ),
+                    child: Image.network(
+                      widget.eObj.image,
                       width: media.width,
                       height: media.width * 0.43,
                       fit: BoxFit.contain,
@@ -135,7 +159,8 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 15,
               ),
               Text(
-                widget.eObj["title"].toString(),
+                // widget.eObj["title"].toString(),
+                widget.eObj.title,
                 style: const TextStyle(
                     color: AppColors.blackColor,
                     fontSize: 16,
@@ -144,9 +169,10 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               const SizedBox(
                 height: 4,
               ),
-              const Text(
-                "Easy | 390 Calories Burn",
-                style: TextStyle(
+              Text(
+                // "Easy | 390 Calories Burn",
+                "${widget.eObj.difficulty} | ${widget.eObj.caloriesBurned} Calories Burn",
+                style: const TextStyle(
                   color: AppColors.grayColor,
                   fontSize: 12,
                 ),
@@ -164,22 +190,24 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               const SizedBox(
                 height: 4,
               ),
-              const ReadMoreText(
-                'A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide',
+              ReadMoreText(
+                // 'A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide',
+                widget.exerciseDetail["description"] ??
+                    "No description available",
                 trimLines: 4,
                 colorClickableText: AppColors.blackColor,
                 trimMode: TrimMode.Line,
                 trimCollapsedText: ' Read More ...',
                 trimExpandedText: ' Read Less',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.grayColor,
                   fontSize: 14,
                 ),
-                moreStyle: TextStyle(
+                moreStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryColor1),
-                lessStyle: TextStyle(
+                lessStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryColor1),
@@ -200,7 +228,10 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      "${stepArr.length} Sets",
+                      // "${exerciseDetail.length} Steps",
+                      // "${exerciseDetail["process_steps"].length} Steps",
+                      "${(widget.exerciseDetail["process_steps"] as List?)?.length ?? 0} Steps",
+
                       style: const TextStyle(
                           color: AppColors.grayColor, fontSize: 12),
                     ),
@@ -210,14 +241,25 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: stepArr.length,
+                itemCount: widget.exerciseDetail["process_steps"].length,
                 itemBuilder: ((context, index) {
-                  var sObj = stepArr[index] as Map? ?? {};
+                  // var sObj = exerciseDetail["process_steps"][index] as Map? ?? {};
 
-                  return StepDetailRow(
-                    sObj: sObj,
-                    isLast: stepArr.last == sObj,
-                  );
+                  // return StepDetailRow(
+                  //   sObj: sObj,
+                  //   isLast: exerciseDetail["process_steps"].last == sObj,
+                  // );
+                  if (widget.exerciseDetail["process_steps"].isNotEmpty) {
+                    // An toàn để truy cập các phần tử
+                    return StepDetailRow(
+                      sObj: widget.exerciseDetail["process_steps"][index],
+                      isLast: index ==
+                          widget.exerciseDetail["process_steps"].length - 1,
+                    );
+                  } else {
+                    // Xử lý trường hợp danh sách rỗng
+                    return const Text("No steps available");
+                  }
                 }),
               ),
               const Text(
@@ -230,7 +272,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               SizedBox(
                 height: 150,
                 child: CupertinoPicker.builder(
-                  itemExtent: 40,
+                  itemExtent: 42,
                   selectionOverlay: Container(
                     width: double.maxFinite,
                     height: 40,
@@ -245,8 +287,10 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                       ),
                     ),
                   ),
-                  onSelectedItemChanged: (index) {},
-                  childCount: 60,
+                  onSelectedItemChanged: (index) {
+                    difficulty = index;
+                  },
+                  childCount: 100,
                   itemBuilder: (context, index) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -279,7 +323,18 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   },
                 ),
               ),
-              RoundGradientButton(title: "Save", onPressed: () {}),
+              // RoundGradientButton(
+              //     title: "Save",
+              //     onPressed: () async {
+              //         widget.exerciseDetail["exercise_difficulties"][0]
+              //             ["value"] = difficulty.toString();
+
+              //       //cập nhật dữ liệu trên server
+              //       await updateExerciseDetail(
+              //           widget.eObj.id, widget.exerciseDetail);
+              //       print(widget.exerciseDetail);
+              //       Navigator.pop(context);
+              //     }),
               const SizedBox(
                 height: 15,
               ),

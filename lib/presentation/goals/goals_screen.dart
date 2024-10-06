@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_application_fitness/routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
+
+Future<void> setGoal(String goal) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('goal', goal);
+}
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({Key? key}) : super(key: key);
@@ -11,21 +18,23 @@ class GoalsScreen extends StatefulWidget {
 }
 
 class _GoalsScreenState extends State<GoalsScreen> {
-
   List pageList = [
     {
       "title": "Improve Shape",
-      "subtitle": "I have a low amount of body fat\nand need / want to build more\nmuscle",
+      "subtitle":
+          "I have a low amount of body fat\nand need / want to build more\nmuscle",
       "image": "assets/images/goal_1.png"
     },
     {
       "title": "Lean & Tone",
-      "subtitle": "I’m “skinny fat”. look thin but have\nno shape. I want to add learn\nmuscle in the right way",
+      "subtitle":
+          "I’m “skinny fat”. look thin but have\nno shape. I want to add learn\nmuscle in the right way",
       "image": "assets/images/goal_2.png"
     },
     {
       "title": "Lose a Fat",
-      "subtitle": "I have over 20 lbs to lose. I want to\ndrop all this fat and gain muscle\nmass",
+      "subtitle":
+          "I have over 20 lbs to lose. I want to\ndrop all this fat and gain muscle\nmass",
       "image": "assets/images/goal_3.png"
     }
   ];
@@ -33,6 +42,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String goal = "";
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -41,7 +51,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
           children: [
             Center(
               child: CarouselSlider(
-                items: pageList.map((obj) => Container(
+                items: pageList
+                    .map((obj) => Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(22),
                             gradient: LinearGradient(
@@ -50,14 +61,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                 end: Alignment.bottomRight),
                           ),
                           alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(vertical: media.width*0.01,horizontal: 25),
+                          padding: EdgeInsets.symmetric(
+                              vertical: media.width * 0.01, horizontal: 25),
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Image.asset(obj["image"],width: media.width*0.5,fit: BoxFit.fitWidth,),
-                                SizedBox(height: media.width*0.02),
+                                Image.asset(
+                                  obj["image"],
+                                  width: media.width * 0.5,
+                                  fit: BoxFit.cover,
+                                ),
+                                SizedBox(height: media.width * 0.02),
                                 Text(
                                   obj["title"],
                                   textAlign: TextAlign.center,
@@ -67,13 +83,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                SizedBox(height: media.width*0.01),
+                                SizedBox(height: media.width * 0.01),
                                 Container(
                                   width: 50,
                                   height: 1,
                                   color: AppColors.lightGrayColor,
                                 ),
-                                SizedBox(height: media.width*0.02),
+                                SizedBox(height: media.width * 0.02),
                                 Text(
                                   obj["subtitle"],
                                   textAlign: TextAlign.center,
@@ -99,6 +115,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   viewportFraction: 0.7,
                   aspectRatio: 0.74,
                   initialPage: 0,
+                  onPageChanged: (index, reason) => {
+                    setState(() {
+                      goal = pageList[index]["title"];
+                    })
+                  },
                 ),
               ),
             ),
@@ -136,7 +157,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     RoundGradientButton(
                       title: "Confirm",
                       onPressed: () {
-                        Navigator.pushNamed(context, '/welcomeScreen');
+                        setGoal(goal);
+                        Navigator.pushReplacementNamed(
+                            context, AppRoutes.welcomeScreen);
                       },
                     )
                   ],
@@ -148,5 +171,4 @@ class _GoalsScreenState extends State<GoalsScreen> {
       ),
     );
   }
-
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/model/workout.dart';
 
 import '../core/utils/app_colors.dart';
 import 'round_button.dart';
 
 class ExercisesRow extends StatelessWidget {
-  final Map eObj;
+  final Exercise eObj;
   final VoidCallback onPressed;
     final RoundButtonType type;
     final double ImagePadding;
@@ -27,11 +28,17 @@ class ExercisesRow extends StatelessWidget {
             height: 60,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child: Image.asset(
-                eObj["image"].toString(),
-                // width: 60,
-                // height: 60,
-                // fit: BoxFit.fill,
+              // child: Image.asset(
+              //   eObj["image"].toString(),
+              //   // width: 60,
+              //   // height: 60,
+              //   // fit: BoxFit.fill,
+              // ),
+              child: Image.network(
+                eObj.image,
+                width: 60,
+                height: 60,
+                fit: BoxFit.fill,
               ),
             ),
           ),
@@ -43,11 +50,13 @@ class ExercisesRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    eObj["title"].toString(),
+                    // eObj["title"].toString(),
+                    eObj.title,
                     style: const TextStyle(color: AppColors.blackColor, fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    eObj["value"].toString(),
+                    // eObj["value"].toString(),
+                    eObj.value.toString(),
                     style: const TextStyle(
                       color: AppColors.grayColor,
                       fontSize: 12,

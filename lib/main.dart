@@ -1,11 +1,9 @@
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'core/utils/pref_utils.dart';
 import 'localization/app_localization.dart';
 import 'routes/app_routes.dart';

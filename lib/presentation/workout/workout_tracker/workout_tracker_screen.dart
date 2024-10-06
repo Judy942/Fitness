@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
 import '../../../widgets/upcoming_workout_row.dart';
 import '../../../widgets/what_train_row.dart';
+import '../../onboarding_screen/start_screen.dart';
+
+
 
 class WorkoutTrackerScreen extends StatefulWidget {
   const WorkoutTrackerScreen({Key? key}) : super(key: key);
@@ -14,7 +20,6 @@ class WorkoutTrackerScreen extends StatefulWidget {
 }
 
 class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
-
   List latestArr = [
     {
       "image": "assets/images/Workout1.png",
@@ -28,26 +33,42 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
     },
   ];
 
-  List whatArr = [
-    {
-      "image": "assets/images/what_1.png",
-      "title": "Fullbody Workout",
-      "exercises": "11 Exercises",
-      "time": "32mins"
-    },
-    {
-      "image": "assets/images/what_2.png",
-      "title": "Lowebody Workout",
-      "exercises": "12 Exercises",
-      "time": "40mins"
-    },
-    {
-      "image": "assets/images/what_3.png",
-      "title": "AB Workout",
-      "exercises": "14 Exercises",
-      "time": "20mins"
+  List whatArr = [];
+
+Future<void> getListWorkout() async {
+    String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+
+    final response = await http.get(
+      Uri.parse(
+          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      setState(() {
+        whatArr = (jsonResponse['data'] as List).map((item) {
+          return {
+            'id': item['id'],
+            'image': item['image'],
+            "title": item['name'],
+            "exercises": "${item['exercises'].length} Exercises",
+            "time": "${item['time']} mins"
+            // Bạn có thể thêm bất kỳ trường nào bạn muốn ở đây
+          };
+        }).toList();
+      });
+    } else {
+      // Xử lý lỗi
+      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
     }
-  ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getListWorkout();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +160,11 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                               show: true,
                               getDotPainter: (spot, percent, barData, index) =>
                                   FlDotCirclePainter(
-                                    radius: 3,
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                    strokeColor: AppColors.secondaryColor1,
-                                  ),
+                                radius: 3,
+                                color: Colors.white,
+                                strokeWidth: 3,
+                                strokeColor: AppColors.secondaryColor1,
+                              ),
                             ),
                           );
                         }).toList();
@@ -208,188 +229,189 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(25),
                     topRight: Radius.circular(25))),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 50,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: AppColors.grayColor.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(3)),
-                  ),
-                  SizedBox(
-                    height: media.width * 0.05,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor2.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(15),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
                     ),
-                    child: Row(
+                    Container(
+                      width: 50,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: AppColors.grayColor.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(3)),
+                    ),
+                    SizedBox(
+                      height: media.width * 0.05,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor2.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Daily Workout Schedule",
+                            style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            height: 30,
+                            child: RoundButton(
+                              type: RoundButtonType.primaryBG,
+                              title: "Check",
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/workoutScheduleView');
+
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) =>
+                                //         const ActivityTrackerView(),
+                                //   ),
+                                // );
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: media.width * 0.05,
+                    ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Daily Workout Schedule",
+                          "Upcoming Workout",
                           style: TextStyle(
                               color: AppColors.blackColor,
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700),
                         ),
-                        SizedBox(
-                          width: 80,
-                          height: 30,
-                          child: RoundButton(
-                            type: RoundButtonType.primaryBG,
-                            title: "Check",
-                            onPressed: () {
-                                Navigator.pushNamed(context, '/workoutScheduleView');
-
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         const ActivityTrackerView(),
-                              //   ),
-                              // );
-                            },
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "See More",
+                            style: TextStyle(
+                                color: AppColors.grayColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
                           ),
                         )
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    height: media.width * 0.05,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Upcoming Workout",
-                        style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          "See More",
+                    ListView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: latestArr.length,
+                        itemBuilder: (context, index) {
+                          var wObj = latestArr[index] as Map? ?? {};
+                          return UpcomingWorkoutRow(wObj: wObj);
+                        }),
+                    SizedBox(
+                      height: media.width * 0.05,
+                    ),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "What Do You Want to Train",
                           style: TextStyle(
-                              color: AppColors.grayColor,
-                              fontSize: 14,
+                              color: AppColors.blackColor,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700),
                         ),
-                      )
-                    ],
-                  ),
-                  ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: latestArr.length,
-                      itemBuilder: (context, index) {
-                        var wObj = latestArr[index] as Map? ?? {};
-                        return UpcomingWorkoutRow(wObj: wObj);
-                      }),
-                  SizedBox(
-                    height: media.width * 0.05,
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "What Do You Want to Train",
-                        style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: whatArr.length,
-                      itemBuilder: (context, index) {
-                        var wObj = whatArr[index] as Map? ?? {};
-                        return WhatTrainRow(wObj: wObj,
-                        );
-                      }),
-                  SizedBox(
-                    height: media.width * 0.1,
-                  ),
-                ],
+                      ],
+                    ),
+                    ListView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: whatArr.length,
+                        itemBuilder: (context, index) {
+                          var wObj = whatArr[index] as Map? ?? {};
+                          return WhatTrainRow(
+                            wObj: wObj,
+                          );
+                        }),
+                    SizedBox(
+                      height: media.width * 0.1,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )),
+            )),
       ),
     );
   }
 
   LineTouchData get lineTouchData1 => const LineTouchData(
-    handleBuiltInTouches: true,
-    touchTooltipData: LineTouchTooltipData(
-    ),
-  );
+        handleBuiltInTouches: true,
+        touchTooltipData: LineTouchTooltipData(),
+      );
 
   List<LineChartBarData> get lineBarsData1 => [
-    lineChartBarData1_1,
-    lineChartBarData1_2,
-  ];
+        lineChartBarData1_1,
+        lineChartBarData1_2,
+      ];
 
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.whiteColor,
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 35),
-      FlSpot(2, 70),
-      FlSpot(3, 40),
-      FlSpot(4, 80),
-      FlSpot(5, 25),
-      FlSpot(6, 70),
-      FlSpot(7, 35),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.whiteColor,
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 35),
+          FlSpot(2, 70),
+          FlSpot(3, 40),
+          FlSpot(4, 80),
+          FlSpot(5, 25),
+          FlSpot(6, 70),
+          FlSpot(7, 35),
+        ],
+      );
 
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.whiteColor.withOpacity(0.5),
-    barWidth: 2,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(
-      show: false,
-    ),
-    spots: const [
-      FlSpot(1, 80),
-      FlSpot(2, 50),
-      FlSpot(3, 90),
-      FlSpot(4, 40),
-      FlSpot(5, 80),
-      FlSpot(6, 35),
-      FlSpot(7, 60),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.whiteColor.withOpacity(0.5),
+        barWidth: 2,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+          show: false,
+        ),
+        spots: const [
+          FlSpot(1, 80),
+          FlSpot(2, 50),
+          FlSpot(3, 90),
+          FlSpot(4, 40),
+          FlSpot(5, 80),
+          FlSpot(6, 35),
+          FlSpot(7, 60),
+        ],
+      );
 
   SideTitles get rightTitles => SideTitles(
-    getTitlesWidget: rightTitleWidgets,
-    showTitles: true,
-    interval: 20,
-    reservedSize: 40,
-  );
+        getTitlesWidget: rightTitleWidgets,
+        showTitles: true,
+        interval: 20,
+        reservedSize: 40,
+      );
 
   Widget rightTitleWidgets(double value, TitleMeta meta) {
     String text;
@@ -425,11 +447,11 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
   }
 
   SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
+        showTitles: true,
+        reservedSize: 32,
+        interval: 1,
+        getTitlesWidget: bottomTitleWidgets,
+      );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     var style = const TextStyle(

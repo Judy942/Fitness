@@ -1,10 +1,59 @@
+import 'dart:convert';
+
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../routes/app_routes.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
+import '../login/login_screen.dart';
+import '../onboarding_screen/start_screen.dart';
+import 'complete_profile_screen.dart';
+import 'package:http/http.dart' as http;
+
+// Future<String?> getGoal() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   return prefs.getString('goal');
+// }
+
+Future<void> loadDataFromserver() async {
+    String? token = await getToken();
+    if (token != null) {
+      // Gọi API để lấy thông tin người dùng
+      final response = await http.get(
+        Uri.parse('http://162.248.102.236:8055/users/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final userData = responseData['data'];
+        await saveUserData(userData);
+        await fetchAndSaveBmi(token);
+      } else {
+        // Xử lý lỗi nếu cần
+      }
+  }
+}
+
+  Future<Map<String, dynamic>> allUserData = getAllData();
+
+
+Future<Map<String, dynamic>> getAllData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    // Lấy tất cả dữ liệu từ SharedPreferences
+    Map<String, dynamic> allData = {};
+    
+    // Lấy từng loại dữ liệu
+    for (String key in prefs.getKeys()) {
+      allData[key] = prefs.get(key);
+    }
+    return allData;
+  }
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -14,11 +63,16 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+  Map<String, dynamic> allData = {};
 
   bool positive = false;
 
   List accountArr = [
-    {"image": "assets/icons/p_personal.png", "name": "Personal Data", "tag": "1"},
+    {
+      "image": "assets/icons/p_personal.png",
+      "name": "Personal Data",
+      "tag": "1"
+    },
     {"image": "assets/icons/p_achi.png", "name": "Achievement", "tag": "2"},
     {
       "image": "assets/icons/p_activity.png",
@@ -32,15 +86,30 @@ class _UserProfileState extends State<UserProfile> {
     }
   ];
 
+  @override
+   void initState() {
+    super.initState();
+    allUserData.then((value) {
+      allData = value;
+    });
+    print('giá trị alldata$allData');
+    setState(() {});
+  }
+
   List otherArr = [
     {"image": "assets/icons/p_contact.png", "name": "Contact Us", "tag": "5"},
-    {"image": "assets/icons/p_privacy.png", "name": "Privacy Policy", "tag": "6"},
+    {
+      "image": "assets/icons/p_privacy.png",
+      "name": "Privacy Policy",
+      "tag": "6"
+    },
     {"image": "assets/icons/p_setting.png", "name": "Setting", "tag": "7"},
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+// printAllStoredInfo();   
+ return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -74,21 +143,22 @@ class _UserProfileState extends State<UserProfile> {
                   const SizedBox(
                     width: 15,
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Judy",
-                          style: TextStyle(
+                          // usetData['last_name'] ?? "you",
+                          allData['last_name'] ?? "you",
+                          style: const TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         Text(
-                          "Lose a Fat Program",
-                          style: TextStyle(
+                          allData['goal'] ?? "Goal",
+                          style: const TextStyle(
                             color: AppColors.grayColor,
                             fontSize: 12,
                           ),
@@ -103,7 +173,12 @@ class _UserProfileState extends State<UserProfile> {
                       title: "Edit",
                       type: RoundButtonType.primaryBG,
                       onPressed: () {
-
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CompleteProfileScreen(isBackToProfile: true,),
+                          ),
+                        );
                       },
                     ),
                   )
@@ -112,30 +187,31 @@ class _UserProfileState extends State<UserProfile> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "180cm",
+                      title: allData['height'] ?? "0",
                       subtitle: "Height",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "65kg",
+                      title: allData['weight'] ?? "0",
                       subtitle: "Weight",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "22yo",
-                      subtitle: "Age",
+                      //now-usetData['birthday']
+                      title: allData['birthday'] ?? "0",
+                      subtitle: "birthday",
                     ),
                   ),
                 ],
@@ -145,7 +221,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
               Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 decoration: BoxDecoration(
                     color: AppColors.whiteColor,
                     borderRadius: BorderRadius.circular(15),
@@ -187,7 +263,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
               Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 decoration: BoxDecoration(
                     color: AppColors.whiteColor,
                     borderRadius: BorderRadius.circular(15),
@@ -232,13 +308,14 @@ class _UserProfileState extends State<UserProfile> {
                               values: const [false, true],
                               indicatorSize: const Size.square(30.0),
                               animationDuration:
-                              const Duration(milliseconds: 200),
+                                  const Duration(milliseconds: 200),
                               animationCurve: Curves.linear,
                               onChanged: (b) => setState(() => positive = b),
                               iconBuilder: (context, local, global) {
                                 return const SizedBox();
                               },
-                              onTap: (b) => setState(() => positive = !positive),
+                              onTap: (b) =>
+                                  setState(() => positive = !positive),
                               iconsTappable: false,
                               wrapperBuilder: (context, global, child) {
                                 return Stack(
@@ -247,17 +324,21 @@ class _UserProfileState extends State<UserProfile> {
                                     Positioned(
                                         left: 10.0,
                                         right: 10.0,
-
                                         height: 30.0,
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
-                                                // colors: AppColors.secondary
-                                                colors: positive?AppColors.secondary:[AppColors.grayColor, AppColors.grayColor],
-                                                ),
+                                              // colors: AppColors.secondary
+                                              colors: positive
+                                                  ? AppColors.secondary
+                                                  : [
+                                                      AppColors.grayColor,
+                                                      AppColors.grayColor
+                                                    ],
+                                            ),
                                             borderRadius:
-                                            const BorderRadius.all(
-                                                Radius.circular(30.0)),
+                                                const BorderRadius.all(
+                                                    Radius.circular(30.0)),
                                           ),
                                         )),
                                     child,
@@ -294,7 +375,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
               Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 decoration: BoxDecoration(
                     color: AppColors.whiteColor,
                     borderRadius: BorderRadius.circular(15),

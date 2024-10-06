@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
+import '../model/workout.dart';
 import '../presentation/workout/workour_detail_view/workour_detail_view.dart';
 import 'round_button.dart';
 
 class WhatTrainRow extends StatelessWidget {
   final Map wObj;
-  
+
   const WhatTrainRow({Key? key, required this.wObj}) : super(key: key);
 
-  void onViewMoreClick(BuildContext context) {
+  Future<void> onViewMoreClick(BuildContext context) async {
+    Workout? workout = await getWorkoutDetail(wObj["id"]);
+    print(workout);
+
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => WorkoutDetailView(
                   dObj: wObj,
+                  workout: workout!,// Provide a default Workout instance if workout is null
                 )));
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class WhatTrainRow extends StatelessWidget {
                       child: RoundButton(
                           title: "View More",
                           onPressed: () {
-                            onViewMoreClick( context);
+                            onViewMoreClick(context);
                           }),
                     )
                   ],
@@ -91,12 +94,17 @@ class WhatTrainRow extends StatelessWidget {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
-                    child: Image.asset(
-                      wObj["image"].toString(),
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.contain,
-                    ),
+                    // child: Image.asset(
+                    //   wObj["image"].toString(),
+                    // width: 90,
+                    // height: 90,
+                    // fit: BoxFit.contain,
+                    // ),
+                    child: Image.network(
+                        'http://162.248.102.236:8055/assets/${wObj["image"]}',
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.contain),
                   ),
                 ],
               ),
