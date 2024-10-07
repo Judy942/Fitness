@@ -27,10 +27,15 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
   Future<void> getWorkoutSchedule() async {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+    DateTime nowUtc = DateTime.now().toUtc().add(Duration(hours: 7));
+    DateTime startOfDayUtc = DateTime.utc(nowUtc.year, nowUtc.month, nowUtc.day);
+    DateTime endOfDayUtc = DateTime.utc(nowUtc.year, nowUtc.month, nowUtc.day, 23, 59, 59, 999);
+    String startDateReq = dateTimeToIsoStringWithTimezone(startOfDayUtc);
+    String endDateReq = dateTimeToIsoStringWithTimezone(endOfDayUtc);
 
     final response = await http.get(
       Uri.parse(
-          'http://162.248.102.236:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=2024-10-06T00:00:00%2B07:00&filter[_and][0][_and][3][scheduled_execution_time][_lte]=2024-10-06T23:59:00%2B07:00'),
+          'http://162.248.102.236:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDateReq&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDateReq'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -45,6 +50,11 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  String dateTimeToIsoStringWithTimezone(DateTime dateTime){
+    String isoStringWithTimezone = dateTime.toIso8601String();
+    return isoStringWithTimezone.replaceAll("Z", "+07:00");
   }
 
 
