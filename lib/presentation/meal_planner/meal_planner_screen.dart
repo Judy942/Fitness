@@ -4,11 +4,44 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/widgets/find_st_to_eat.dart';
 import 'package:flutter_application_fitness/widgets/round_button.dart';
+import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/today_meals_row.dart';
 import '../onboarding_screen/start_screen.dart';
-import 'package:http/http.dart' as http;
+
+  Future<List> getMealType() async {
+    // setState(() {
+    //   isLoading = true;
+    // });
+    List somethingToEat = [];
+    String? token = await getToken();
+    final response = await http.get(
+      Uri.parse('http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
+          headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      // setState(() {
+        somethingToEat = (jsonResponse['data'] as List).map((item) {
+          return {
+            'id': item['id'],
+            'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+            "title": item['name'],
+            "countFoods": "${item['dishes']} Foods",
+          };
+        }).toList();
+        print(somethingToEat);
+      //   isLoading = false;
+      // });
+    } else {
+      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
+      // setState(() {
+      //   isLoading = false;
+      // });
+    }
+    return somethingToEat;
+  }
 
 class MealPlannerScreen extends StatefulWidget {
   const MealPlannerScreen({Key? key}) : super(key: key);
@@ -33,65 +66,17 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     },
   ];
 
-  // List somethingToEat = [
-  //   {
-  //     "title": "Breakfast",
-  //     "countFoods": "120+ Foods",
-  //     "image": "assets/images/pie.png"
-  //   },
-  //   {
-  //     "title": "Lunch",
-  //     "countFoods": "120+ Foods",
-  //     "image": "assets/images/canai_bread.png"
-  //   },
-  //   {
-  //     "title": "Dinner",
-  //     "countFoods": "120+ Foods",
-  //     "image": "assets/images/pie.png"
-  //   },
-  //   {
-  //     "title": "Snacks",
-  //     "countFoods": "120+ Foods",
-  //     "image": "assets/images/canai_bread.png"
-  //   },
-  // ];
-
   List somethingToEat = [];
 
-  Future<void> getSomethingToEat() async {
-    setState(() {
-      isLoading = true;
-    });
-    String? token = await getToken();
-    final response = await http.get(
-      Uri.parse('http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
-          headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      setState(() {
-        somethingToEat = (jsonResponse['data'] as List).map((item) {
-          return {
-            'id': item['id'],
-            'image': 'http://162.248.102.236:8055/assets/${item['image']}',
-            "title": item['name'],
-            "countFoods": "${item['dishes']} Foods",
-          };
-        }).toList();
-        isLoading = false;
-      });
-    } else {
-      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    getSomethingToEat();
+    getMealType().then((value) {
+      setState(() {
+        somethingToEat = value;
+      });
+    });
   }
 
   List<FlSpot> get allSpots => const [
@@ -508,14 +493,6 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                           title: "Check",
                           onPressed: () {
                             Navigator.pushNamed(context, '/mealScheduleScreen');
-
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //         const ActivityTrackerView(),
-                            //   ),
-                            // );
                           },
                         ),
                       )

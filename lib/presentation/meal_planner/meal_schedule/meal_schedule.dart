@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
@@ -7,6 +10,49 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
+import '../../onboarding_screen/start_screen.dart';
+import 'add_meal_schedule.dart';
+
+Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
+  String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+  
+  final response = await http.get(
+    Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=$date'),
+        // Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=2024-10-08'),
+
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+  if (response.statusCode == 200) {
+    final parsedData = json.decode(response.body);
+    List<Map<String, dynamic>> mealSchedule = [];
+
+    for (var meal in parsedData['data']) {
+  mealSchedule.add({
+    'id': meal['id'],
+    'name': meal['name'],
+    'from_time': meal['from_time'],
+    'to_time': meal['to_time'],
+    'meals': (meal['meals'] ?? []).map((m) {
+      return {
+        'id': m['id'],
+        'name': m['dish_id']['name'],
+        'description': m['dish_id']['description'],
+        'image': 'http://162.248.102.236:8055/assets/images/dish/${m['dish_id']['image']}',
+        'nutritions': m['dish_id']['nutritions'],
+      };
+    }).toList()
+  });
+}
+
+
+    return mealSchedule;
+  } else {
+    throw Exception('Failed to load meal schedule: ${response.statusCode}');
+  }
+}
 
 class MealSchedule extends StatefulWidget {
   const MealSchedule({Key? key}) : super(key: key);
@@ -20,306 +66,7 @@ class _MealScheduleState extends State<MealSchedule> {
       CalendarAgendaController();
   late DateTime _selectedDateAppBBar;
 
-  List mealScheduleArr = [
-    {
-      "title": "Breakfast",
-      "set": [
-        {
-          "name": "Honey Pancakes",
-          "time": "21/09/2024 7:00 AM",
-          "image": "assets/images/cake.png",
-          "nutrition": {
-            "calories": "350",
-            "protein": "10",
-            "carbs": "50",
-            "fat": "15"
-          },
-        },
-        {
-          "name": "coffee",
-          "time": "21/09/2024 8:00 AM",
-          "image": "assets/images/coffee.png",
-          "nutrition": {
-            "calories": "100",
-            "protein": "5",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ],
-    },
-    {
-      "title": "Lunch",
-      "set": [
-        {
-          "name": "Steak",
-          "time": "21/09/2024 11:00 AM",
-          "image": "assets/images/steak.png",
-          "nutrition": {
-            "calories": "500",
-            "protein": "20",
-            "carbs": "30",
-            "fat": "25"
-          },
-        },
-        {
-          "name": "milk",
-          "time": "21/09/2024 12:00 PM",
-          "image": "assets/images/milk.png",
-          "nutrition": {
-            "calories": "150",
-            "protein": "10",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Snack",
-      "set": [
-        {
-          "name": "Orange",
-          "time": "21/09/2024 3:00 PM",
-          "image": "assets/images/orange.png",
-          "nutrition": {
-            "calories": "50",
-            "protein": "2",
-            "carbs": "10",
-            "fat": "1"
-          },
-        },
-        {
-          "name": "Apple Pie",
-          "time": "21/09/2024 4:00 PM",
-          "image": "assets/images/apple_pie.png",
-          "nutrition": {
-            "calories": "200",
-            "protein": "5",
-            "carbs": "30",
-            "fat": "10"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Dinner",
-      "set": [
-        {
-          "name": "Salad",
-          "time": "21/09/2024 7:00 PM",
-          "image": "assets/images/salad.png",
-          "nutrition": {
-            "calories": "200",
-            "protein": "5",
-            "carbs": "20",
-            "fat": "10"
-          },
-        },
-        {
-          "name": "oatmeal",
-          "time": "21/09/2024 8:00 PM",
-          "image": "assets/images/oatmeal.png",
-          "nutrition": {
-            "calories": "300",
-            "protein": "10",
-            "carbs": "40",
-            "fat": "15"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Breakfast",
-      "set": [
-        {
-          "name": "Honey Pancakes",
-          "time": "22/09/2024 7:00 AM",
-          "image": "assets/images/cake.png",
-          "nutrition": {
-            "calories": "350",
-            "protein": "10",
-            "carbs": "50",
-            "fat": "15"
-          },
-        },
-        {
-          "name": "coffee",
-          "time": "22/09/2024 8:00 AM",
-          "image": "assets/images/coffee.png",
-          "nutrition": {
-            "calories": "100",
-            "protein": "5",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ],
-    },
-    {
-      "title": "Lunch",
-      "set": [
-        {
-          "name": "Steak",
-          "time": "22/09/2024 11:00 AM",
-          "image": "assets/images/steak.png",
-          "nutrition": {
-            "calories": "500",
-            "protein": "20",
-            "carbs": "30",
-            "fat": "25"
-          },
-        },
-        {
-          "name": "milk",
-          "time": "22/09/2024 12:00 PM",
-          "image": "assets/images/milk.png",
-          "nutrition": {
-            "calories": "150",
-            "protein": "10",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Snack",
-      "set": [
-        {
-          "name": "Orange",
-          "time": "22/09/2024 3:00 PM",
-          "image": "assets/images/orange.png",
-          "nutrition": {
-            "calories": "50",
-            "protein": "2",
-            "carbs": "10",
-            "fat": "1"
-          },
-        },
-        {
-          "name": "Apple Pie",
-          "time": "22/09/2024 4:00 PM",
-          "image": "assets/images/apple_pie.png",
-          "nutrition": {
-            "calories": "200",
-            "protein": "5",
-            "carbs": "30",
-            "fat": "10"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Dinner",
-      "set": [
-        {
-          "name": "Salad",
-          "time": "22/09/2024 7:00 PM",
-          "image": "assets/images/salad.png",
-          "nutrition": {
-            "calories": "200",
-            "protein": "5",
-            "carbs": "20",
-            "fat": "10"
-          },
-        },
-        {
-          "name": "oatmeal",
-          "time": "22/09/2024 8:00 PM",
-          "image": "assets/images/oatmeal.png",
-          "nutrition": {
-            "calories": "300",
-            "protein": "10",
-            "carbs": "40",
-            "fat": "15"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Breakfast",
-      "set": [
-        {
-          "name": "Honey Pancakes",
-          "time": "23/09/2024 7:00 AM",
-          "image": "assets/images/cake.png",
-          "nutrition": {
-            "calories": "350",
-            "protein": "10",
-            "carbs": "50",
-            "fat": "15"
-          },
-        },
-        {
-          "name": "coffee",
-          "time": "23/09/2024 8:00 AM",
-          "image": "assets/images/coffee.png",
-          "nutrition": {
-            "calories": "100",
-            "protein": "5",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ],
-    },
-    {
-      "title": "Lunch",
-      "set": [
-        {
-          "name": "Steak",
-          "time": "23/09/2024 11:00 AM",
-          "image": "assets/images/steak.png",
-          "nutrition": {
-            "calories": "500",
-            "protein": "20",
-            "carbs": "30",
-            "fat": "25"
-          },
-        },
-        {
-          "name": "milk",
-          "time": "23/09/2024 12:00 PM",
-          "image": "assets/images/milk.png",
-          "nutrition": {
-            "calories": "150",
-            "protein": "10",
-            "carbs": "20",
-            "fat": "5"
-          },
-        },
-      ]
-    },
-    {
-      "title": "Snack",
-      "set": [
-        {
-          "name": "Orange",
-          "time": "23/09/2024 3:00 PM",
-          "image": "assets/images/orange.png",
-          "nutrition": {
-            "calories": "50",
-            "protein": "2",
-            "carbs": "10",
-            "fat": "1"
-          },
-        },
-        {
-          "name": "Apple Pie",
-          "time": "23/09/2024 4:00 PM",
-          "image": "assets/images/apple_pie.png",
-          "nutrition": {
-            "calories": "200",
-            "protein": "5",
-            "carbs": "30",
-            "fat": "10"
-          },
-        },
-      ]
-    }
-  ];
-
+  List mealScheduleArr = [];
   List nutritionGoalArr = [
     {
       "title": "Calories",
@@ -345,32 +92,46 @@ class _MealScheduleState extends State<MealSchedule> {
   void initState() {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
-    setDayEventMealSchedule();
+    //type 2024-08-20
+    getMealSchedule(DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar)).then((value) {
+      mealScheduleArr = value;
+      setDayEventMealSchedule();
+      getNutritionData();
+      print(mealScheduleArr);
+      
+    });
+    // setDayEventMealSchedule();
   }
-
-  void setDayEventMealSchedule() {
-    var date = dateToStartDate(_selectedDateAppBBar);
-    selectDayEventArr = mealScheduleArr.map((wObj) {
-      return {
-        "title": wObj["title"],
-        "set": wObj["set"].map((sObj) {
-          return {
-            "name": sObj["name"],
-            "start_time": stringToDate(sObj["time"].toString(),
-                formatStr: "dd/MM/yyyy hh:mm aa"),
-            "image": sObj["image"],
-            "nutrition": sObj["nutrition"]
-          };
-        }).toList(),
-      };
-    }).where((wObj) {
+void setDayEventMealSchedule() {
+  var date = dateToStartDate(_selectedDateAppBBar);
+  selectDayEventArr = mealScheduleArr.map((wObj) {
+    // Kiểm tra trường "set" có null không
+    var setList = wObj["set"] ?? []; // Nếu null, gán cho danh sách rỗng
+    return {
+      "title": wObj["title"],
+      "set": setList.map((sObj) {
+        return {
+          "name": sObj["name"],
+          "start_time": stringToDate(sObj["time"].toString(),
+              formatStr: "dd/MM/yyyy hh:mm aa"),
+          "image": sObj["image"],
+          "nutrition": sObj["nutrition"]
+        };
+      }).toList(),
+    };
+  }).where((wObj) {
+    // Kiểm tra nếu "set" không rỗng trước khi truy cập phần tử
+    if (wObj["set"].isNotEmpty) {
       return dateToStartDate(wObj["set"][0]["start_time"]) == date;
-    }).toList();
-
-    if (mounted) {
-      setState(() {});
     }
+    return false; // Nếu "set" rỗng, trả về false
+  }).toList();
+
+  if (mounted) {
+    setState(() {});
   }
+}
+
 
   int getCalories(List setArr) {
     int calories = 0;
@@ -729,12 +490,12 @@ class _MealScheduleState extends State<MealSchedule> {
       ),
       floatingActionButton: InkWell(
         onTap: () {
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (context) => AddScheduleView(
-          //           date: _selectedDateAppBBar,
-          //         )));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddMealSchedule(
+                    date: _selectedDateAppBBar,
+                  )));
         },
         child: Container(
           width: 55,

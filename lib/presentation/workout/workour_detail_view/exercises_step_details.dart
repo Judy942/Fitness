@@ -6,39 +6,6 @@ import 'package:readmore/readmore.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/step_detail_row.dart';
 
-// Future<void> updateExerciseDetail(int id, Map<String, dynamic> exercise) async {
-//   String url =
-//       'http://162.248.102.236:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
-
-//   String? token = await getToken();
-
-//   try {
-//     final response = await http.put(Uri.parse(url), headers: <String, String>{
-//       'Content-Type': 'application/json; charset=UTF-8',
-//       'Authorization': 'Bearer $token'
-//     }, body: <String, dynamic>{
-//       "description": exercise["description"],
-//       "process_steps": exercise["process_steps"],
-//       "exercise_difficulties": [
-//         {
-//           "difficulty_id": {"code": "EASY"},
-//           "value": exercise["difficulty"],
-//           "calories_burn": exercise["caloriesBurned"],
-//           "excercise_time": exercise["excerciseTime"]
-//         }
-//       ]
-//     });
-//     if (response.statusCode == 200) {
-//       print("Update exercise detail success");
-//     } else {
-//       print("Update exercise detail failed");
-//       print(response.body);
-//     }
-//   } catch (e) {
-//     print("Update exercise detail failed $e");
-//   }
-// }
-
 class ExercisesStepDetails extends StatefulWidget {
   final Exercise eObj;
   final Map<String, dynamic> exerciseDetail;
@@ -125,12 +92,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     decoration: BoxDecoration(
                         gradient: LinearGradient(colors: AppColors.primary),
                         borderRadius: BorderRadius.circular(20)),
-                    // child: Image.asset(
-                    //   "assets/images/video_temp.png",
-                    //   width: media.width,
-                    //   height: media.width * 0.43,
-                    //   fit: BoxFit.contain,
-                    // ),
                     child: Image.network(
                       widget.eObj.image,
                       width: media.width,
@@ -145,14 +106,14 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         color: AppColors.blackColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Image.asset(
-                      "assets/icons/play_icon.png",
-                      width: 30,
-                      height: 30,
-                    ),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {},
+                  //   icon: Image.asset(
+                  //     "assets/icons/play_icon.png",
+                  //     width: 30,
+                  //     height: 30,
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(

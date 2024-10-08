@@ -10,16 +10,16 @@ import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
 import '../../onboarding_screen/start_screen.dart';
 
-class AddScheduleView extends StatefulWidget {
+class AddMealSchedule extends StatefulWidget {
   DateTime date;
 
-  AddScheduleView({super.key, required this.date});
+  AddMealSchedule({super.key, required this.date});
 
   @override
-  State<AddScheduleView> createState() => _AddScheduleViewState();
+  State<AddMealSchedule> createState() => _AddMealScheduleState();
 }
 
-class _AddScheduleViewState extends State<AddScheduleView> {
+class _AddMealScheduleState extends State<AddMealSchedule> {
   List whatArr = [];
   bool isLoading = true; // Biến để theo dõi trạng thái tải dữ liệu
   int workoutSelected = 0;
@@ -245,14 +245,8 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                         onPressed: () {
                           print(widget.date);
                           // DateTime utcDateTime = widget.date.toUtc();
-                          // String formattedTime = '${widget.date
-                          //     .toIso8601String()}Z';// Thêm 'Z' vào cuối
-                          //     formattedTime = formattedTime.replaceAll("Z", "+07:00");
-                          // DateTime utcDateTime = widget.date.toUtc();
-
-                          // Định dạng thời gian theo định dạng ISO 8601
-                          String formattedTime =
-                              '${widget.date.toIso8601String()}+07:00';
+                          String formattedTime = '${widget.date
+                              .toIso8601String()}Z';// Thêm 'Z' vào cuối
                           Map<String, dynamic> data = {
                             "scheduled_execution_time": formattedTime,
                             "workout_id": whatArr[workoutSelected]['id'],
@@ -284,12 +278,6 @@ Future<void> addWorkoutSchedule(
   );
   if (response.statusCode == 200) {
     print(response.body);
-    //hiển thị thông báo
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Add schedule success'),
-      ),
-    );
     Navigator.pop(context);
   } else {
     // Xử lý lỗi

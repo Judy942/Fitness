@@ -28,12 +28,6 @@ class ExercisesRow extends StatelessWidget {
             height: 60,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              // child: Image.asset(
-              //   eObj["image"].toString(),
-              //   // width: 60,
-              //   // height: 60,
-              //   // fit: BoxFit.fill,
-              // ),
               child: Image.network(
                 eObj.image,
                 width: 60,

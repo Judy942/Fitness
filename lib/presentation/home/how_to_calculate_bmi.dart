@@ -43,7 +43,7 @@ class HowToCalculateBmi extends StatelessWidget {
                       style: TextStyle(
                         decoration: TextDecoration.none,
                         color: AppColors.whiteColor,
-                        fontSize: 18,
+                        fontSize: 16,
                       ),
                     ),
                   ),

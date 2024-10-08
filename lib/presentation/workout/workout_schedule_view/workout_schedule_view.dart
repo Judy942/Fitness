@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_tracker/workout_tracker_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
@@ -23,89 +25,117 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   late DateTime _selectedDateAppBBar;
 
   List eventArr = [];
-  bool isLoading = true;
+  List workoutArr = [];
+  bool isLoading = false;
 
-  Future<void> getWorkoutSchedule() async {
-    String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+  Future<void> getWorkoutSchedule(String url) async {
+    setState(() {
+      isLoading = true; // Đặt lại trạng thái loading
+    });
+    String? token =
+        await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse(
-          'http://162.248.102.236:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=2024-10-06T00:00:00%2B07:00&filter[_and][0][_and][3][scheduled_execution_time][_lte]=2024-10-06T23:59:00%2B07:00'),
+      Uri.parse(url),
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      eventArr = jsonResponse["data"];
-      print(eventArr);
-    }else{
-      print(response.body);
+      print("jsonResponse: $jsonResponse");
+      setState(() {
+        eventArr = jsonResponse["data"];
+        setDayEventWorkoutList(); // Gọi ở đây để cập nhật selectDayEventArr
+        isLoading = false;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: ${response.statusCode}')),
+      );
+      setState(() {
+        isLoading = false;
+      });
     }
-    setState(() {
-      isLoading = false;
-    });
+    isLoading = false;
   }
-
 
   // List eventArr = [
   //   {
-  //     "name": "Ab Workout",
-  //     "start_time": "20/09/2024 07:30 AM",
-  //   },
-  //   {
-  //     "name": "Upperbody Workout",
-  //     "start_time": "20/09/2024 09:00 AM",
-  //   },
-  //   {
   //     "name": "Lowerbody Workout",
-  //     "start_time": "20/09/2024 03:00 PM",
+  //     "scheduled_execution_time": "2024-10-08T08:44:00.000Z",
   //   },
   //   {
   //     "name": "Ab Workout",
-  //     "start_time": "21/09/2024 07:30 AM",
+  //     "scheduled_execution_time": "2024-10-08T09:00:00.000Z",
   //   },
   //   {
   //     "name": "Upperbody Workout",
-  //     "start_time": "21/09/2024 09:00 AM",
+  //     "scheduled_execution_time": "2024-10-08T10:00:00.000Z",
   //   },
   //   {
   //     "name": "Lowerbody Workout",
-  //     "start_time": "21/09/2024 03:00 PM",
-  //   },
-  //   {
-  //     "name": "Ab Workout",
-  //     "start_time": "22/09/2024 07:30 AM",
-  //   },
-  //   {
-  //     "name": "Upperbody Workout",
-  //     "start_time": "22/09/2024 09:00 AM",
-  //   },
-  //   {
-  //     "name": "Lowerbody Workout",
-  //     "start_time": "22/09/2024 03:00 PM",
+  //     "scheduled_execution_time": "2024-10-08T11:00:00.000Z",
   //   }
   // ];
 
   List selectDayEventArr = [];
 
+  String createWorkoutScheduleUrl(DateTime date) {
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    String startDate = "${formattedDate}T00:00:00%2B07:00";
+    String endDate = "${formattedDate}T23:59:00%2B07:00";
+
+    return 'http://162.248.102.236:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
+  }
+
   @override
   void initState() {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
+
+    getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar));
     setDayEventWorkoutList();
-    getWorkoutSchedule();
+    getListWorkout().then((workouts) {
+      setState(() {
+        workoutArr = workouts;
+      });
+    });
+  }
+
+  String formatScheduledTime(String time) {
+    DateTime dateTime = DateTime.parse(time); // Parse từ chuỗi
+    return DateFormat('dd/MM/yyyy hh:mm a').format(dateTime); // Định dạng lại
   }
 
   void setDayEventWorkoutList() {
     var date = dateToStartDate(_selectedDateAppBBar);
+
     selectDayEventArr = eventArr.map((wObj) {
+      // Chuyển đổi thời gian từ chuỗi thành DateTime
+      DateTime scheduledTime = DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
+      String workoutName = workoutArr.where((w) {
+        return w["id"] == wObj["workout_id"];
+      }).isNotEmpty
+          ? workoutArr.where((w) {
+              return w["id"] == wObj["workout_id"];
+            }).first["title"]
+          : " Workout"; // Hoặc giá trị mặc định khác
+
       return {
-        "name": wObj["name"],
-        "start_time": wObj["start_time"],
-        "date": stringToDate(wObj["start_time"].toString(),
-            formatStr: "dd/MM/yyyy hh:mm aa")
+        "name": workoutName,
+        "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
+        "date": scheduledTime,
       };
+
+      // return {
+      //   //tên workout có id tương ứng
+      //   "name": workoutArr.where((w) {
+      //     return w["id"] == wObj["workout_id"];
+      //   }).first["title"],
+      //   "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
+      //   "date": scheduledTime, // Lưu DateTime để xử lý sau này
+      // };
     }).where((wObj) {
       return dateToStartDate(wObj["date"] as DateTime) == date;
     }).toList();
@@ -117,15 +147,10 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
   @override
   Widget build(BuildContext context) {
+    // print("eventArr: $eventArr");
+    print("workoutArr: $workoutArr");
     var media = MediaQuery.of(context).size;
-    return isLoading
-        ? const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        :
-     Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -212,14 +237,25 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
             selectedDateColor: Colors.white,
             dateColor: Colors.black,
             locale: 'en',
-
-            initialDate: DateTime.now(),
+            initialDate: _selectedDateAppBBar,
             calendarEventColor: AppColors.primaryColor2,
             firstDate: DateTime.now().subtract(const Duration(days: 140)),
             lastDate: DateTime.now().add(const Duration(days: 60)),
+            onDateSelected: (date) async {
+              // _selectedDateAppBBar = date;
+              DateTime now = DateTime.now();
 
-            onDateSelected: (date) {
-              _selectedDateAppBBar = date;
+              // Kết hợp ngày đã chọn với giờ hiện tại
+              _selectedDateAppBBar = DateTime(
+                date.year,
+                date.month,
+                date.day,
+                now.hour,
+                now.minute,
+                now.second, // Thêm giây nếu cần
+              );
+              print("date: $_selectedDateAppBBar");
+              getWorkoutSchedule(createWorkoutScheduleUrl(date));
               setDayEventWorkoutList();
             },
             selectedDayLogo: Container(
@@ -235,93 +271,105 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: media.width * 1.5,
-                child: ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      var timelineDataWidth = (media.width * 1.5) - (80 + 40);
-                      var availWidth = (media.width * 1.2) - (80 + 40);
-                      var slotArr = selectDayEventArr.where((wObj) {
-                        return (wObj["date"] as DateTime).hour == index;
-                      }).toList();
+            child: isLoading
+                ? const Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: media.width * 1,
+                      child: ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            var availWidth = (media.width * 1.2) - (80 + 40);
+                            var slotArr = selectDayEventArr.where((wObj) {
+                              return (wObj["date"] as DateTime).hour == index;
+                            }).toList();
+                            print("slotArr: $slotArr");
 
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        height: 40,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                getTime(index * 60),
-                                style: const TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            if (slotArr.isNotEmpty)
-                              Expanded(
-                                  child: Stack(
-                                alignment: Alignment.centerLeft,
-                                children: slotArr.map((sObj) {
-                                  var min = (sObj["date"] as DateTime).minute;
-                                  //(0 to 2)
-                                  var pos = (min / 60) * 2 - 1;
-
-                                  return Align(
-                                    alignment: Alignment(pos, 0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return ShowLog(eObj: sObj, title: "Workout Schedule",);
-                                          },
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 35,
-                                        width: availWidth * 0.5,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        alignment: Alignment.centerLeft,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                              colors: AppColors.secondary),
-                                          borderRadius:
-                                              BorderRadius.circular(17.5),
-                                        ),
-                                        child: Text(
-                                          "${sObj["name"].toString()}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            color: AppColors.whiteColor,
-                                            fontSize: 12,
-                                          ),
-                                        ),
+                            return Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              height: 40,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      getTime(index * 60),
+                                      style: const TextStyle(
+                                        color: AppColors.blackColor,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                  );
-                                }).toList(),
-                              ))
-                          ],
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return Divider(
-                        color: AppColors.grayColor.withOpacity(0.2),
-                        height: 1,
-                      );
-                    },
-                    itemCount: 24),
-              ),
-            ),
+                                  ),
+                                  if (slotArr.isNotEmpty)
+                                    Expanded(
+                                      child: ListView.builder(
+                                        scrollDirection: Axis
+                                            .horizontal, // Hiển thị theo chiều ngang
+                                        itemCount: slotArr.length,
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        itemBuilder: (context, index) {
+                                          var sObj = slotArr[index];
+                                          return InkWell(
+                                            onTap: () {
+                                              print("slotArr: $slotArr");
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return ShowLog(
+                                                    eObj: sObj,
+                                                    title: "Workout Schedule",
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 35,
+                                              width: availWidth * 0.5,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8),
+                                              alignment: Alignment.centerLeft,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    colors:
+                                                        AppColors.secondary),
+                                                borderRadius:
+                                                    BorderRadius.circular(17.5),
+                                              ),
+                                              child: Text(
+                                                "${sObj["name"].toString()}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  color: AppColors.whiteColor,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    )
+                                ],
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Divider(
+                              color: AppColors.grayColor.withOpacity(0.2),
+                              height: 1,
+                            );
+                          },
+                          itemCount: 24),
+                    ),
+                  ),
           ),
         ],
       ),

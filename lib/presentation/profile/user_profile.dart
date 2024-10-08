@@ -1,56 +1,18 @@
-
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../main.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
+import '../home/home_screen.dart';
 import 'complete_profile_screen.dart';
 
-// Future<String?> getGoal() async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   return prefs.getString('goal');
-// }
-
-// Future<void> loadDataFromserver() async {
-//     String? token = await getToken();
-//     if (token != null) {
-//       // Gọi API để lấy thông tin người dùng
-//       final response = await http.get(
-//         Uri.parse('http://162.248.102.236:8055/users/me'),
-//         headers: {'Authorization': 'Bearer $token'},
-//       );
-
-//       if (response.statusCode == 200) {
-//         final responseData = json.decode(response.body);
-//         final userData = responseData['data'];
-//         await saveUserData(userData);
-//         await fetchAndSaveBmi(token);
-//       } else {
-//         // Xử lý lỗi nếu cần
-//       }
-//   }
-// }
-
-
-  // Future<Map<String, dynamic>> allUserData = getAllData();
-
-
-// Future<Map<String, dynamic>> getAllData() async {
-//     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-//     // Lấy tất cả dữ liệu từ SharedPreferences
-//     Map<String, dynamic> allData = {};
-    
-//     // Lấy từng loại dữ liệu
-//     for (String key in prefs.getKeys()) {
-//       allData[key] = prefs.get(key);
-//     }
-//     return allData;
-//   }
+Future<String?> getGoal() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('goal');
+}
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -60,7 +22,20 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  Map<String, dynamic> allData = {};
+  Map<String, dynamic> userData = {};
+  String? goal;
+  @override
+  void initState() {
+    super.initState();
+    getUserData().then((data) {
+      setState(() {
+        userData = data;
+      });
+    });
+    getGoal().then((value) {
+      goal = value;
+    });
+  }
 
   bool positive = false;
 
@@ -83,18 +58,6 @@ class _UserProfileState extends State<UserProfile> {
     }
   ];
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   loadUserData();
-  // }
-
-  // Future<void> loadUserData() async {
-  //   allData = await getAllData() as Map<String, dynamic>;
-  //   print('giá trị alldata$allData');
-  //   setState(() {});
-  // }
-
   List otherArr = [
     {"image": "assets/icons/p_contact.png", "name": "Contact Us", "tag": "5"},
     {
@@ -107,8 +70,8 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final prefsNotifier = Provider.of<PreferencesNotifier>(context);
- return Scaffold(
+    // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
+    return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -147,7 +110,7 @@ class _UserProfileState extends State<UserProfile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          prefsNotifier.userData['last_name'] ?? "you",
+                          userData['last_name'] ?? "you",
                           // allData['last_name'] ?? "you",
                           style: const TextStyle(
                             color: AppColors.blackColor,
@@ -156,7 +119,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                         ),
                         Text(
-                          prefsNotifier.userData['goal'] ?? "Goal",
+                          goal ?? "Goal",
                           style: const TextStyle(
                             color: AppColors.grayColor,
                             fontSize: 12,
@@ -171,13 +134,33 @@ class _UserProfileState extends State<UserProfile> {
                     child: RoundButton(
                       title: "Edit",
                       type: RoundButtonType.primaryBG,
-                      onPressed: () {
-                        Navigator.push(
+                      // onPressed: () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => CompleteProfileScreen(isBackToProfile: true,),
+                      //     ),
+
+                      //   );
+
+                      // },
+                      onPressed: () async {
+                        final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CompleteProfileScreen(isBackToProfile: true,),
+                            builder: (context) =>
+                                CompleteProfileScreen(isBackToProfile: true),
                           ),
                         );
+
+                        // Kiểm tra xem có giá trị trả về không
+                        if (result != null) {
+                          getUserData().then((data) {
+                            setState(() {
+                              userData = data;
+                            });
+                          });
+                        }
                       },
                     ),
                   )
@@ -190,7 +173,7 @@ class _UserProfileState extends State<UserProfile> {
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: prefsNotifier.userData['height'] ?? "0",
+                      title: userData['height'].toString(),
                       subtitle: "Height",
                     ),
                   ),
@@ -199,7 +182,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: prefsNotifier.userData['weight'] ?? "0",
+                      title: userData['weight'].toString(),
                       subtitle: "Weight",
                     ),
                   ),
@@ -209,7 +192,7 @@ class _UserProfileState extends State<UserProfile> {
                   Expanded(
                     child: TitleSubtitleCell(
                       //now-usetData['birthday']
-                      title: prefsNotifier.userData['birthday'] ?? "0",
+                      title: userData['birthday'] ?? "0",
                       subtitle: "birthday",
                     ),
                   ),

@@ -1,22 +1,42 @@
 
+import 'dart:convert';
+
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../main.dart';
+import '../../routes/app_routes.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
+import '../onboarding_screen/start_screen.dart';
 import 'how_to_calculate_bmi.dart';
 
-Future<String?> getBmi() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('bmi'); // Lấy giá trị BMI từ SharedPreferences
-}
+ Future<Map<String, dynamic>> getUserData() async {
+    String? token = await getToken();
+    Map<String, dynamic> userData = {};
+
+    if (token != null) {
+      // Gọi API để lấy thông tin người dùng
+      final response = await http.get(
+        Uri.parse('http://162.248.102.236:8055/users/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        userData = responseData['data'];
+        return userData;
+      } else {
+        await clearLocalData();
+        return userData;
+      }
+    } else {
+      return userData;
+    }
+  }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -26,21 +46,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-    Map<String, dynamic> allData = {};
+
+    Map<String, dynamic> userData = {};
+    String bmi = '0';
   @override
   void initState() {
     super.initState();
-    loadUserData();
+    getUserData().then((data) {
+      setState(() {
+        userData = data;
+      });
+    });
+    getBmi().then((value) {
+      setState(() {
+        bmi = value =="null"? '0': value;
+      });
+    });
   }
 
-  Future<void> loadUserData() async {
-    // allData = await getAllData() as Map<String, dynamic>;
-    setState(() {});
-  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    final prefsNotifier = Provider.of<PreferencesNotifier>(context);
+    // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
 
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -51,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 TopBar(prefsNotifier.userData['last_name'] ?? ""),
+                 TopBar(userData['last_name'] ?? ""),
                 SizedBox(height: media.width * 0.05),
-                const ContainerBmi(),
+                 ContainerBmi(bmi: bmi),
                 SizedBox(height: media.width * 0.05),
                 const TodayTargetSection(),
                 SizedBox(height: media.width * 0.05),
@@ -121,51 +149,18 @@ class TopBar extends StatelessWidget {
 }
 
 class ContainerBmi extends StatelessWidget {
-  const ContainerBmi({super.key});
-
-  // Future<String?> getBmi() async {
-  //   const String url =
-  //       'http://162.248.102.236:8055/api/users/bmi'; // Địa chỉ API của bạn
-  //   String? token = await getToken();
-
-  //   if (token != null) {
-  //     try {
-  //       final response = await http.get(
-  //         Uri.parse(url),
-  //         headers: {
-  //           'Authorization': 'Bearer $token', // Thêm access token vào tiêu đề
-  //         },
-  //       );
-
-  //       if (response.statusCode == 200) {
-  //         // Giả định rằng API trả về một JSON với trường 'bmi'
-  //         final Map<String, dynamic> data = json.decode(response.body);
-  //         print(data);
-  //         return data['bmi'] != null ? data['bmi'].toString() : '0.0';
-  //       } else {
-  //         // Xử lý lỗi tại đây
-  //         print('Failed to load BMI: ${response.statusCode}');
-  //         return null;
-  //       }
-  //     } catch (e) {
-  //       // Xử lý ngoại lệ
-  //       print('Error occurred: $e');
-
-  //       return null;
-  //     }
-  //   }
-  //   return null;
-  // }
-
+  String bmi;
+  ContainerBmi({super.key, required this.bmi});
 
   @override
   Widget build(BuildContext context) {
     List<PieChartSectionData> showingSections(String bmi) {
+                const color0 = AppColors.secondaryColor2;
+          const color1 = AppColors.whiteColor;
       return List.generate(
         2,
         (i) {
-          const color0 = AppColors.secondaryColor2;
-          const color1 = AppColors.whiteColor;
+
 
           switch (i) {
             case 0:
@@ -204,24 +199,12 @@ class ContainerBmi extends StatelessWidget {
         borderRadius:
             BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
       ),
-      child: FutureBuilder<String?>(
-        future: getBmi(), // Fetch the BMI value asynchronously
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child:
-                    CircularProgressIndicator()); // Show loading while fetching
-          } else {
-            String? bmi = snapshot.data;
-            return _buildBMIContent(bmi ?? "0", context); // Pass the valid BMI value
-          }
-        },
-      ),
+      child: _buildBMIContent(bmi , context)
     );
   }
 
   Widget _buildBMIContent(String bmi, BuildContext context) {
-        final prefsNotifier = Provider.of<PreferencesNotifier>(context);
+        // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -250,7 +233,7 @@ class ContainerBmi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    prefsNotifier.userData['bmi'] ?? "Enter your height and weight",
+                    bmi == "0" ? "Enter your height and weight": bmi,
                     style: TextStyle(
                       color: AppColors.whiteColor.withOpacity(0.7),
                       fontSize: 12,
@@ -678,7 +661,8 @@ class TodayTargetSection extends StatelessWidget {
               title: "Check",
               type: RoundButtonType.primaryBG,
               onPressed: () {
-                Navigator.pushNamed(context, '/activityTrackerScreen');
+              Navigator.pushNamed(context, AppRoutes.activityTrackerScreen);
+
               },
             ),
           ),

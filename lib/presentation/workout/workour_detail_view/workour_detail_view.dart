@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../model/workout.dart';
@@ -10,8 +11,7 @@ import '../../../widgets/round_gradient_button.dart';
 import '../../onboarding_screen/start_screen.dart';
 import 'exercises_step_details.dart';
 
-
-  Future<Map<String, dynamic>> getExerciseDetail(int id) async {
+Future<Map<String, dynamic>> getExerciseDetail(int id) async {
   String url =
       'http://162.248.102.236:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
 
@@ -37,7 +37,6 @@ import 'exercises_step_details.dart';
     }
   } catch (e) {
     print("Exception: $e");
-    
   }
   return {}; // Return an empty map if no data is found or an error occurs
 }
@@ -45,26 +44,25 @@ import 'exercises_step_details.dart';
 class WorkoutDetailView extends StatefulWidget {
   final Map dObj;
   final Workout workout;
-  const WorkoutDetailView({Key? key, required this.dObj, required this.workout}) : super(key: key);
-  
+  const WorkoutDetailView({Key? key, required this.dObj, required this.workout})
+      : super(key: key);
 
   @override
   State<WorkoutDetailView> createState() => _WorkoutDetailViewState();
 }
 
 class _WorkoutDetailViewState extends State<WorkoutDetailView> {
-
-
   @override
   Widget build(BuildContext context) {
     // List exercisesArr = widget.workout.exercises;
-    List<GroupedExercise> groupedExercises = widget.workout.groupExercisesBySetNumber();
+    List<GroupedExercise> groupedExercises =
+        widget.workout.groupExercisesBySetNumber();
     List equipmentArr = widget.workout.equipments;
 
     var media = MediaQuery.of(context).size;
     return Container(
       decoration:
-      BoxDecoration(gradient: LinearGradient(colors: AppColors.primary)),
+          BoxDecoration(gradient: LinearGradient(colors: AppColors.primary)),
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -200,7 +198,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           time: "5/27, 09:00 AM",
                           color: AppColors.primaryColor2.withOpacity(0.3),
                           onPressed: () {
-                            Navigator.pushNamed(context, '/workoutScheduleView');
+                            Navigator.pushNamed(
+                                context, '/workoutScheduleView');
                           }),
                       SizedBox(
                         height: media.width * 0.02,
@@ -225,17 +224,21 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                 fontWeight: FontWeight.w700),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              print(media.width);
+                            },
                             child: Text(
                               "${equipmentArr.length} Items",
-                              style:
-                              const TextStyle(color: AppColors.grayColor, fontSize: 12),
+                              style: const TextStyle(
+                                  color: AppColors.grayColor, fontSize: 12),
                             ),
                           )
                         ],
                       ),
                       SizedBox(
-                        height: media.width * 0.5,
+                        height: media.width > 400
+                            ? media.width * 0.48
+                            : media.width * 0.55,
                         child: ListView.builder(
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.horizontal,
@@ -247,7 +250,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                   margin: const EdgeInsets.all(8),
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         height: media.width * 0.35,
@@ -255,10 +258,10 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                         decoration: BoxDecoration(
                                             color: AppColors.lightGrayColor,
                                             borderRadius:
-                                            BorderRadius.circular(15)),
+                                                BorderRadius.circular(15)),
                                         alignment: Alignment.center,
                                         child: Image.network(
-                                            yObj["image"].toString(),
+                                          yObj["image"].toString(),
                                           width: media.width * 0.2,
                                           height: media.width * 0.2,
                                           fit: BoxFit.contain,
@@ -297,8 +300,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                             onPressed: () {},
                             child: Text(
                               "${groupedExercises.length} Sets",
-                              style:
-                              const TextStyle(color: AppColors.grayColor, fontSize: 12),
+                              style: const TextStyle(
+                                  color: AppColors.grayColor, fontSize: 12),
                             ),
                           )
                         ],
@@ -334,7 +337,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      RoundGradientButton(title: "Start Workout", onPressed: () {})
+                      RoundGradientButton(
+                          title: "Start Workout", onPressed: () {})
                     ],
                   ),
                 )
@@ -352,7 +356,10 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => ExercisesStepDetails(eObj: obj, exerciseDetail: exerciseDetail,),
+      builder: (context) => ExercisesStepDetails(
+        eObj: obj,
+        exerciseDetail: exerciseDetail,
+      ),
     ),
   );
 }

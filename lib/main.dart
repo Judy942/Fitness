@@ -4,33 +4,31 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/utils/pref_utils.dart';
 import 'localization/app_localization.dart';
 import 'routes/app_routes.dart';
 import 'theme/bloc/theme_bloc.dart';
-import 'package:provider/provider.dart';
 
-class PreferencesNotifier extends ChangeNotifier {
-  Map<String, dynamic> _userData = {};
+// class PreferencesNotifier extends ChangeNotifier {
+//   Map<String, dynamic> _userData = {};
 
-  Map<String, dynamic> get userData => _userData;
+//   Map<String, dynamic> get userData => _userData;
 
-  Future<void> loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _userData = {};
-    for (String key in prefs.getKeys()) {
-      _userData[key] = prefs.get(key);
-    }
-    notifyListeners(); // Thông báo rằng dữ liệu đã thay đổi
-  }
+//   Future<void> loadUserData() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     _userData = {};
+//     for (String key in prefs.getKeys()) {
+//       _userData[key] = prefs.get(key);
+//     }
+//     notifyListeners(); // Thông báo rằng dữ liệu đã thay đổi
+//   }
 
-  Future<void> updateUserData(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value.toString());
-    await loadUserData(); // Tải lại dữ liệu
-  }
-}
+//   // Future<void> updateUserData(String key, dynamic value) async {
+//   //   final prefs = await SharedPreferences.getInstance();
+//   //   await prefs.setString(key, value.toString());
+//   //   await loadUserData(); // Tải lại dữ liệu
+//   // }
+// }
 
 var golobalMessage = GlobalKey<ScaffoldMessengerState>();
 void main() {
@@ -40,10 +38,11 @@ void main() {
   ]).then((value) {
     PrefUtils().init();
     runApp(
-      ChangeNotifierProvider(
-      create: (context) => PreferencesNotifier()..loadUserData(),
-      child: const MyApp(),
-    ),
+      const MyApp(),
+    //   ChangeNotifierProvider(
+    //   create: (context) => PreferencesNotifier()..loadUserData(),
+    //   child: const MyApp(),
+    // ),
     );
   });
 }
