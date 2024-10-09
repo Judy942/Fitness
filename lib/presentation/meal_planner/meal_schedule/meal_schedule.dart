@@ -15,41 +15,24 @@ import 'add_meal_schedule.dart';
 
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
-  
+
   final response = await http.get(
     Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=$date'),
-        // Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=2024-10-08'),
-
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     },
   );
+
   if (response.statusCode == 200) {
-    final parsedData = json.decode(response.body);
-    List<Map<String, dynamic>> mealSchedule = [];
+    // Chuyển đổi body của API thành List<Map<String, dynamic>>
+    final Map<String, dynamic> responseBody = json.decode(response.body);
+    final List<dynamic> data = responseBody['data'];
 
-    for (var meal in parsedData['data']) {
-  mealSchedule.add({
-    'id': meal['id'],
-    'name': meal['name'],
-    'from_time': meal['from_time'],
-    'to_time': meal['to_time'],
-    'meals': (meal['meals'] ?? []).map((m) {
-      return {
-        'id': m['id'],
-        'name': m['dish_id']['name'],
-        'description': m['dish_id']['description'],
-        'image': 'http://162.248.102.236:8055/assets/images/dish/${m['dish_id']['image']}',
-        'nutritions': m['dish_id']['nutritions'],
-      };
-    }).toList()
-  });
-}
-
-
-    return mealSchedule;
+    // Chuyển đổi dữ liệu thành List<Map<String, dynamic>>
+    return List<Map<String, dynamic>>.from(data);
   } else {
+    // Xử lý lỗi ở đây nếu cần
     throw Exception('Failed to load meal schedule: ${response.statusCode}');
   }
 }
@@ -93,50 +76,86 @@ class _MealScheduleState extends State<MealSchedule> {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
     //type 2024-08-20
-    getMealSchedule(DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar)).then((value) {
+    getMealSchedule(DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar))
+        .then((value) {
       mealScheduleArr = value;
       setDayEventMealSchedule();
       getNutritionData();
       print(mealScheduleArr);
-      
     });
     // setDayEventMealSchedule();
   }
-void setDayEventMealSchedule() {
-  var date = dateToStartDate(_selectedDateAppBBar);
-  selectDayEventArr = mealScheduleArr.map((wObj) {
-    // Kiểm tra trường "set" có null không
-    var setList = wObj["set"] ?? []; // Nếu null, gán cho danh sách rỗng
-    return {
-      "title": wObj["title"],
-      "set": setList.map((sObj) {
-        return {
-          "name": sObj["name"],
-          "start_time": stringToDate(sObj["time"].toString(),
-              formatStr: "dd/MM/yyyy hh:mm aa"),
-          "image": sObj["image"],
-          "nutrition": sObj["nutrition"]
-        };
-      }).toList(),
-    };
-  }).where((wObj) {
-    // Kiểm tra nếu "set" không rỗng trước khi truy cập phần tử
-    if (wObj["set"].isNotEmpty) {
-      return dateToStartDate(wObj["set"][0]["start_time"]) == date;
-    }
-    return false; // Nếu "set" rỗng, trả về false
-  }).toList();
 
-  if (mounted) {
-    setState(() {});
+  // void setDayEventMealSchedule() {
+  //   var date = dateToStartDate(_selectedDateAppBBar);
+  //   selectDayEventArr = mealScheduleArr.map((wObj) {
+  //     // Kiểm tra trường "set" có null không
+  //     var setList = wObj["set"] ?? []; // Nếu null, gán cho danh sách rỗng
+  //     return {
+  //       "title": wObj["title"],
+  //       "set": setList.map((sObj) {
+  //         return {
+  //           "name": sObj["name"],
+  //           "start_time": stringToDate(sObj["time"].toString(),
+  //               formatStr: "dd/MM/yyyy hh:mm aa"),
+  //           "image": sObj["image"],
+  //           "nutrition": sObj["nutrition"]
+  //         };
+  //       }).toList(),
+  //     };
+  //   }).where((wObj) {
+  //     if (wObj["set"].isNotEmpty) {
+  //       return dateToStartDate(wObj["set"][0]["start_time"]) == date;
+  //     }
+  //     return false; // Nếu "set" rỗng, trả về false
+  //   }).toList();
+
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
+
+  void setDayEventMealSchedule() {
+    var date = dateToStartDate(_selectedDateAppBBar);
+
+    selectDayEventArr = mealScheduleArr.map((wObj) {
+      return {
+        'id': wObj['id'],
+        'name': wObj['name'],
+        'from_time': wObj['from_time'],
+        'to_time': wObj['to_time'],
+        'meals': wObj['meals']
+            .map((sObj) {
+              var mealDate = DateTime.parse(sObj['meal_time']).toLocal();
+
+              return {
+                'id': sObj['id'],
+                'meal_time': mealDate,
+                'dish_id': {
+                  'id': sObj['dish_id']['id'],
+                  'name': sObj['dish_id']['name'],
+                  'description': sObj['dish_id']['description'],
+                  'image':
+                      'http://162.248.102.236:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
+                  'nutritions': sObj['dish_id']['nutritions'],
+                },
+              };
+            })
+            .where((meal) => meal != null)
+            .toList(), // Lọc bỏ các món ăn null
+      };
+    }).toList();
   }
-}
-
 
   int getCalories(List setArr) {
     int calories = 0;
     for (var sObj in setArr) {
-      calories += int.parse(sObj["nutrition"]["calories"]);
+      // calories += int.parse(sObj["nutrition"]["calories"]);
+      if (sObj["dish_id"] != null &&
+          sObj["dish_id"]["nutrition"] != null &&
+          sObj["dish_id"]["nutrition"].isNotEmpty) {
+        calories += (sObj["dish_id"]["nutrition"][0]["value"] as int);
+      }
     }
     return calories;
   }
@@ -182,7 +201,7 @@ void setDayEventMealSchedule() {
     return fat;
   }
 
-  List getNutrition = [0,0,0,0];
+  List getNutrition = [0, 0, 0, 0];
 
   void getNutritionData() {
     getNutrition = [
@@ -192,7 +211,6 @@ void setDayEventMealSchedule() {
       sumFat(), //fat
     ];
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -292,8 +310,14 @@ void setDayEventMealSchedule() {
 
             onDateSelected: (date) {
               _selectedDateAppBBar = date;
-              setDayEventMealSchedule();
-              getNutritionData();
+              getMealSchedule(
+                      DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar))
+                  .then((value) {
+                mealScheduleArr = value;
+                setDayEventMealSchedule();
+                getNutritionData();
+                print(mealScheduleArr);
+              });
             },
             selectedDayLogo: Container(
               width: double.maxFinite,
@@ -327,10 +351,11 @@ void setDayEventMealSchedule() {
                           itemCount: 4,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            var slotArr = selectDayEventArr.where((wObj) {
-                              // return (wObj["date"] as DateTime).hour == index;
-                              return (wObj["set"] as List).isNotEmpty;
-                            }).toList();
+                            // var slotArr = selectDayEventArr.where((wObj) {
+                            //   // return (wObj["date"] as DateTime).hour == index;
+                            //   return (wObj["set"] as List).isNotEmpty;
+                            // }).toList();
+                            var slotArr = selectDayEventArr;
                             return Column(
                               children: slotArr.length <= index
                                   ? [const SizedBox()]
@@ -340,7 +365,8 @@ void setDayEventMealSchedule() {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            slotArr[index]["title"],
+                                            // slotArr[index]["title"],
+                                            slotArr[index]["name"],
                                             style: const TextStyle(
                                                 color: AppColors.blackColor,
                                                 fontSize: 16,
@@ -348,7 +374,8 @@ void setDayEventMealSchedule() {
                                           ),
                                           const Spacer(),
                                           Text(
-                                            "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                            // "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                            "${slotArr[index]["meals"].length} meals| ${getCalories(slotArr[index]["meals"])} calories",
                                             style: const TextStyle(
                                                 color: AppColors.blackColor,
                                                 fontSize: 12,
@@ -365,19 +392,23 @@ void setDayEventMealSchedule() {
                                               const NeverScrollableScrollPhysics(),
                                           shrinkWrap: true,
                                           itemCount:
-                                              slotArr[index]["set"].length,
+                                              // slotArr[index]["set"].length,
+                                              slotArr[index]["meals"].length,
                                           itemBuilder: (context, itemIndex) {
-                                            var yObj = slotArr[index]["set"]
+                                            // var yObj = slotArr[index]["set"][itemIndex];
+                                            var yObj = slotArr[index]["meals"]
                                                 [itemIndex];
                                             return ExercisesRow(
                                               ImagePadding: 10,
-                                              eObj: yObj
-                                                ..addAll({
-                                                  "title": yObj["name"],
-                                                  "value": DateFormat("hh:mm a")
-                                                      .format(
-                                                          yObj["start_time"]),
-                                                }),
+                                              eObj: yObj..addAll({"name": yObj["dish_id"]["name"]}),
+                                              // eObj:   yObj..add(Exercise(title: yObj
+
+                                              // ..addAll({
+                                              //     "title": yObj["name"],
+                                              //     "value": DateFormat("hh:mm a")
+                                              //         .format(
+                                              //             yObj["start_time"]),
+                                              //   }),
                                               onPressed: () {
                                                 showDialog(
                                                   context: context,
@@ -467,7 +498,10 @@ void setDayEventMealSchedule() {
                                       backgroundColor: Colors.grey.shade100,
                                       foregrondColor: Colors.purple,
                                       // ratio: wObj["progress"] as double? ?? 0.0,
-                                      ratio: getNutrition[index] / int.parse(nutritionGoalArr[index]["value"].split(" ")[0]),
+                                      ratio: getNutrition[index] /
+                                          int.parse(nutritionGoalArr[index]
+                                                  ["value"]
+                                              .split(" ")[0]),
                                       direction: Axis.horizontal,
                                       curve: Curves.fastLinearToSlowEaseIn,
                                       duration: const Duration(seconds: 3),
@@ -494,8 +528,8 @@ void setDayEventMealSchedule() {
               context,
               MaterialPageRoute(
                   builder: (context) => AddMealSchedule(
-                    date: _selectedDateAppBBar,
-                  )));
+                        date: _selectedDateAppBBar,
+                      )));
         },
         child: Container(
           width: 55,
