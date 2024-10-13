@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
 import '../../widgets/today_target_cell.dart';
+import '../meal_planner/meal_schedule/meal_schedule.dart';
 
 
 class ActivityTrackerScreen extends StatefulWidget {
@@ -41,10 +42,21 @@ Future<void> requestLocationPermission() async {
     },
   ];
 
+  int calories = 0;
+
     @override
   void initState() {
     super.initState();
     initPlatformState();
+        getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
+      setState(() {
+            for (var wObj in value) {
+      wObj["meals"].forEach((sObj) {
+        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
+      });
+    }
+      });
+    });
   }
 
   void onStepCount(StepCount event) {
@@ -251,11 +263,11 @@ Future<void> requestLocationPermission() async {
                     ),
                     Row(
                       children: [
-                        const Expanded(
+                         Expanded(
                           child: TodayTargetCell(
                             icon: "assets/icons/water_icon.png",
-                            value: "8L",
-                            title: "Water Intake",
+                            value: calories.toString(),
+                            title: "Calories",
                           ),
                         ),
                         const SizedBox(
@@ -277,26 +289,26 @@ Future<void> requestLocationPermission() async {
                 height: media.width * 0.05,
               ),
             
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Latest Workout",
+                  Text(
+                    "Latest Activity",
                     style: TextStyle(
                         color: AppColors.blackColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w700),
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "See More",
-                      style: TextStyle(
-                          color: AppColors.grayColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  )
+                  // TextButton(
+                  //   onPressed: () {},
+                  //   child: const Text(
+                  //     "See More",
+                  //     style: TextStyle(
+                  //         color: AppColors.grayColor,
+                  //         fontSize: 14,
+                  //         fontWeight: FontWeight.w700),
+                  //   ),
+                  // )
                 ],
               ),
               ListView.builder(

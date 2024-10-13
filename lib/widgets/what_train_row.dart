@@ -11,7 +11,7 @@ class WhatTrainRow extends StatelessWidget {
   const WhatTrainRow({Key? key, required this.wObj}) : super(key: key);
 
   Future<void> onViewMoreClick(BuildContext context) async {
-    Workout? workout = await getWorkoutDetail(wObj["id"]);
+    Workout workout = await getWorkoutDetail(wObj["id"]);
     print(workout);
 
     Navigator.push(
@@ -19,7 +19,7 @@ class WhatTrainRow extends StatelessWidget {
         MaterialPageRoute(
             builder: (context) => WorkoutDetailView(
                   dObj: wObj,
-                  workout: workout!,// Provide a default Workout instance if workout is null
+                  workout: workout,
                 )));
   }
 

@@ -59,25 +59,6 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     isLoading = false;
   }
 
-  // List eventArr = [
-  //   {
-  //     "name": "Lowerbody Workout",
-  //     "scheduled_execution_time": "2024-10-08T08:44:00.000Z",
-  //   },
-  //   {
-  //     "name": "Ab Workout",
-  //     "scheduled_execution_time": "2024-10-08T09:00:00.000Z",
-  //   },
-  //   {
-  //     "name": "Upperbody Workout",
-  //     "scheduled_execution_time": "2024-10-08T10:00:00.000Z",
-  //   },
-  //   {
-  //     "name": "Lowerbody Workout",
-  //     "scheduled_execution_time": "2024-10-08T11:00:00.000Z",
-  //   }
-  // ];
-
   List selectDayEventArr = [];
 
   String createWorkoutScheduleUrl(DateTime date) {
@@ -93,14 +74,13 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   void initState() {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
+    getListWorkout().then((workouts) {
+      workoutArr = workouts;
 
+      setState(() {});
+    });
     getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar));
     setDayEventWorkoutList();
-    getListWorkout().then((workouts) {
-      setState(() {
-        workoutArr = workouts;
-      });
-    });
   }
 
   String formatScheduledTime(String time) {
@@ -113,7 +93,9 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
     selectDayEventArr = eventArr.map((wObj) {
       // Chuyển đổi thời gian từ chuỗi thành DateTime
-      DateTime scheduledTime = DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
+      DateTime scheduledTime =
+          DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
+          
       String workoutName = workoutArr.where((w) {
         return w["id"] == wObj["workout_id"];
       }).isNotEmpty
@@ -121,21 +103,11 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
               return w["id"] == wObj["workout_id"];
             }).first["title"]
           : " Workout"; // Hoặc giá trị mặc định khác
-
       return {
         "name": workoutName,
         "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
         "date": scheduledTime,
       };
-
-      // return {
-      //   //tên workout có id tương ứng
-      //   "name": workoutArr.where((w) {
-      //     return w["id"] == wObj["workout_id"];
-      //   }).first["title"],
-      //   "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
-      //   "date": scheduledTime, // Lưu DateTime để xử lý sau này
-      // };
     }).where((wObj) {
       return dateToStartDate(wObj["date"] as DateTime) == date;
     }).toList();
@@ -147,8 +119,6 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
   @override
   Widget build(BuildContext context) {
-    // print("eventArr: $eventArr");
-    print("workoutArr: $workoutArr");
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,

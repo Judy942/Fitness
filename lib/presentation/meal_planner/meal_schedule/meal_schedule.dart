@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../../../core/utils/app_colors.dart';
-import '../../../core/utils/date_and_time.dart';
+import '../../../model/workout.dart';
 import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
 import '../../onboarding_screen/start_screen.dart';
@@ -27,7 +28,7 @@ Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   if (response.statusCode == 200) {
     // Chuyển đổi body của API thành List<Map<String, dynamic>>
     final Map<String, dynamic> responseBody = json.decode(response.body);
-    final List<dynamic> data = responseBody['data'];
+    final List<dynamic> data = responseBody['data'] ?? [];
 
     // Chuyển đổi dữ liệu thành List<Map<String, dynamic>>
     return List<Map<String, dynamic>>.from(data);
@@ -75,48 +76,19 @@ class _MealScheduleState extends State<MealSchedule> {
   void initState() {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
-    //type 2024-08-20
     getMealSchedule(DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar))
         .then((value) {
       mealScheduleArr = value;
       setDayEventMealSchedule();
       getNutritionData();
       print(mealScheduleArr);
+      setState(() {});
     });
     // setDayEventMealSchedule();
   }
 
-  // void setDayEventMealSchedule() {
-  //   var date = dateToStartDate(_selectedDateAppBBar);
-  //   selectDayEventArr = mealScheduleArr.map((wObj) {
-  //     // Kiểm tra trường "set" có null không
-  //     var setList = wObj["set"] ?? []; // Nếu null, gán cho danh sách rỗng
-  //     return {
-  //       "title": wObj["title"],
-  //       "set": setList.map((sObj) {
-  //         return {
-  //           "name": sObj["name"],
-  //           "start_time": stringToDate(sObj["time"].toString(),
-  //               formatStr: "dd/MM/yyyy hh:mm aa"),
-  //           "image": sObj["image"],
-  //           "nutrition": sObj["nutrition"]
-  //         };
-  //       }).toList(),
-  //     };
-  //   }).where((wObj) {
-  //     if (wObj["set"].isNotEmpty) {
-  //       return dateToStartDate(wObj["set"][0]["start_time"]) == date;
-  //     }
-  //     return false; // Nếu "set" rỗng, trả về false
-  //   }).toList();
-
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
   void setDayEventMealSchedule() {
-    var date = dateToStartDate(_selectedDateAppBBar);
+    // var date = dateToStartDate(_selectedDateAppBBar);
 
     selectDayEventArr = mealScheduleArr.map((wObj) {
       return {
@@ -127,10 +99,10 @@ class _MealScheduleState extends State<MealSchedule> {
         'meals': wObj['meals']
             .map((sObj) {
               var mealDate = DateTime.parse(sObj['meal_time']).toLocal();
-
+              // var mealDate = DateTime.parse(sObj['meal_time']);
               return {
                 'id': sObj['id'],
-                'meal_time': mealDate,
+                'meal_time': DateFormat('dd/MM/yyyy hh:mm a').format(mealDate),
                 'dish_id': {
                   'id': sObj['dish_id']['id'],
                   'name': sObj['dish_id']['name'],
@@ -152,9 +124,9 @@ class _MealScheduleState extends State<MealSchedule> {
     for (var sObj in setArr) {
       // calories += int.parse(sObj["nutrition"]["calories"]);
       if (sObj["dish_id"] != null &&
-          sObj["dish_id"]["nutrition"] != null &&
-          sObj["dish_id"]["nutrition"].isNotEmpty) {
-        calories += (sObj["dish_id"]["nutrition"][0]["value"] as int);
+          sObj["dish_id"]["nutritions"] != null &&
+          sObj["dish_id"]["nutritions"].isNotEmpty) {
+        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
       }
     }
     return calories;
@@ -163,9 +135,8 @@ class _MealScheduleState extends State<MealSchedule> {
   int sumCalories() {
     int calories = 0;
     for (var wObj in selectDayEventArr) {
-      wObj["set"].forEach((sObj) {
-        calories += int.parse(sObj["nutrition"]["calories"]);
-        print(calories);
+      wObj["meals"].forEach((sObj) {
+        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
       });
     }
     return calories;
@@ -174,8 +145,8 @@ class _MealScheduleState extends State<MealSchedule> {
   int sumProtein() {
     int protein = 0;
     for (var wObj in selectDayEventArr) {
-      wObj["set"].forEach((sObj) {
-        protein += int.parse(sObj["nutrition"]["protein"]);
+      wObj["meals"].forEach((sObj) {
+        protein += (sObj["dish_id"]["nutritions"][2]["value"] as int);
       });
     }
     return protein;
@@ -184,8 +155,8 @@ class _MealScheduleState extends State<MealSchedule> {
   int sumCarbs() {
     int carbs = 0;
     for (var wObj in selectDayEventArr) {
-      wObj["set"].forEach((sObj) {
-        carbs += int.parse(sObj["nutrition"]["carbs"]);
+      wObj["meals"].forEach((sObj) {
+        carbs += (sObj["dish_id"]["nutritions"][3]["value"] as int);
       });
     }
     return carbs;
@@ -194,8 +165,8 @@ class _MealScheduleState extends State<MealSchedule> {
   int sumFat() {
     int fat = 0;
     for (var wObj in selectDayEventArr) {
-      wObj["set"].forEach((sObj) {
-        fat += int.parse(sObj["nutrition"]["fat"]);
+      wObj["meals"].forEach((sObj) {
+        fat += (sObj["dish_id"]["nutritions"][1]["value"] as int);
       });
     }
     return fat;
@@ -309,14 +280,26 @@ class _MealScheduleState extends State<MealSchedule> {
             lastDate: DateTime.now().add(const Duration(days: 60)),
 
             onDateSelected: (date) {
-              _selectedDateAppBBar = date;
+              // _selectedDateAppBBar = date;
+              DateTime now = DateTime.now();
+
+              _selectedDateAppBBar = DateTime(
+                date.year,
+                date.month,
+                date.day,
+                now.hour,
+                now.minute,
+                now.second, // Thêm giây nếu cần
+              );
+              print("date: $_selectedDateAppBBar");
               getMealSchedule(
                       DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar))
-                  .then((value) {
+                  .then((value) async {
                 mealScheduleArr = value;
                 setDayEventMealSchedule();
                 getNutritionData();
                 print(mealScheduleArr);
+                setState(() {});
               });
             },
             selectedDayLogo: Container(
@@ -341,99 +324,158 @@ class _MealScheduleState extends State<MealSchedule> {
                     // mainAxisAlignment: MainAxisAlignment.start,
                     // verticalDirection: VerticalDirection.up,
                     children: [
-                      SizedBox(
-                        width: media.width,
-                        // height: media.height * 0.6,
-                        child: ListView.builder(
-                          // scrollDirection: Axis.vertical,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 20),
-                          itemCount: 4,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            // var slotArr = selectDayEventArr.where((wObj) {
-                            //   // return (wObj["date"] as DateTime).hour == index;
-                            //   return (wObj["set"] as List).isNotEmpty;
-                            // }).toList();
-                            var slotArr = selectDayEventArr;
-                            return Column(
-                              children: slotArr.length <= index
-                                  ? [const SizedBox()]
-                                  : [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            // slotArr[index]["title"],
-                                            slotArr[index]["name"],
-                                            style: const TextStyle(
-                                                color: AppColors.blackColor,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            // "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
-                                            "${slotArr[index]["meals"].length} meals| ${getCalories(slotArr[index]["meals"])} calories",
-                                            style: const TextStyle(
-                                                color: AppColors.blackColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      ListView.builder(
-                                          padding: EdgeInsets.zero,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          shrinkWrap: true,
-                                          itemCount:
-                                              // slotArr[index]["set"].length,
-                                              slotArr[index]["meals"].length,
-                                          itemBuilder: (context, itemIndex) {
-                                            // var yObj = slotArr[index]["set"][itemIndex];
-                                            var yObj = slotArr[index]["meals"]
-                                                [itemIndex];
-                                            return ExercisesRow(
-                                              ImagePadding: 10,
-                                              eObj: yObj..addAll({"name": yObj["dish_id"]["name"]}),
-                                              // eObj:   yObj..add(Exercise(title: yObj
+                      getNutrition[0] == 0
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Lottie.asset("assets/food.json",
+                                    width: media.width,
+                                    height: media.height * 0.35),
+                                const Text(
+                                  "No meal schedule for today",
+                                  style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                              ],
+                            )
+                          : SizedBox(
+                              width: media.width,
+                              // height: media.height * 0.6,
+                              child: ListView.builder(
+                                // scrollDirection: Axis.vertical,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 20),
+                                itemCount: 4,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  var slotArr = selectDayEventArr;
+                                  // print(slotArr);
+                                  return slotArr[index]['meals'].isEmpty
+                                      ? const SizedBox()
+                                      : Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  // slotArr[index]["title"],
+                                                  slotArr[index]["name"],
+                                                  style: const TextStyle(
+                                                      color:
+                                                          AppColors.blackColor,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                const Spacer(),
+                                                Text(
+                                                  // "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
+                                                  "${slotArr[index]["meals"].length} meals| ${getCalories(slotArr[index]["meals"])} calories",
+                                                  style: const TextStyle(
+                                                      color:
+                                                          AppColors.blackColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            ListView.builder(
+                                                padding: EdgeInsets.zero,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    // slotArr[index]["set"].length,
+                                                    slotArr[index]["meals"]
+                                                        .length,
+                                                itemBuilder:
+                                                    (context, itemIndex) {
+                                                  // var yObj = slotArr[index]["set"][itemIndex];
+                                                  var yObj = slotArr[index]
+                                                      ["meals"][itemIndex];
+                                                  return ExercisesRow(
+                                                    ImagePadding: 10,
+                                                    eObj: Exercise(
+                                                        title: yObj["dish_id"]
+                                                            ["name"],
+                                                        image: yObj["dish_id"]
+                                                            ["image"],
+                                                        caloriesBurned: yObj[
+                                                                    "dish_id"]
+                                                                ["nutritions"]
+                                                            [0]["value"],
+                                                        id: yObj["id"],
+                                                        value: yObj["meal_time"]
+                                                            .toString()),
+                                                    onPressed: () {
+                                                      print(yObj);
+                                                      // showDialog(
+                                                      //   context: context,
+                                                      //   builder: (context) {
+                                                      //     return ShowLog(
+                                                      //       eObj: yObj,
+                                                      //       title:
+                                                      //           "Workout Schedule",
+                                                      //     );
+                                                      //   },
+                                                      // );
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          // Kiểm tra xem meal_time có phải là null không
+                                                          var mealTime =
+                                                              yObj["meal_time"];
+                                                          String
+                                                              formattedMealTime;
+                                                          if (mealTime !=
+                                                              null) {
+                                                            DateTime dateTime =
+                                                                DateTime.parse(
+                                                                    mealTime);
+                                                            formattedMealTime =
+                                                                DateFormat(
+                                                                        "dd/MM/yyyy hh:mm a")
+                                                                    .format(
+                                                                        dateTime);
+                                                          } else {
+                                                            formattedMealTime =
+                                                                "Không xác định"; // Hoặc xử lý theo cách khác
+                                                          }
 
-                                              // ..addAll({
-                                              //     "title": yObj["name"],
-                                              //     "value": DateFormat("hh:mm a")
-                                              //         .format(
-                                              //             yObj["start_time"]),
-                                              //   }),
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return ShowLog(
-                                                      eObj: yObj
-                                                        ..addAll({
-                                                          "name": yObj["title"],
-                                                          "start_time": DateFormat(
-                                                                  "dd/MM/yyyy hh:mm a")
-                                                              .format(yObj[
-                                                                  "start_time"])
-                                                        }),
-                                                      title: "Meal Schedule",
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
-                                          }),
-                                    ],
-                            );
-                          },
-                        ),
-                      ),
+                                                          return ShowLog(
+                                                            eObj: yObj
+                                                              ..addAll({
+                                                                "name": yObj[
+                                                                        "dish_id"]
+                                                                    ["name"],
+                                                                "start_time":
+                                                                    formattedMealTime,
+                                                              }),
+                                                            title:
+                                                                "Meal Schedule",
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  );
+                                                }),
+                                          ],
+                                        );
+                                },
+                              ),
+                            ),
                       const Text(
                         "Today Meal Nutritions",
                         style: TextStyle(

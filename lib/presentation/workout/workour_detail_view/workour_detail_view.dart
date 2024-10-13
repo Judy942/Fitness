@@ -25,7 +25,7 @@ Future<Map<String, dynamic>> getExerciseDetail(int id) async {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-
+      print(data);
       // Kiểm tra xem dữ liệu có tồn tại không
       if (data.containsKey('data')) {
         return data['data']; // Trả về exerciseDetail
@@ -223,18 +223,16 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              print(media.width);
-                            },
-                            child: Text(
+                           Text(
                               "${equipmentArr.length} Items",
                               style: const TextStyle(
                                   color: AppColors.grayColor, fontSize: 12),
                             ),
-                          )
+                          
                         ],
-                      ),
+                      ), equipmentArr.isEmpty
+                          ? const SizedBox()
+                          :
                       SizedBox(
                         height: media.width > 400
                             ? media.width * 0.48
@@ -296,14 +294,12 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
+                            Text(
                               "${groupedExercises.length} Sets",
                               style: const TextStyle(
                                   color: AppColors.grayColor, fontSize: 12),
                             ),
-                          )
+                          
                         ],
                       ),
                       ListView.builder(

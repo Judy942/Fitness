@@ -26,7 +26,7 @@ class ShowLog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
                   onTap: () {
@@ -55,6 +55,26 @@ class ShowLog extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w700),
                 ),
+               InkWell(
+            onTap: () {
+              
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              height: 40,
+              width: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  color: AppColors.lightGrayColor,
+                  borderRadius: BorderRadius.circular(10)),
+              child: Image.asset(
+                "assets/icons/more_icon.png",
+                width: 15,
+                height: 15,
+                fit: BoxFit.contain,
+              ),
+            ),
+          )
               ],
             ),
             const SizedBox(

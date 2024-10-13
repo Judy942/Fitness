@@ -54,7 +54,7 @@ class Exercise {
   final String image;
   final int caloriesBurned;
   final String? difficulty;
-  final double? value;
+  final String? value;
   final int id;
 
   Exercise({
@@ -98,7 +98,7 @@ class Equipment {
 }
 
 
-Future<Workout?> getWorkoutDetail(int id) async {
+Future<Workout> getWorkoutDetail(int id) async {
   String url = 'http://162.248.102.236:8055/api/workouts/$id?difficulity=EASY';
   String? token = await getToken();
 
@@ -107,25 +107,20 @@ Future<Workout?> getWorkoutDetail(int id) async {
       Uri.parse(url),
       headers: {'Authorization': 'Bearer $token'},
     );
-
+    print('getWorkoutDetail response: ${response.statusCode}');
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final workoutData = data['data'];
 
-      // Kiểm tra xem workoutData có hợp lệ không
-      if (workoutData == null) {
-        throw Exception('Workout data is null');
-      }
-
       List<Exercise> exercises = (workoutData['exercises'] as List).map((exercise) {
         final exerciseId = exercise['exercise_id'];
         final exerciseDifficulties = exerciseId['exercise_difficulties'] as List<dynamic>? ?? [];
-
+        print('exerciseDifficulties: ok');
         return Exercise(
           title: exerciseId['title'] ?? 'Unknown Title', // Gán giá trị mặc định nếu null
           description: exerciseId['description'],
           setNumber: exercise['set_number'],
-          unit: exercise['unit'],
+          unit: exercise['unit'].toString(),
           image: 'http://162.248.102.236:8055/assets/${exerciseId['image']}',
           caloriesBurned: exerciseDifficulties.isNotEmpty
               ? exerciseDifficulties[0]['calories_burn'] ?? 0 // Gán giá trị mặc định nếu null
@@ -134,12 +129,13 @@ Future<Workout?> getWorkoutDetail(int id) async {
               ? exerciseDifficulties[0]['difficulty_id']['code'] // Sử dụng toán tử ? để tránh lỗi
               : null,
           value: exerciseDifficulties.isNotEmpty
-              ? double.tryParse(exerciseDifficulties[0]['value'].toString()) // Lấy giá trị từ exercise_difficulties
-              :0,
+              ? exerciseDifficulties[0]['value'].toString() // Sử dụng toán tử ? để tránh lỗi
+              : '0',
           id: exerciseId['id'] ?? 0,
         );
+        
       }).toList();
-
+      print('exercises: ok');
       List<Equipment> equipments = (workoutData['equipments'] as List).map((equipment) {
         final equipmentId = equipment['equipment_id'];
         return Equipment(
@@ -148,7 +144,7 @@ Future<Workout?> getWorkoutDetail(int id) async {
           image: 'http://162.248.102.236:8055/assets/${equipmentId['image']}',
         );
       }).toList();
-
+      print('equipments: ok');
       return Workout(
         id: workoutData['id'] ?? 0, // Gán giá trị mặc định nếu null
         name: workoutData['name'] ?? 'Unknown Workout', // Gán giá trị mặc định nếu null
@@ -167,7 +163,17 @@ Future<Workout?> getWorkoutDetail(int id) async {
     print('Error fetching workout details: $error');
   }
 
-  return null; // Nếu có lỗi, trả về null
+  print('getWorkoutDetail failed');
+  return Workout(
+    id: 0,
+    name: 'Unknown Workout',
+    status: 'Unknown Status',
+    time: 0,
+    totalExercises: 0,
+    totalCaloriesBurned: 0,
+    exercises: [],
+    equipments: [],
+  );
 }
 
 class GroupedExercise {

@@ -9,39 +9,36 @@ import 'package:http/http.dart' as http;
 import '../../core/utils/app_colors.dart';
 import '../../widgets/today_meals_row.dart';
 import '../onboarding_screen/start_screen.dart';
+import 'meal_schedule/meal_schedule.dart';
 
-  Future<List> getMealType() async {
+Future<List> getMealType() async {
+  // setState(() {
+  //   isLoading = true;
+  // });
+  List somethingToEat = [];
+  String? token = await getToken();
+  final response = await http.get(
+    Uri.parse(
+        'http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
+    headers: {'Authorization': 'Bearer $token'},
+  );
+  if (response.statusCode == 200) {
+    final jsonResponse = json.decode(response.body);
     // setState(() {
-    //   isLoading = true;
-    // });
-    List somethingToEat = [];
-    String? token = await getToken();
-    final response = await http.get(
-      Uri.parse('http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
-          headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      // setState(() {
-        somethingToEat = (jsonResponse['data'] as List).map((item) {
-          return {
-            'id': item['id'],
-            'image': 'http://162.248.102.236:8055/assets/${item['image']}',
-            "title": item['name'],
-            "countFoods": "${item['dishes']} Foods",
-          };
-        }).toList();
-        print(somethingToEat);
-      //   isLoading = false;
-      // });
-    } else {
-      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
-      // setState(() {
-      //   isLoading = false;
-      // });
-    }
-    return somethingToEat;
+    somethingToEat = (jsonResponse['data'] as List).map((item) {
+      return {
+        'id': item['id'],
+        'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+        "title": item['name'],
+        "countFoods": item['dishes'].length,
+      };
+    }).toList();
+    print(somethingToEat);
+  } else {
+    print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
   }
+  return somethingToEat;
+}
 
 class MealPlannerScreen extends StatefulWidget {
   const MealPlannerScreen({Key? key}) : super(key: key);
@@ -53,21 +50,23 @@ class MealPlannerScreen extends StatefulWidget {
 class _HomeScreenState extends State<MealPlannerScreen> {
   List<int> showingTooltipOnSpots = [21];
   bool isLoading = false;
-  List mealArr = [
-    {
-      "image": "assets/images/salmon_nigiri.png",
-      "title": "SalMon Nigiri",
-      "time": "Today, 07:00am"
-    },
-    {
-      "image": "assets/images/milk.png",
-      "title": "Lowfat Milk",
-      "time": "Today, 08:00am"
-    },
-  ];
+  String dropdownValue = 'Breakfast';
+  int selectedMeal = 0;
+  List todayMeals = [];
+  // List mealArr = [
+  //   {
+  //     "image": "assets/images/salmon_nigiri.png",
+  //     "title": "SalMon Nigiri",
+  //     "time": "Today, 07:00am"
+  //   },
+  //   {
+  //     "image": "assets/images/milk.png",
+  //     "title": "Lowfat Milk",
+  //     "time": "Today, 08:00am"
+  //   },
+  // ];
 
   List somethingToEat = [];
-
 
   @override
   void initState() {
@@ -75,6 +74,12 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     getMealType().then((value) {
       setState(() {
         somethingToEat = value;
+      });
+    });
+    getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
+      print(value);
+      setState(() {
+        todayMeals = value;
       });
     });
   }
@@ -112,12 +117,6 @@ class _HomeScreenState extends State<MealPlannerScreen> {
         FlSpot(29, 60),
         FlSpot(30, 40),
       ];
-
-  //       List<LineChartBarData> get lineBarsData => [
-  //   lineChartBarData,
-  //   // lineChartBarData1_2,
-  // ];
-
   LineChartBarData get lineChartBarData => LineChartBarData(
         isCurved: true,
         gradient: LinearGradient(colors: [
@@ -252,358 +251,394 @@ class _HomeScreenState extends State<MealPlannerScreen> {
     final tooltipsOnBar = lineBarsData[0];
 
     return isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    :Scaffold(
-      backgroundColor: AppColors.whiteColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.whiteColor,
-        centerTitle: true,
-        elevation: 0,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            height: 40,
-            width: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: AppColors.lightGrayColor,
-                borderRadius: BorderRadius.circular(10)),
-            child: Image.asset(
-              "assets/icons/back_icon.png",
-              width: 15,
-              height: 15,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        title: const Text(
-          "Meal Planner",
-          style: TextStyle(
-              color: AppColors.blackColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w700),
-        ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/more_icon.png",
-                width: 12,
-                height: 12,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
-      ),
-      body: SafeArea(
-        child: Container(
-          height: media.height * 0.9,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Meal Nutritions",
-                      style: TextStyle(
-                        color: AppColors.blackColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Container(
-                      height: 35,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: AppColors.primary),
-                          borderRadius: BorderRadius.circular(15)),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          items: ["Weekly", "Monthly"]
-                              .map((name) => DropdownMenuItem(
-                                  value: name,
-                                  child: Text(
-                                    name,
-                                    style: const TextStyle(
-                                        color: AppColors.blackColor,
-                                        fontSize: 14),
-                                  )))
-                              .toList(),
-                          onChanged: (value) {},
-                          icon: const Icon(Icons.expand_more,
-                              color: AppColors.whiteColor),
-                          hint: const Text("Weekly",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: AppColors.whiteColor, fontSize: 12)),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                    padding: const EdgeInsets.only(left: 15),
-                    height: media.width * 0.5,
-                    width: double.maxFinite,
-                    child: LineChart(
-                      LineChartData(
-                        showingTooltipIndicators:
-                            showingTooltipOnSpots.map((index) {
-                          return ShowingTooltipIndicators([
-                            LineBarSpot(
-                              tooltipsOnBar,
-                              lineBarsData.indexOf(tooltipsOnBar),
-                              tooltipsOnBar.spots[index],
-                            ),
-                          ]);
-                        }).toList(),
-                        lineTouchData: LineTouchData(
-                          enabled: true,
-                          handleBuiltInTouches: true,
-                          touchCallback: (FlTouchEvent event,
-                              LineTouchResponse? response) {
-                            if (response == null ||
-                                response.lineBarSpots == null) {
-                              return;
-                            }
-                            if (event is FlTapUpEvent) {
-                              final spotIndex =
-                                  response.lineBarSpots!.first.spotIndex;
-                              showingTooltipOnSpots.clear();
-                              setState(() {
-                                showingTooltipOnSpots.add(spotIndex);
-                              });
-                            }
-                          },
-                          mouseCursorResolver: (FlTouchEvent event,
-                              LineTouchResponse? response) {
-                            if (response == null ||
-                                response.lineBarSpots == null) {
-                              return SystemMouseCursors.basic;
-                            }
-                            return SystemMouseCursors.click;
-                          },
-                          getTouchedSpotIndicator: (LineChartBarData barData,
-                              List<int> spotIndexes) {
-                            return spotIndexes.map((index) {
-                              return TouchedSpotIndicatorData(
-                                const FlLine(
-                                  color: Colors.transparent,
-                                ),
-                                FlDotData(
-                                  show: true,
-                                  getDotPainter:
-                                      (spot, percent, barData, index) =>
-                                          FlDotCirclePainter(
-                                    radius: 3,
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                    strokeColor: AppColors.secondaryColor1,
-                                  ),
-                                ),
-                              );
-                            }).toList();
-                          },
-                          touchTooltipData: LineTouchTooltipData(
-                            tooltipRoundedRadius: 20,
-                            getTooltipItems: (List<LineBarSpot> lineBarsSpot) {
-                              return lineBarsSpot.map((lineBarSpot) {
-                                return LineTooltipItem(
-                                  "${lineBarSpot.x.toInt()} mins ago",
-                                  const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                              }).toList();
-                            },
-                          ),
-                        ),
-                        lineBarsData: [lineChartBarData],
-                        minY: -0.5,
-                        maxY: 110,
-                        titlesData: FlTitlesData(
-                            show: true,
-                            leftTitles: const AxisTitles(),
-                            topTitles: const AxisTitles(),
-                            bottomTitles: AxisTitles(
-                              sideTitles: bottomTitles,
-                            ),
-                            rightTitles: AxisTitles(
-                              sideTitles: rightTitles,
-                            )),
-                        gridData: FlGridData(
-                          show: true,
-                          drawHorizontalLine: true,
-                          horizontalInterval: 10,
-                          drawVerticalLine: false,
-                          getDrawingHorizontalLine: (value) {
-                            return FlLine(
-                              color: AppColors.grayColor.withOpacity(0.15),
-                              strokeWidth: 2,
-                            );
-                          },
-                        ),
-                        borderData: FlBorderData(
-                          show: false,
-                        ),
-                      ),
-                    )),
-                SizedBox(height: media.width * 0.05),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        ? const Center(child: CircularProgressIndicator())
+        : Scaffold(
+            backgroundColor: AppColors.whiteColor,
+            appBar: AppBar(
+              backgroundColor: AppColors.whiteColor,
+              centerTitle: true,
+              elevation: 0,
+              leading: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(8),
+                  height: 40,
+                  width: 40,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor2.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(15),
+                      color: AppColors.lightGrayColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Image.asset(
+                    "assets/icons/back_icon.png",
+                    width: 15,
+                    height: 15,
+                    fit: BoxFit.contain,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+              ),
+              title: const Text(
+                "Meal Planner",
+                style: TextStyle(
+                    color: AppColors.blackColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+              ),
+              actions: [
+                InkWell(
+                  onTap: () {},
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    height: 40,
+                    width: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: AppColors.lightGrayColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Image.asset(
+                      "assets/icons/more_icon.png",
+                      width: 12,
+                      height: 12,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            body: SafeArea(
+              child: Container(
+                height: media.height * 0.9,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Meal Nutritions",
+                            style: TextStyle(
+                              color: AppColors.blackColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Container(
+                            height: 35,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                                gradient:
+                                    LinearGradient(colors: AppColors.primary),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                items: ["Weekly", "Monthly"]
+                                    .map((name) => DropdownMenuItem(
+                                        value: name,
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 14),
+                                        )))
+                                    .toList(),
+                                onChanged: (value) {},
+                                icon: const Icon(Icons.expand_more,
+                                    color: AppColors.whiteColor),
+                                hint: const Text("Weekly",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: AppColors.whiteColor,
+                                        fontSize: 12)),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                          padding: const EdgeInsets.only(left: 15),
+                          height: media.width * 0.5,
+                          width: double.maxFinite,
+                          child: LineChart(
+                            LineChartData(
+                              showingTooltipIndicators:
+                                  showingTooltipOnSpots.map((index) {
+                                return ShowingTooltipIndicators([
+                                  LineBarSpot(
+                                    tooltipsOnBar,
+                                    lineBarsData.indexOf(tooltipsOnBar),
+                                    tooltipsOnBar.spots[index],
+                                  ),
+                                ]);
+                              }).toList(),
+                              lineTouchData: LineTouchData(
+                                enabled: true,
+                                handleBuiltInTouches: true,
+                                touchCallback: (FlTouchEvent event,
+                                    LineTouchResponse? response) {
+                                  if (response == null ||
+                                      response.lineBarSpots == null) {
+                                    return;
+                                  }
+                                  if (event is FlTapUpEvent) {
+                                    final spotIndex =
+                                        response.lineBarSpots!.first.spotIndex;
+                                    showingTooltipOnSpots.clear();
+                                    setState(() {
+                                      showingTooltipOnSpots.add(spotIndex);
+                                    });
+                                  }
+                                },
+                                mouseCursorResolver: (FlTouchEvent event,
+                                    LineTouchResponse? response) {
+                                  if (response == null ||
+                                      response.lineBarSpots == null) {
+                                    return SystemMouseCursors.basic;
+                                  }
+                                  return SystemMouseCursors.click;
+                                },
+                                getTouchedSpotIndicator:
+                                    (LineChartBarData barData,
+                                        List<int> spotIndexes) {
+                                  return spotIndexes.map((index) {
+                                    return TouchedSpotIndicatorData(
+                                      const FlLine(
+                                        color: Colors.transparent,
+                                      ),
+                                      FlDotData(
+                                        show: true,
+                                        getDotPainter:
+                                            (spot, percent, barData, index) =>
+                                                FlDotCirclePainter(
+                                          radius: 3,
+                                          color: Colors.white,
+                                          strokeWidth: 3,
+                                          strokeColor:
+                                              AppColors.secondaryColor1,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList();
+                                },
+                                touchTooltipData: LineTouchTooltipData(
+                                  tooltipRoundedRadius: 20,
+                                  getTooltipItems:
+                                      (List<LineBarSpot> lineBarsSpot) {
+                                    return lineBarsSpot.map((lineBarSpot) {
+                                      return LineTooltipItem(
+                                        "${lineBarSpot.x.toInt()} mins ago",
+                                        const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                ),
+                              ),
+                              lineBarsData: [lineChartBarData],
+                              minY: -0.5,
+                              maxY: 110,
+                              titlesData: FlTitlesData(
+                                  show: true,
+                                  leftTitles: const AxisTitles(),
+                                  topTitles: const AxisTitles(),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: bottomTitles,
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: rightTitles,
+                                  )),
+                              gridData: FlGridData(
+                                show: true,
+                                drawHorizontalLine: true,
+                                horizontalInterval: 10,
+                                drawVerticalLine: false,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color:
+                                        AppColors.grayColor.withOpacity(0.15),
+                                    strokeWidth: 2,
+                                  );
+                                },
+                              ),
+                              borderData: FlBorderData(
+                                show: false,
+                              ),
+                            ),
+                          )),
+                      SizedBox(height: media.width * 0.05),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 15),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor2.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Daily Meal Schedule",
+                              style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              height: 30,
+                              child: RoundButton(
+                                type: RoundButtonType.primaryBG,
+                                title: "Check",
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, '/mealScheduleScreen');
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: media.width * 0.05),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Today Meals",
+                            style: TextStyle(
+                              color: AppColors.blackColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Container(
+                            height: 35,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                                gradient:
+                                    LinearGradient(colors: AppColors.primary),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                items: ["Breakfast", "Lunch", "Dinner", "Snack"]
+                                    .map((name) => DropdownMenuItem(
+                                        value: name,
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 14),
+                                        )))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    dropdownValue = value.toString();
+                                    print(dropdownValue);
+                                  });
+                                },
+                                icon: const Icon(Icons.expand_more,
+                                    color: AppColors.whiteColor),
+                                hint:  Text(dropdownValue,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: AppColors.whiteColor,
+                                        fontSize: 12)),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      todayMeals.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "No meal found",
+                                style: TextStyle(
+                                    color: AppColors.blackColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            )
+                          : SizedBox(height: media.width * 0.05),
+                      for (var i = 0; i < todayMeals.length; i++)
+                        if (todayMeals[i].isNotEmpty)
+                          todayMeals[i]['code'].toUpperCase() ==
+                                  dropdownValue.toUpperCase()
+                              ? ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: todayMeals[i]['meals'].length,
+                                  itemBuilder: (context, index) {
+                                    var wObj =
+                                        todayMeals[i]['meals'][index] as Map? ??
+                                            {};
+                                    return TodayMealsRow(wObj: wObj);
+                                  })
+                              : const SizedBox(),
+                      SizedBox(
+                        height: media.width * 0.05,
+                      ),
                       const Text(
-                        "Daily Meal Schedule",
+                        "Find Something To Eat",
                         style: TextStyle(
                             color: AppColors.blackColor,
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700),
                       ),
                       SizedBox(
-                        width: 80,
-                        height: 30,
-                        child: RoundButton(
-                          type: RoundButtonType.primaryBG,
-                          title: "Check",
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/mealScheduleScreen');
-                          },
+                        height: media.width * 0.05,
+                      ),
+                      SingleChildScrollView(
+                        // scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              height: media.width * 0.5,
+                              width: media.width - 40,
+                              child: ListView.builder(
+                                itemBuilder: (context, position) {
+                                  if (position % 2 == 0) {
+                                    var wObj =
+                                        somethingToEat[position] as Map? ?? {};
+                                    return Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 20),
+                                        width: media.width * 0.5,
+                                        child: FindStToEat(wObj: wObj));
+                                  } else {
+                                    var wObj =
+                                        somethingToEat[position] as Map? ?? {};
+                                    return Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 20),
+                                        width: media.width * 0.45,
+                                        child: FindStToEat(
+                                            wObj: wObj,
+                                            type: RoundButtonType.secondaryBG));
+                                  }
+                                },
+                                padding: EdgeInsets.zero,
+                                // physics: const NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: somethingToEat.length,
+                              ),
+                            ),
+                          ],
                         ),
                       )
                     ],
                   ),
                 ),
-                SizedBox(height: media.width * 0.05),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Today Meals",
-                      style: TextStyle(
-                        color: AppColors.blackColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Container(
-                      height: 35,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: AppColors.primary),
-                          borderRadius: BorderRadius.circular(15)),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          items: ["Breakfast", "Lunch", "Dinner"]
-                              .map((name) => DropdownMenuItem(
-                                  value: name,
-                                  child: Text(
-                                    name,
-                                    style: const TextStyle(
-                                        color: AppColors.blackColor,
-                                        fontSize: 14),
-                                  )))
-                              .toList(),
-                          onChanged: (value) {},
-                          icon: const Icon(Icons.expand_more,
-                              color: AppColors.whiteColor),
-                          hint: const Text("Breakfast",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: AppColors.whiteColor, fontSize: 12)),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(height: media.width * 0.05),
-                ListView.builder(
-                    padding: EdgeInsets.zero,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: mealArr.length,
-                    itemBuilder: (context, index) {
-                      var wObj = mealArr[index] as Map? ?? {};
-                      return TodayMealsRow(wObj: wObj);
-                    }),
-                SizedBox(
-                  height: media.width * 0.05,
-                ),
-                const Text(
-                  "Find Something To Eat",
-                  style: TextStyle(
-                      color: AppColors.blackColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700),
-                ),
-                SizedBox(
-                  height: media.width * 0.05,
-                ),
-                SingleChildScrollView(
-                  // scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: media.width * 0.5,
-                        width: media.width - 40,
-                        child: ListView.builder(
-                          itemBuilder: (context, position) {
-                            if (position % 2 == 0) {
-                              var wObj = somethingToEat[position] as Map? ?? {};
-                              return Container(
-                                  margin: const EdgeInsets.only(right: 20),
-                                  width: media.width * 0.5,
-                                  child: FindStToEat(wObj: wObj));
-                            } else {
-                              var wObj = somethingToEat[position] as Map? ?? {};
-                              return Container(
-                                  margin: const EdgeInsets.only(right: 20),
-                                  width: media.width * 0.45,
-                                  child: FindStToEat(
-                                      wObj: wObj,
-                                      type: RoundButtonType.secondaryBG));
-                            }
-                          },
-                          padding: EdgeInsets.zero,
-                          // physics: const NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemCount: somethingToEat.length,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

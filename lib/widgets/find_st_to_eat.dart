@@ -45,11 +45,6 @@ class FindStToEat extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image.asset(
-                //   wObj["image"].toString(),
-                //   width: MediaQuery.of(context).size.width * 0.25,
-                //   height: MediaQuery.of(context).size.width * 0.25,
-                // ),
                 Image.network(
                                     wObj["image"].toString(),
                   width: MediaQuery.of(context).size.width * 0.25,

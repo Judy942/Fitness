@@ -61,7 +61,6 @@ class _AddScheduleViewState extends State<AddScheduleView> {
     {"id": '1', "title": "Easy"},
     {"id": '2', "title": "Normal"},
     {"id": '3', "title": "Hard"},
-    // {"id": 4, "title": "Very Hard"},
   ];
 
   @override
@@ -105,27 +104,6 @@ class _AddScheduleViewState extends State<AddScheduleView> {
               fontSize: 16,
               fontWeight: FontWeight.w700),
         ),
-        // actions: [
-        //   InkWell(
-        //     onTap: () {
-        //     },
-        //     child: Container(
-        //       margin: const EdgeInsets.all(8),
-        //       height: 40,
-        //       width: 40,
-        //       alignment: Alignment.center,
-        //       decoration: BoxDecoration(
-        //           color: AppColors.lightGrayColor,
-        //           borderRadius: BorderRadius.circular(10)),
-        //       child: Image.asset(
-        //         "assets/icons/more_icon.png",
-        //         width: 15,
-        //         height: 15,
-        //         fit: BoxFit.contain,
-        //       ),
-        //     ),
-        //   )
-        // ],
       ),
       backgroundColor: AppColors.whiteColor,
       body: isLoading
@@ -168,7 +146,15 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       height: media.width * 0.35,
                       child: CupertinoDatePicker(
                         onDateTimeChanged: (newDate) {
-                          widget.date = newDate;
+                          // Kết hợp ngày đã chọn với giờ hiện tại
+                          widget.date = DateTime(
+                            widget.date.year,
+                            widget.date.month,
+                            widget.date.day,
+                            newDate.hour,
+                            newDate.minute,
+                            newDate.second,
+                          );
                           print(widget.date);
                         },
                         initialDateTime: DateTime.now(),
@@ -190,7 +176,6 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                     const SizedBox(
                       height: 8,
                     ),
-
                     IconTitleNextRow(
                       icon: "assets/icons/choose_workout.png",
                       title: "Choose Workout",
@@ -200,7 +185,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       color: AppColors.lightGrayColor,
                       onPressed: () async {
                         workoutSelected =
-                            await _showWorkoutDialog(context, whatArr) - 1;
+                            await showWorkoutDialog(context, whatArr) - 1;
                         print(workoutSelected);
                         setState(() {});
                       },
@@ -217,28 +202,13 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                         color: AppColors.lightGrayColor,
                         onPressed: () async {
                           diffSelected =
-                              await _showWorkoutDialog(context, diffArr) - 1;
+                              await showWorkoutDialog(context, diffArr) - 1;
                           print(diffSelected);
                           setState(() {});
                         }),
                     const SizedBox(
                       height: 10,
                     ),
-                    // IconTitleNextRow(
-                    //     icon: "assets/icons/repetitions.png",
-                    //     title: "Custom Repetitions",
-                    //     time: "",
-                    //     color: AppColors.lightGrayColor,
-                    //     onPressed: () {}),
-                    // const SizedBox(
-                    //   height: 10,
-                    // ),
-                    // IconTitleNextRow(
-                    //     icon: "assets/icons/repetitions.png",
-                    //     title: "Custom Weights",
-                    //     time: "",
-                    //     color: AppColors.lightGrayColor,
-                    //     onPressed: () {}),
                     const Spacer(),
                     RoundGradientButton(
                         title: "Save",
@@ -297,7 +267,8 @@ Future<void> addWorkoutSchedule(
   }
 }
 
-Future<int> _showWorkoutDialog(BuildContext context, List whatArr) async {
+Future<int> showWorkoutDialog(BuildContext context, List whatArr) async {
+  print(whatArr);
   int selectedWorkoutId =
       -1; // Giá trị mặc định hoặc bất kỳ giá trị thích hợp nào
   await showDialog(
@@ -318,6 +289,7 @@ Future<int> _showWorkoutDialog(BuildContext context, List whatArr) async {
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(whatArr[index]['title'] ??
+                          whatArr[index]['name'] ??
                           ''), // Thay đổi phù hợp với cấu trúc của bạn
                       onTap: () {
                         selectedWorkoutId = int.parse(whatArr[index]['id']
@@ -338,4 +310,3 @@ Future<int> _showWorkoutDialog(BuildContext context, List whatArr) async {
   );
   return selectedWorkoutId;
 }
-// Replacing 'Z' with the correct offset

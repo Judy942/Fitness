@@ -22,6 +22,7 @@ Future<List> getListWorkout() async {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
       // setState(() {
         whatArr = (jsonResponse['data'] as List).map((item) {
           return {
