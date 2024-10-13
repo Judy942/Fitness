@@ -1,52 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
+import 'package:flutter_application_fitness/push_up_detection/pose_detection_view.dart';
+import 'package:flutter_application_fitness/push_up_detection/push_up_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'core/utils/pref_utils.dart';
-import 'localization/app_localization.dart';
-import 'routes/app_routes.dart';
-import 'theme/bloc/theme_bloc.dart';
-import 'package:provider/provider.dart';
 
-class PreferencesNotifier extends ChangeNotifier {
-  Map<String, dynamic> _userData = {};
 
-  Map<String, dynamic> get userData => _userData;
-
-  Future<void> loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _userData = {};
-    for (String key in prefs.getKeys()) {
-      _userData[key] = prefs.get(key);
-    }
-    notifyListeners(); // Thông báo rằng dữ liệu đã thay đổi
-  }
-
-  Future<void> updateUserData(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value.toString());
-    await loadUserData(); // Tải lại dữ liệu
-  }
-}
-
-var golobalMessage = GlobalKey<ScaffoldMessengerState>();
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  Future.wait([
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
-  ]).then((value) {
-    PrefUtils().init();
-    runApp(
-      ChangeNotifierProvider(
-      create: (context) => PreferencesNotifier()..loadUserData(),
-      child: const MyApp(),
-    ),
-    );
-  });
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -54,31 +12,81 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ThemeBloc(
-        ThemeState(
-          themeType: PrefUtils().getThemeData(),
+      create: (context) => PushUpCounter(),
+      child: MaterialApp(
+          title: 'Material App',
+          home: Home()
+      ),
+    );
+  }
+}
+
+
+
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Fitness App'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  ExpansionTile(
+                    title: const Text('Gyms'),
+                    children: [
+                      CustomCard('Push Up Detector', PoseDetectorView()),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
-    
-      child: BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
-        return MaterialApp(
-          title: "my app",
-          navigatorKey: NavigatorService.navigatorKey,
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: const [
-            AppLocalizationDelegate(),
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''),
-          ],
-          initialRoute: AppRoutes.startScreen,
-          // initialRoute: AppRoutes.mealScheduleScreen,
-          routes: AppRoutes.routes,
-        );
-      },)
     );
+
+  }
 }
+
+class CustomCard extends StatelessWidget {
+  final String _label;
+  final Widget _viewPage;
+  final bool featureCompleted;
+
+  const CustomCard(this._label, this._viewPage, {this.featureCompleted = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        tileColor: Theme.of(context).primaryColor,
+        title: Text(
+          _label,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        onTap: () {
+          if (!featureCompleted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                const Text('This feature has not been implemented yet')));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => _viewPage));
+          }
+        },
+      ),
+    );
+  }
 }
