@@ -104,6 +104,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
             }).first["title"]
           : " Workout"; // Hoặc giá trị mặc định khác
       return {
+        "id": wObj["id"],
         "name": workoutName,
         "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
         "date": scheduledTime,
@@ -153,26 +154,6 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
               fontSize: 16,
               fontWeight: FontWeight.w700),
         ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/more_icon.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,16 +270,17 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                                           var sObj = slotArr[index];
                                           return InkWell(
                                             onTap: () {
-                                              print("slotArr: $slotArr");
+                                              print("sObj: $sObj");
                                               showDialog(
                                                 context: context,
                                                 builder: (context) {
                                                   return ShowLog(
                                                     eObj: sObj,
                                                     title: "Workout Schedule",
-                                                  );
+                                                  );                                                  
                                                 },
                                               );
+                                              setState(() {});
                                             },
                                             child: Container(
                                               height: 35,
@@ -345,7 +327,6 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       ),
       floatingActionButton: InkWell(
         onTap: () {
-          // chờ 3giây
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(

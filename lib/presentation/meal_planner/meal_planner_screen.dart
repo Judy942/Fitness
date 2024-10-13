@@ -547,7 +547,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                                     color: AppColors.whiteColor),
                                 hint:  Text(dropdownValue,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: AppColors.whiteColor,
                                         fontSize: 12)),
                               ),
