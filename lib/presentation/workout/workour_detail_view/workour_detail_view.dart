@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../model/workout.dart';
+import '../../../push_up_detection/pose_detection_view.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
@@ -223,67 +224,69 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                           Text(
-                              "${equipmentArr.length} Items",
-                              style: const TextStyle(
-                                  color: AppColors.grayColor, fontSize: 12),
-                            ),
-                          
+                          Text(
+                            "${equipmentArr.length} Items",
+                            style: const TextStyle(
+                                color: AppColors.grayColor, fontSize: 12),
+                          ),
                         ],
-                      ), equipmentArr.isEmpty
-                          ? const SizedBox()
-                          :
-                      SizedBox(
-                        height: media.width > 400
-                            ? media.width * 0.48
-                            : media.width * 0.55,
-                        child: ListView.builder(
-                            padding: EdgeInsets.zero,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: equipmentArr.length,
-                            itemBuilder: (context, index) {
-                              var yObj = equipmentArr[index].toMap();
-                              return Container(
-                                  margin: const EdgeInsets.all(8),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        height: media.width * 0.35,
-                                        width: media.width * 0.35,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.lightGrayColor,
-                                            borderRadius:
-                                                BorderRadius.circular(15)),
-                                        alignment: Alignment.center,
-                                        child: Image.network(
-                                          yObj["image"].toString(),
-                                          width: media.width * 0.2,
-                                          height: media.width * 0.2,
-                                          fit: BoxFit.contain,
-                                        ),
-                                        // Image.asset(
-                                        //   yObj["image"].toString(),
-                                        //   width: media.width * 0.2,
-                                        //   height: media.width * 0.2,
-                                        //   fit: BoxFit.contain,
-                                        // ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          yObj["name"].toString(),
-                                          style: const TextStyle(
-                                              color: AppColors.blackColor,
-                                              fontSize: 16),
-                                        ),
-                                      )
-                                    ],
-                                  ));
-                            }),
                       ),
+                      equipmentArr.isEmpty
+                          ? const SizedBox()
+                          : SizedBox(
+                              height: media.width > 400
+                                  ? media.width * 0.48
+                                  : media.width * 0.55,
+                              child: ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  scrollDirection: Axis.horizontal,
+                                  shrinkWrap: true,
+                                  itemCount: equipmentArr.length,
+                                  itemBuilder: (context, index) {
+                                    var yObj = equipmentArr[index].toMap();
+                                    return Container(
+                                        margin: const EdgeInsets.all(8),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: media.width * 0.35,
+                                              width: media.width * 0.35,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      AppColors.lightGrayColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              alignment: Alignment.center,
+                                              child: Image.network(
+                                                yObj["image"].toString(),
+                                                width: media.width * 0.2,
+                                                height: media.width * 0.2,
+                                                fit: BoxFit.contain,
+                                              ),
+                                              // Image.asset(
+                                              //   yObj["image"].toString(),
+                                              //   width: media.width * 0.2,
+                                              //   height: media.width * 0.2,
+                                              //   fit: BoxFit.contain,
+                                              // ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                yObj["name"].toString(),
+                                                style: const TextStyle(
+                                                    color: AppColors.blackColor,
+                                                    fontSize: 16),
+                                              ),
+                                            )
+                                          ],
+                                        ));
+                                  }),
+                            ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -294,12 +297,11 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                            Text(
-                              "${groupedExercises.length} Sets",
-                              style: const TextStyle(
-                                  color: AppColors.grayColor, fontSize: 12),
-                            ),
-                          
+                          Text(
+                            "${groupedExercises.length} Sets",
+                            style: const TextStyle(
+                                color: AppColors.grayColor, fontSize: 12),
+                          ),
                         ],
                       ),
                       ListView.builder(
@@ -334,7 +336,37 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       RoundGradientButton(
-                          title: "Start Workout", onPressed: () {})
+                          title: "Start Workout",
+                          onPressed: () {
+                            return Scaffold(
+                              appBar: AppBar(
+                                title: Text('Finess App'),
+                                centerTitle: true,
+                                elevation: 0,
+                              ),
+                              body: SafeArea(
+                                child: Center(
+                                  child: SingleChildScrollView(
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 16),
+                                      child: Column(
+                                        children: [
+                                          ExpansionTile(
+                                            title: const Text('Gyms'),
+                                            children: [
+                                              CustomCard('PushUpDetector',
+                                                  PoseDetectorView()),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          })
                     ],
                   ),
                 )
@@ -358,4 +390,36 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
       ),
     ),
   );
+}
+class CustomCard extends StatelessWidget {
+  final String _label;
+  final Widget _viewPage;
+  final bool featureCompleted;
+ 
+  const CustomCard(this._label, this._viewPage, {this.featureCompleted = true});
+ 
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        tileColor: Theme.of(context).primaryColor,
+        title: Text(
+          _label,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        onTap: () {
+          if (!featureCompleted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                const Text('This feature has not been implemented yet')));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => _viewPage));
+          }
+        },
+      ),
+    );
+  }
 }

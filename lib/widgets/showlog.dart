@@ -67,8 +67,8 @@ print(url);
                   },
                   child: Container(
                     margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
+                    height: 30,
+                    width: 30,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         color: AppColors.lightGrayColor,
@@ -90,15 +90,13 @@ print(url);
                 ),
                InkWell(
             onTap: () {
-
                   _showOptionsDialog(context);
-
               
             },
             child: Container(
               margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
+              height: 30,
+              width: 30,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                   color: AppColors.lightGrayColor,

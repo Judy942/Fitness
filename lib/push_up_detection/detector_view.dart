@@ -9,7 +9,7 @@ import 'gallery_view.dart';
 enum DetectorViewMode { liveFeed, gallery }
 
 class DetectorView extends StatefulWidget {
-  DetectorView({
+  const DetectorView({
     Key? key,
     required this.posePainter,
     required this.title,

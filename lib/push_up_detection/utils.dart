@@ -36,11 +36,12 @@ double angle(PoseLandmark firstLandmark, PoseLandmark midLandmark, PoseLandmark 
 }
 
 PushUpState? isPushUp(double angleElbow, PushUpState current){
-  final umbraElbow = 60.0;
-  final umbraElbowExt = 160.0;
+  const umbraElbow = 60.0;
+  const umbraElbowExt = 160.0;
   if(current == PushUpState.neutral && angleElbow > umbraElbowExt && angleElbow < 180){
     return PushUpState.init;
   }else if(current == PushUpState.init && angleElbow < umbraElbow && angleElbow > 40){
     return PushUpState.complete;
   }
+  return null;
 }

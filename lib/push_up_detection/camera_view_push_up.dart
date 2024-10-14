@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_fitness/push_up_detection/pose_painter.dart';
 import 'package:flutter_application_fitness/push_up_detection/push_up_model.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mlkit_commons/google_mlkit_commons.dart';
-import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:flutter_application_fitness/push_up_detection/utils.dart' as utils;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 class CameraView extends StatefulWidget {
-  CameraView(
+  const CameraView(
       {Key? key,
         required this.customPaint,
         required this.onImage,
@@ -127,8 +126,8 @@ class _CameraViewState extends State<CameraView> {
         children: <Widget>[
           Center(
             child: _changingCameraLens
-                ? Center(
-              child: const Text('Changing camera lens'),
+                ? const Center(
+              child: Text('Changing camera lens'),
             )
                 : CameraPreview(
               _controller!,
@@ -151,7 +150,7 @@ class _CameraViewState extends State<CameraView> {
       left: 0,
       top: 50,
       right: 0,
-      child: Container(
+      child: SizedBox(
         width: 70,
         child: Column(
           children: [
@@ -165,7 +164,7 @@ class _CameraViewState extends State<CameraView> {
               ),
               child: Text("${bloc.counter}",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold),),
@@ -189,7 +188,7 @@ class _CameraViewState extends State<CameraView> {
           Navigator.of(context).pop();
         },
         backgroundColor: Colors.black54,
-        child: Icon(
+        child: const Icon(
           Icons.arrow_back_ios_outlined,
           size: 20,
         ),
@@ -207,7 +206,7 @@ class _CameraViewState extends State<CameraView> {
         heroTag: Object(),
         onPressed: widget.onDetectorViewModeChanged,
         backgroundColor: Colors.black54,
-        child: Icon(
+        child: const Icon(
           Icons.photo_library_outlined,
           size: 25,
         ),
@@ -273,7 +272,7 @@ class _CameraViewState extends State<CameraView> {
                 child: Center(
                   child: Text(
                     '${_currentZoomLevel.toStringAsFixed(1)}x',
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -288,7 +287,7 @@ class _CameraViewState extends State<CameraView> {
     top: 40,
     right: 8,
     child: ConstrainedBox(
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         maxHeight: 250,
       ),
       child: Column(children: [
@@ -303,7 +302,7 @@ class _CameraViewState extends State<CameraView> {
             child: Center(
               child: Text(
                 '${_currentExposureOffset.toStringAsFixed(1)}x',
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
