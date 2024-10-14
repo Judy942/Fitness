@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
+import '../presentation/meal_planner/meal_planner_detail/meal_planner_detail_screen.dart';
 import 'round_button.dart';
 
 class FindStToEat extends StatelessWidget {
@@ -11,8 +12,13 @@ class FindStToEat extends StatelessWidget {
       {Key? key, required this.wObj, this.type = RoundButtonType.primaryBG})
       : super(key: key);
 
-  void onViewMoreClick(BuildContext context) {
-    Navigator.pushNamed(context, '/mealPlannerDetailScreen');
+  void onClickSelect(BuildContext context) {
+     Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MealPlannerDetailScreen(
+                  title: wObj["title"].toString(),
+                )));
   }
 
   @override
@@ -39,11 +45,11 @@ class FindStToEat extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  wObj["image"].toString(),
+                Image.network(
+                                    wObj["image"].toString(),
                   width: MediaQuery.of(context).size.width * 0.25,
                   height: MediaQuery.of(context).size.width * 0.25,
-                ),
+                )
               ],
             ),
             Padding(
@@ -77,7 +83,7 @@ class FindStToEat extends StatelessWidget {
                         type: type,
                         title: "Select",
                         onPressed: () {
-                          onViewMoreClick(context);
+                          onClickSelect(context);
                         }),
                   )
                 ],

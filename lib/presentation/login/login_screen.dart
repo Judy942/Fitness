@@ -12,7 +12,6 @@ import '../../core/utils/app_colors.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
-import '../onboarding_screen/start_screen.dart';
 
 Future<void> saveToken(String token) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -66,8 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final accessToken = responseBody["data"]["access_token"];
     await saveToken(accessToken);
     // Lưu thông tin người dùng
-        await saveUserData(responseBody["data"]);
-        await printAllStoredInfo(); // In thông tin lưu trữ
+        // await saveUserData(responseBody["data"]);
+        // await printAllStoredInfo(); // In thông tin lưu trữ
     Navigator.pushReplacementNamed(context, AppRoutes.completeProfileScreen);
   } else {
     // Xử lý trường hợp không có access_token

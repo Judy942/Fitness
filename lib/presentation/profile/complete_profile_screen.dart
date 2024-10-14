@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../main.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
+import '../home/home_screen.dart';
 import '../onboarding_screen/start_screen.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -21,9 +19,9 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
-  // Map<String, dynamic> allData = {};
+  Map<String, dynamic> userData = {};
   Future<void> updateUserData(Map<String, String> data) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = await getToken();
     try {
     String json = jsonEncode(data);
@@ -39,7 +37,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         print('Update user data success');
         print(response.body);
         if (widget.isBackToProfile) {
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         } else {
           Navigator.pushNamed(context, '/goalsScreen');
         }
@@ -51,11 +49,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   loadUserData();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    getUserData().then((data) {
+      setState(() {
+        userData = data;
+      });
+    });
+  }
 
   // Future<void> loadUserData() async {
   //   allData = await getAllData() as Map<String, dynamic>;
@@ -64,8 +66,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-        final prefsNotifier = Provider.of<PreferencesNotifier>(context);
-        Map<String, dynamic> usetData = prefsNotifier.userData;
+        // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
+        // Map<String, dynamic> usetData = prefsNotifier.userData;
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -136,11 +138,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                   )))
                               .toList(),
                           onChanged: (value) {
-                            usetData['gender'] = value!.toUpperCase();
+                            userData['gender'] = value!.toUpperCase();
                             setState(() {});
                           },
                           isExpanded: true,
-                          hint: Text(usetData['gender'] ?? (usetData['gender'] == ''? 'Choose Gender': 'Choose gender'),
+                          hint: Text(userData['gender'] ?? (userData['gender'] == 'null'? 'Choose Gender': 'Choose gender'),
 
                               // usetData['gender'] ?? '',
                               style: const TextStyle(
@@ -156,33 +158,33 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
-                    usetData['birthday'] = p0;
+                    userData['birthday'] = p0;
                     setState(() {
                       
                     });
                   },
                   hintText: 
-                   usetData['birthday'] ?? (usetData['birthday'] == ''? 'dd/mm/yyyy': 'dd/mm/yyyy'),
+                   userData['birthday'] ?? (userData['birthday'] == 'null'? 'dd/mm/yyyy': 'dd/mm/yyyy'),
                   icon: "assets/icons/calendar_icon.png",
                   textInputType: TextInputType.datetime,
                 ),
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
-                    usetData['weight'] = p0;
+                    userData['weight'] = p0;
                     setState(() {});
                   },
-                  hintText: usetData['weight'] ?? (usetData['weight'] == ''? 'Weight': 'Weight'),
+                  hintText: userData['weight'].toString(),
                   icon: "assets/icons/weight_icon.png",
                   textInputType: TextInputType.text,
                 ),
                 const SizedBox(height: 15),
                 RoundTextField(
                   onChanged: (p0) {
-                    usetData['height'] = p0;
+                    userData['height'] = p0;
                     setState(() {});
                   },
-                  hintText: usetData['height'] ?? (usetData['height'] == ''? 'Height': 'Height'),
+                  hintText: userData['height'].toString(),
                   icon: "assets/icons/swap_icon.png",
                   textInputType: TextInputType.text,
                 ),
@@ -193,19 +195,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     Map<String, String> data = {
                       // 'first_name': usetData['first_name'],
                       // 'last_name': usetData['last_name'],
-                      'gender': usetData['gender'],
-                      'height': usetData['height'],
-                      'weight': usetData['weight'],
-                      'birthday': usetData['birthday'],
+                      'gender': userData['gender'],
+                      'height': userData['height'].toString(),
+                      'weight': userData['weight'].toString(),
+                      //chuyển data về dạng yyyy-mm-dd
+                      'birthday': userData['birthday']
 
                     };
                     updateUserData(
                       data,
                     );
-                     prefsNotifier.updateUserData('gender', data['gender']);
-                     prefsNotifier.updateUserData('birthday', data['birthday']);
-                      prefsNotifier.updateUserData('weight', data['weight']);
-                      prefsNotifier.updateUserData('height', data['height']);
+                    //  prefsNotifier.updateUserData('gender', data['gender']);
+                    //  prefsNotifier.updateUserData('birthday', data['birthday']);
+                    //   prefsNotifier.updateUserData('weight', data['weight']);
+                    //   prefsNotifier.updateUserData('height', data['height']);
                       
                   },
                 )

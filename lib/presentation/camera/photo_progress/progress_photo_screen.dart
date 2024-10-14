@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/utils/app_colors.dart';
-import '../../widgets/round_button.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../widgets/round_button.dart';
+import 'result_view.dart';
 
 class ProgressPhotoScreen extends StatefulWidget {
   const ProgressPhotoScreen({Key? key}) : super(key: key);
@@ -153,31 +154,32 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
+                        const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(
+                              SizedBox(
                                 height: 15,
                               ),
-                              const Text(
+                              Text(
                                 "Track Your Progress Each\nMonth With Photo",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
-                                  fontSize: 12,
+                                  fontSize: 14,
                                 ),
                               ),
-                              const Spacer(),
+                              Spacer(),
                               SizedBox(
                                 width: 110,
                                 height: 35,
-                                child: RoundButton(
-                                    title: "Learn More",
-                                    onPressed: () {}),
+                                // child: RoundButton(
+                                //     title: "Learn More",
+                                //     onPressed: () {}),
                               )
                             ]),
                         Image.asset(
                           "assets/images/progress_each_photo.png",
                           width: media.width * 0.35,
+                          fit: BoxFit.cover,
                         )
                       ],
                     ),
@@ -210,13 +212,13 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                         child: RoundButton(
                           title: "Compare",
                           onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //     const ComparisonView(),
-                            //   ),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                ResultView(date1 : DateTime.now(), date2 : DateTime.now()),
+                              ),
+                            );
                           },
                         ),
                       )
@@ -237,7 +239,15 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             fontWeight: FontWeight.w700),
                       ),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                ResultView(date1 : DateTime.now(), date2 : DateTime.now()),
+                              ),
+                            );
+                          },
                           child: const Text(
                             "See more",
                             style: TextStyle(color: AppColors.grayColor, fontSize: 12),

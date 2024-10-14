@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
-import 'package:flutter_application_fitness/presentation/camera/progress_photo_screen.dart';
+import 'package:flutter_application_fitness/presentation/camera/photo_progress/progress_photo_screen.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart';
 import 'package:flutter_application_fitness/presentation/home/home_screen.dart';

@@ -9,64 +9,33 @@ import '../../../core/utils/date_and_time.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
 import '../../onboarding_screen/start_screen.dart';
+import '../../workout/workout_schedule_view/add_schedule_view.dart';
+import '../meal_planner_detail/meal_planner_detail_screen.dart';
 
-class AddScheduleView extends StatefulWidget {
+class AddMealSchedule extends StatefulWidget {
   DateTime date;
 
-  AddScheduleView({super.key, required this.date});
+  AddMealSchedule({super.key, required this.date});
 
   @override
-  State<AddScheduleView> createState() => _AddScheduleViewState();
+  State<AddMealSchedule> createState() => _AddMealScheduleState();
 }
 
-class _AddScheduleViewState extends State<AddScheduleView> {
-  List whatArr = [];
+class _AddMealScheduleState extends State<AddMealSchedule> {
   bool isLoading = true; // Biến để theo dõi trạng thái tải dữ liệu
-  int workoutSelected = 0;
-  int diffSelected = 0;
-  Future<void> getListWorkout() async {
-    String? token =
-        await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+  int mealSelected = 0;
 
-    final response = await http.get(
-      Uri.parse(
-          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      setState(() {
-        whatArr = (jsonResponse['data'] as List).map((item) {
-          return {
-            'id': item['id'],
-            'image': item['image'],
-            "title": item['name'],
-            "exercises": "${item['exercises'].length} Exercises",
-            "time": "${item['time']} mins"
-          };
-        }).toList();
-        isLoading = false; // Đánh dấu rằng dữ liệu đã được tải
-      });
-    } else {
-      // Xử lý lỗi
-      print('Có lỗi xảy ra: ${response.body}');
-      setState(() {
-        isLoading = false; // Cũng đánh dấu là đã xong
-      });
-    }
-  }
-
-  List diffArr = [
-    {"id": '1', "title": "Easy"},
-    {"id": '2', "title": "Normal"},
-    {"id": '3', "title": "Hard"},
-  ];
+  List recommendationArr = [];
 
   @override
   void initState() {
     super.initState();
-    getListWorkout();
+    getRecommendation().then((value) {
+      setState(() {
+        recommendationArr = value;
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -167,7 +136,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       height: 20,
                     ),
                     const Text(
-                      "Details Workout",
+                      "Details meal",
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 14,
@@ -177,33 +146,18 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       height: 8,
                     ),
                     IconTitleNextRow(
-                      icon: "assets/icons/choose_workout.png",
-                      title: "Choose Workout",
-                      time: whatArr.isNotEmpty
-                          ? whatArr[workoutSelected]['title']
-                          : '',
-                      color: AppColors.lightGrayColor,
-                      onPressed: () async {
-                        workoutSelected =
-                            await showWorkoutDialog(context, whatArr) - 1;
-                        print(workoutSelected);
-                        setState(() {});
-                      },
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    IconTitleNextRow(
                         icon: "assets/icons/difficulity_icon.png",
-                        title: "Difficulity",
-                        time: diffArr.isNotEmpty
-                            ? diffArr[diffSelected]['title']
+                        title: "Meal",
+                        time: (recommendationArr.isNotEmpty &&
+                                recommendationArr[0] != null)
+                            ? recommendationArr[0]['name']
                             : '',
                         color: AppColors.lightGrayColor,
                         onPressed: () async {
-                          diffSelected =
-                              await showWorkoutDialog(context, diffArr) - 1;
-                          print(diffSelected);
+                          mealSelected = await showWorkoutDialog(
+                                  context, recommendationArr) -
+                              1;
+                          print(mealSelected);
                           setState(() {});
                         }),
                     const SizedBox(
@@ -214,22 +168,27 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                         title: "Save",
                         onPressed: () {
                           print(widget.date);
-                          // DateTime utcDateTime = widget.date.toUtc();
-                          // String formattedTime = '${widget.date
-                          //     .toIso8601String()}Z';// Thêm 'Z' vào cuối
-                          //     formattedTime = formattedTime.replaceAll("Z", "+07:00");
-                          // DateTime utcDateTime = widget.date.toUtc();
 
-                          // Định dạng thời gian theo định dạng ISO 8601
-                          String formattedTime =
-                              '${widget.date.toIso8601String()}+07:00';
+                          // String formattedTime =
+                          //     '${widget.date.toIso8601String()}+07:00';
+                          // Map<String, dynamic> data = {
+                          //   "meal_time": formattedTime,
+                          //   "dish_id": recommendationArr[mealSelected]['id'],
+                          //   // "difficulty_id": diffArr[diffSelected]['id'],
+                          // };
+                          // print(data);
+                          // addMealSchedule(data, context);
+                          DateTime utcDateTime = widget.date.toUtc();
+                          String formattedTime = utcDateTime
+                              .toIso8601String(); // không cần thêm 'Z'
+
                           Map<String, dynamic> data = {
-                            "scheduled_execution_time": formattedTime,
-                            "workout_id": whatArr[workoutSelected]['id'],
-                            "difficulty_id": diffArr[diffSelected]['id'],
+                            "meal_time": formattedTime,
+                            "dish_id": recommendationArr[mealSelected]['id'],
                           };
+
                           print(data);
-                          addWorkoutSchedule(data, context);
+                          addMealSchedule(data, context);
                         }),
                     const SizedBox(
                       height: 20,
@@ -240,12 +199,12 @@ class _AddScheduleViewState extends State<AddScheduleView> {
   }
 }
 
-Future<void> addWorkoutSchedule(
+Future<void> addMealSchedule(
     Map<String, dynamic> data, BuildContext context) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   String json = jsonEncode(data);
   final response = await http.post(
-    Uri.parse('http://162.248.102.236:8055/items/workout_schedule'),
+    Uri.parse('http://162.248.102.236:8055/items/meal_schedule'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -254,7 +213,6 @@ Future<void> addWorkoutSchedule(
   );
   if (response.statusCode == 200) {
     print(response.body);
-    //hiển thị thông báo
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Add schedule success'),
@@ -262,51 +220,8 @@ Future<void> addWorkoutSchedule(
     );
     Navigator.pop(context);
   } else {
-    // Xử lý lỗi
+    print(response.body);
+
     print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
   }
-}
-
-Future<int> showWorkoutDialog(BuildContext context, List whatArr) async {
-  print(whatArr);
-  int selectedWorkoutId =
-      -1; // Giá trị mặc định hoặc bất kỳ giá trị thích hợp nào
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Select'),
-        content: SizedBox(
-          width: double.maxFinite, // Đảm bảo dialog có chiều rộng tối đa
-          child: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                ListView.separated(
-                  shrinkWrap:
-                      true, // Để ListView không chiếm toàn bộ không gian
-                  physics:
-                      const NeverScrollableScrollPhysics(), // Tắt cuộn của ListView
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(whatArr[index]['title'] ??
-                          whatArr[index]['name'] ??
-                          ''), // Thay đổi phù hợp với cấu trúc của bạn
-                      onTap: () {
-                        selectedWorkoutId = int.parse(whatArr[index]['id']
-                            .toString()); // Gán giá trị đã chọn và ép kiểu int
-                        Navigator.of(context).pop(); // Đóng dialog
-                      },
-                    );
-                  },
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemCount: whatArr.length,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
-  return selectedWorkoutId;
 }

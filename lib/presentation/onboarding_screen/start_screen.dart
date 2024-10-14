@@ -6,31 +6,32 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../routes/app_routes.dart';
-import '../login/login_screen.dart';
 
 Future<String?> getToken() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('userToken');
 }
 
-Future<void> saveUserData(Map<String, dynamic> userData) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  // Lưu dữ liệu người dùng
-  await prefs.setString('first_name', userData['first_name'] ?? '');
-  await prefs.setString('last_name', userData['last_name'] ?? '');
-  await prefs.setString('email', userData['email'] ?? '');
-  await prefs.setString('height', userData['height']?.toString() ?? '');
-  await prefs.setString('weight', userData['weight']?.toString() ?? '');
-  await prefs.setString('birthday', userData['birthday'] ?? '');
-  await prefs.setString('gender', userData['gender'] ?? '');
-}
+// Future<void> saveUserData(Map<String, dynamic> userData) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   // Lưu dữ liệu người dùng
+//   await prefs.setString('first_name', userData['first_name'] ?? '');
+//   await prefs.setString('last_name', userData['last_name'] ?? '');
+//   await prefs.setString('email', userData['email'] ?? '');
+//   await prefs.setString('height', userData['height']?.toString() ?? '');
+//   await prefs.setString('weight', userData['weight']?.toString() ?? '');
+//   await prefs.setString('birthday', userData['birthday'] ?? '');
+//   await prefs.setString('gender', userData['gender'] ?? '');
+// }
 
 Future<void> clearLocalData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.clear(); // Xóa tất cả dữ liệu local
 }
 
-Future<void> fetchAndSaveBmi(String token) async {
+Future<String> getBmi() async {
+  String? token = await getToken();
+  print(token);
   try {
     final response = await http.get(
       Uri.parse(
@@ -40,15 +41,14 @@ Future<void> fetchAndSaveBmi(String token) async {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      final bmi = responseData['bmi']; // Giả sử API trả về trường "bmi"
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('bmi', bmi); // Lưu BMI vào SharedPreferences
+      final bmi = responseData['data']['bmi'];
+      print(bmi);
+      return bmi.toString();
     } else {
-      // Xử lý lỗi nếu cần
+      return '0'; // Trả về giá trị mặc định nếu không lấy được dữ liệu
     }
   } catch (e) {
-    // Xử lý lỗi nếu cần
+    return '0'; // Trả về giá trị mặc định nếu không lấy được dữ liệu
   }
 }
 
@@ -78,9 +78,6 @@ class _StartScreenState extends State<StartScreen> {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final userData = responseData['data'];
-        await saveUserData(userData);
-        await printAllStoredInfo(); // In thông tin lưu trữ
-        await fetchAndSaveBmi(token);
         Navigator.pushReplacementNamed(context, AppRoutes.dashboardScreen);
       } else {
         // Lỗi, xóa dữ liệu local và yêu cầu đăng nhập lại

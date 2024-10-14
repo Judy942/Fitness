@@ -11,6 +11,36 @@ import '../../../widgets/what_train_row.dart';
 import '../../onboarding_screen/start_screen.dart';
 
 
+Future<List> getListWorkout() async {
+    String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+    List whatArr = [];
+    final response = await http.get(
+      Uri.parse(
+          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      // setState(() {
+        whatArr = (jsonResponse['data'] as List).map((item) {
+          return {
+            'id': item['id'],
+            'image': item['image'],
+            "title": item['name'],
+            "exercises": "${item['exercises'].length} Exercises",
+            "time": "${item['time']} mins"
+            // Bạn có thể thêm bất kỳ trường nào bạn muốn ở đây
+          };
+        }).toList();
+      // });
+    } else {
+      // Xử lý lỗi
+      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
+    }
+    return whatArr;
+  }
 
 class WorkoutTrackerScreen extends StatefulWidget {
   const WorkoutTrackerScreen({Key? key}) : super(key: key);
@@ -35,39 +65,16 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
 
   List whatArr = [];
 
-Future<void> getListWorkout() async {
-    String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
-    final response = await http.get(
-      Uri.parse(
-          'http://162.248.102.236:8055/items/workout?limit=5&page=1&meta=*'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      setState(() {
-        whatArr = (jsonResponse['data'] as List).map((item) {
-          return {
-            'id': item['id'],
-            'image': item['image'],
-            "title": item['name'],
-            "exercises": "${item['exercises'].length} Exercises",
-            "time": "${item['time']} mins"
-            // Bạn có thể thêm bất kỳ trường nào bạn muốn ở đây
-          };
-        }).toList();
-      });
-    } else {
-      // Xử lý lỗi
-      print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    getListWorkout();
+    getListWorkout().then((value) {
+      setState(() {
+        whatArr = value;
+      });
+    });
   }
 
   @override

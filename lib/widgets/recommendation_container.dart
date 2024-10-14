@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/utils/app_colors.dart';
+import '../presentation/meal_planner/meal_planner_detail/meal_details_screen.dart';
 import 'round_button.dart';
 
 class RecommendationContainer extends StatelessWidget {
@@ -12,12 +13,13 @@ class RecommendationContainer extends StatelessWidget {
       : super(key: key);
 
   void onViewMoreClick(BuildContext context) {
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (context) => WorkoutDetailView(
-    //               dObj: wObj,
-    //             )));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MealDetailsScreen(
+                  dObj: wObj,
+                )));
+                
   }
 
   @override
@@ -33,10 +35,15 @@ class RecommendationContainer extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
+              // Image.asset(
+              //   height: MediaQuery.of(context).size.width * 0.2,
+              //   width: MediaQuery.of(context).size.width * 0.2,
+              //   wObj["image"].toString(),
+              // ),
+              Image.network(
+                wObj["image"].toString(),
                 height: MediaQuery.of(context).size.width * 0.2,
                 width: MediaQuery.of(context).size.width * 0.2,
-                wObj["image"].toString(),
               ),
               const SizedBox(
                 height: 5,
@@ -49,7 +56,7 @@ class RecommendationContainer extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               Text(
-                "${wObj["difficulty"]} | ${wObj["time"]} | ${wObj["calories"]}",
+                "${wObj["difficulty"]} | ${wObj["cooking_time"]} | ${wObj["nutritions"][0]['value']} Kcal",
                 style: const TextStyle(
                     color: AppColors.grayColor,
                     fontSize: 14,

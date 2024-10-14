@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../camera/progress_photo_screen.dart';
+import '../camera/photo_progress/progress_photo_screen.dart';
 import '../home/home_screen.dart';
 import '../profile/user_profile.dart';
 import '../workout/workout_tracker/workout_tracker_screen.dart';

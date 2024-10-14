@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../core/utils/app_colors.dart';
 import '../core/utils/date_and_time.dart';
+import '../presentation/onboarding_screen/start_screen.dart';
 import 'round_gradient_button.dart';
 
 class ShowLog extends StatelessWidget {
@@ -9,7 +11,38 @@ class ShowLog extends StatelessWidget {
   final String title;
   const ShowLog({Key? key, required this.eObj, required this.title})
       : super(key: key);
+void _editEvent() {
+  // Thêm logic sửa sự kiện ở đây
+  print("Edit event");
+}
 
+void _deleteEvent(BuildContext context) async {
+    String? token = await getToken();
+    final id = eObj["id"]; // Giả sử eObj chứa id
+    final url = 'http://162.248.102.236:8055/items/workout_schedule/$id';
+print(url);
+    final response = await http.delete(Uri.parse(url),
+          headers: {'Authorization': 'Bearer $token'},
+);
+
+    if (response.statusCode == 204) {
+
+      // Navigator.pop(context);
+      const SnackBar(
+        content: Text('Workout deleted successfully!'),
+      );
+      
+    } else {
+      // Xảy ra lỗi
+      // Navigator.pop(context);
+      print("Failed to delete workout: ${response.body}");
+      // ScaffoldMessenger.of(context).showSnackBar(
+      // const SnackBar(
+      //   content: Text('Failed to delete workout!'),
+      // ),
+    // );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -26,7 +59,7 @@ class ShowLog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
                   onTap: () {
@@ -55,6 +88,29 @@ class ShowLog extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w700),
                 ),
+               InkWell(
+            onTap: () {
+
+                  _showOptionsDialog(context);
+
+              
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              height: 40,
+              width: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  color: AppColors.lightGrayColor,
+                  borderRadius: BorderRadius.circular(10)),
+              child: Image.asset(
+                "assets/icons/more_icon.png",
+                width: 15,
+                height: 15,
+                fit: BoxFit.contain,
+              ),
+            ),
+          )
               ],
             ),
             const SizedBox(
@@ -98,4 +154,41 @@ class ShowLog extends StatelessWidget {
       ),
     );
   }
+  void _showOptionsDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Choose an option"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text("Edit"),
+              onTap: () {
+                Navigator.pop(context);
+                                Navigator.pop(context);
+
+                _editEvent();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text("Delete"),
+              onTap: () {
+                Navigator.pop(context);
+                                Navigator.pop(context);
+
+                // Gọi hàm xóa sự kiện ở đây
+                _deleteEvent(context);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 }

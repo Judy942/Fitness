@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
 import '../../widgets/today_target_cell.dart';
+import '../meal_planner/meal_schedule/meal_schedule.dart';
 
 
 class ActivityTrackerScreen extends StatefulWidget {
@@ -41,10 +42,21 @@ Future<void> requestLocationPermission() async {
     },
   ];
 
+  int calories = 0;
+
     @override
   void initState() {
     super.initState();
     initPlatformState();
+        getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
+      setState(() {
+            for (var wObj in value) {
+      wObj["meals"].forEach((sObj) {
+        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
+      });
+    }
+      });
+    });
   }
 
   void onStepCount(StepCount event) {
@@ -86,13 +98,39 @@ Future<void> requestLocationPermission() async {
 
     return granted;
   }
+  Future<void> requestPermissions() async {
+  // Yêu cầu quyền truy cập vị trí
+  var locationStatus = await Permission.location.request();
+  if (locationStatus.isDenied) {
+    // Nếu người dùng từ chối quyền, có thể hiển thị thông báo
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Location permission is required.')),
+    );
+  } else if (locationStatus.isPermanentlyDenied) {
+    // Nếu người dùng từ chối vĩnh viễn, hướng dẫn họ mở cài đặt
+    openAppSettings();
+  }
+
+  // Yêu cầu quyền nhận diện hoạt động
+  var activityStatus = await Permission.activityRecognition.request();
+  if (activityStatus.isDenied) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Activity recognition permission is required.')),
+    );
+  } else if (activityStatus.isPermanentlyDenied) {
+    openAppSettings();
+  }
+}
+
 
   Future<void> initPlatformState() async {
     bool granted = await _checkActivityRecognitionPermission();
-    if (!granted) {
-      // tell user, the app will not work
-      
-    }
+  if (!granted) {
+    await requestPermissions();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Permission to access activity recognition is required.')),
+    );
+  }
 
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     (_pedestrianStatusStream.listen(onPedestrianStatusChanged))
@@ -225,11 +263,11 @@ Future<void> requestLocationPermission() async {
                     ),
                     Row(
                       children: [
-                        const Expanded(
+                         Expanded(
                           child: TodayTargetCell(
                             icon: "assets/icons/water_icon.png",
-                            value: "8L",
-                            title: "Water Intake",
+                            value: calories.toString(),
+                            title: "Calories",
                           ),
                         ),
                         const SizedBox(
@@ -251,26 +289,26 @@ Future<void> requestLocationPermission() async {
                 height: media.width * 0.05,
               ),
             
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Latest Workout",
+                  Text(
+                    "Latest Activity",
                     style: TextStyle(
                         color: AppColors.blackColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w700),
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "See More",
-                      style: TextStyle(
-                          color: AppColors.grayColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  )
+                  // TextButton(
+                  //   onPressed: () {},
+                  //   child: const Text(
+                  //     "See More",
+                  //     style: TextStyle(
+                  //         color: AppColors.grayColor,
+                  //         fontSize: 14,
+                  //         fontWeight: FontWeight.w700),
+                  //   ),
+                  // )
                 ],
               ),
               ListView.builder(
@@ -291,97 +329,4 @@ Future<void> requestLocationPermission() async {
       ),
     );
   }
-
-  // Widget getTitles(double value, TitleMeta meta) {
-  //   var style = const TextStyle(
-  //     color: AppColors.grayColor,
-  //     fontWeight: FontWeight.w500,
-  //     fontSize: 12,
-  //   );
-  //   Widget text;
-  //   switch (value.toInt()) {
-  //     case 0:
-  //       text =  Text('Sun', style: style);
-  //       break;
-  //     case 1:
-  //       text =  Text('Mon', style: style);
-  //       break;
-  //     case 2:
-  //       text =  Text('Tue', style: style);
-  //       break;
-  //     case 3:
-  //       text =  Text('Wed', style: style);
-  //       break;
-  //     case 4:
-  //       text =  Text('Thu', style: style);
-  //       break;
-  //     case 5:
-  //       text =  Text('Fri', style: style);
-  //       break;
-  //     case 6:
-  //       text =  Text('Sat', style: style);
-  //       break;
-  //     default:
-  //       text =  Text('', style: style);
-  //       break;
-  //   }
-  //   return SideTitleWidget(
-  //     axisSide: meta.axisSide,
-  //     space: 16,
-  //     child: text,
-  //   );
-  // }
-
-  // List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-  //   switch (i) {
-  //     case 0:
-  //       return makeGroupData(0, 5, AppColors.primary , isTouched: i == touchedIndex);
-  //     case 1:
-  //       return makeGroupData(1, 10.5, AppColors.secondary, isTouched: i == touchedIndex);
-  //     case 2:
-  //       return makeGroupData(2, 5, AppColors.primary , isTouched: i == touchedIndex);
-  //     case 3:
-  //       return makeGroupData(3, 7.5, AppColors.secondary, isTouched: i == touchedIndex);
-  //     case 4:
-  //       return makeGroupData(4, 15, AppColors.primary , isTouched: i == touchedIndex);
-  //     case 5:
-  //       return makeGroupData(5, 5.5, AppColors.secondary, isTouched: i == touchedIndex);
-  //     case 6:
-  //       return makeGroupData(6, 8.5, AppColors.primary , isTouched: i == touchedIndex);
-  //     default:
-  //       return throw Error();
-  //   }
-  // });
-
-  // BarChartGroupData makeGroupData(
-  //     int x,
-  //     double y,
-  //     List<Color> barColor,
-  //     {
-  //       bool isTouched = false,
-
-  //       double width = 22,
-  //       List<int> showTooltips = const [],
-  //     }) {
-
-  //   return BarChartGroupData(
-  //     x: x,
-  //     barRods: [
-  //       BarChartRodData(
-  //         toY: isTouched ? y + 1 : y,
-  //         gradient: LinearGradient(colors: barColor, begin: Alignment.topCenter, end: Alignment.bottomCenter ),
-  //         width: width,
-  //         borderSide: isTouched
-  //             ? const BorderSide(color: Colors.green)
-  //             : const BorderSide(color: Colors.white, width: 0),
-  //         backDrawRodData: BackgroundBarChartRodData(
-  //           show: true,
-  //           toY: 20,
-  //           color: AppColors.lightGrayColor,
-  //         ),
-  //       ),
-  //     ],
-  //     showingTooltipIndicators: showTooltips,
-  //   );
-  // }
 }

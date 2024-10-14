@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../core/utils/app_colors.dart';
 
@@ -27,11 +28,17 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
             ClipRRect(
               // borderRadius: BorderRadius.circular(30),
               
-              child: Image.asset(
-                widget.wObj["image"].toString(),
+              child: Image.network(
+                'http://162.248.102.236:8055/assets/${widget.wObj['dish_id']["image"]}',
                 width: 50,
                 height: 50,
+                fit: BoxFit.cover,
               ),
+              // Image.asset(
+              //   widget.wObj['dish_id']["image"].toString(),
+              //   width: 50,
+              //   height: 50,
+              // ),
             ),
             const SizedBox(
               width: 15,
@@ -41,17 +48,18 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.wObj["title"].toString(),
+                      widget.wObj['dish_id']["name"].toString(),
                       style: const TextStyle(
                           color: AppColors.blackColor,
-                          fontSize: 12,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      widget.wObj["time"].toString(),
+                      'Today | ${DateFormat('hh:mm a').format(DateTime.parse(widget.wObj["meal_time"]).toLocal())}',
+                      
                       style: const TextStyle(
                         color: AppColors.grayColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ],
