@@ -338,13 +338,25 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                       RoundGradientButton(
                           title: "Start Workout",
                           onPressed: () {
-                            return Scaffold(
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => const PoseDetectorView()));
+                            // ExpansionTile(
+                            //   title: Text('Gyms'),
+                            //   children: [
+                            //     CustomCard(
+                            //         'PushUpDetector', PoseDetectorView()),
+                            //   ],
+                            // );
+                            // return 
+                            Scaffold(
                               appBar: AppBar(
-                                title: Text('Finess App'),
+                                title: const Text('Finess App'),
                                 centerTitle: true,
                                 elevation: 0,
                               ),
-                              body: SafeArea(
+                              body: const SafeArea(
                                 child: Center(
                                   child: SingleChildScrollView(
                                     child: Padding(
@@ -353,7 +365,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                       child: Column(
                                         children: [
                                           ExpansionTile(
-                                            title: const Text('Gyms'),
+                                            title: Text('Gyms'),
                                             children: [
                                               CustomCard('PushUpDetector',
                                                   PoseDetectorView()),
@@ -391,29 +403,31 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
     ),
   );
 }
+
 class CustomCard extends StatelessWidget {
   final String _label;
   final Widget _viewPage;
   final bool featureCompleted;
- 
-  const CustomCard(this._label, this._viewPage, {this.featureCompleted = true});
- 
+
+  const CustomCard(this._label, this._viewPage,
+      {super.key, this.featureCompleted = true});
+
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
-      margin: EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         tileColor: Theme.of(context).primaryColor,
         title: Text(
           _label,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         onTap: () {
           if (!featureCompleted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content:
-                const Text('This feature has not been implemented yet')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('This feature has not been implemented yet')));
           } else {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => _viewPage));
