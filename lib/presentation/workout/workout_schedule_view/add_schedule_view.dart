@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -12,8 +14,11 @@ import '../../onboarding_screen/start_screen.dart';
 
 class AddScheduleView extends StatefulWidget {
   DateTime date;
-
-  AddScheduleView({super.key, required this.date});
+  Map? obj = {};
+  String? url;
+  bool? isEdit;
+  AddScheduleView(
+      {super.key, required this.date, this.obj, this.url, this.isEdit});
 
   @override
   State<AddScheduleView> createState() => _AddScheduleViewState();
@@ -66,11 +71,22 @@ class _AddScheduleViewState extends State<AddScheduleView> {
   @override
   void initState() {
     super.initState();
+    // workoutSelected =  (widget.obj!['workout_id']?? 1)-1;
+    workoutSelected = ((widget.obj != null && widget.obj!['workout_id'] != null)
+    ? widget.obj!['workout_id']
+    : 1) - 1;
+
+    // diffSelected =  (widget.obj!['difficulty_id']?? 1)-1;
+    diffSelected = ((widget.obj != null && widget.obj!['difficulty_id'] != null)
+    ? widget.obj!['difficulty_id']
+    : 1) - 1;
     getListWorkout();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("workoutSelected: $workoutSelected");
+    print("diffSelected: $diffSelected");
     var media = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -157,7 +173,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                           );
                           print(widget.date);
                         },
-                        initialDateTime: DateTime.now(),
+                        initialDateTime: widget.date, //DateTime.now(),
                         use24hFormat: false,
                         minuteInterval: 1,
                         mode: CupertinoDatePickerMode.time,
@@ -213,14 +229,6 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                     RoundGradientButton(
                         title: "Save",
                         onPressed: () {
-                          print(widget.date);
-                          // DateTime utcDateTime = widget.date.toUtc();
-                          // String formattedTime = '${widget.date
-                          //     .toIso8601String()}Z';// Thêm 'Z' vào cuối
-                          //     formattedTime = formattedTime.replaceAll("Z", "+07:00");
-                          // DateTime utcDateTime = widget.date.toUtc();
-
-                          // Định dạng thời gian theo định dạng ISO 8601
                           String formattedTime =
                               '${widget.date.toIso8601String()}+07:00';
                           Map<String, dynamic> data = {
@@ -229,7 +237,13 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                             "difficulty_id": diffArr[diffSelected]['id'],
                           };
                           print(data);
-                          addWorkoutSchedule(data, context);
+                          if (widget.isEdit == true) {
+                            editSchedule(context, data, widget.url!);
+                            print("Edit");
+                          } else {
+                            addWorkoutSchedule(data, context);
+                            print("Add");
+                          }
                         }),
                     const SizedBox(
                       height: 20,
@@ -237,6 +251,42 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                   ]),
             ),
     );
+  }
+}
+
+Future<void> editSchedule(
+    BuildContext context, Map<String, dynamic> eObj, String url) async {
+  String? token = await getToken();
+  final response = await http.patch(
+    Uri.parse(url),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(eObj),
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 204 ||
+      response.statusCode == 201) {
+    // Gọi hàm edit ở đây
+    print("Edit workout: ${response.body}");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Edit successfully!'),
+      ),
+    );
+    Navigator.pop(context);
+    Navigator.pop(context);
+    // Navigator.pop(context);
+  } else {
+    print("Failed to get workout: ${response.body}");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Failed to edit!'),
+      ),
+    );
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 }
 
@@ -270,7 +320,7 @@ Future<void> addWorkoutSchedule(
 Future<int> showWorkoutDialog(BuildContext context, List whatArr) async {
   print(whatArr);
   int selectedWorkoutId =
-      -1; // Giá trị mặc định hoặc bất kỳ giá trị thích hợp nào
+      1; // Giá trị mặc định hoặc bất kỳ giá trị thích hợp nào
   await showDialog(
     context: context,
     builder: (BuildContext context) {

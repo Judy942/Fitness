@@ -338,44 +338,10 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                       RoundGradientButton(
                           title: "Start Workout",
                           onPressed: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) => const PoseDetectorView()));
-                            // ExpansionTile(
-                            //   title: Text('Gyms'),
-                            //   children: [
-                            //     CustomCard(
-                            //         'PushUpDetector', PoseDetectorView()),
-                            //   ],
-                            // );
-                            // return 
-                            Scaffold(
-                              appBar: AppBar(
-                                title: const Text('Finess App'),
-                                centerTitle: true,
-                                elevation: 0,
-                              ),
-                              body: const SafeArea(
-                                child: Center(
-                                  child: SingleChildScrollView(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 16),
-                                      child: Column(
-                                        children: [
-                                          ExpansionTile(
-                                            title: Text('Gyms'),
-                                            children: [
-                                              CustomCard('PushUpDetector',
-                                                  PoseDetectorView()),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AiHome(),
                               ),
                             );
                           })
@@ -404,13 +370,46 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
   );
 }
 
+class AiHome extends StatelessWidget {
+  const AiHome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Finess App'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: const SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  ExpansionTile(
+                    title: Text('Gyms'),
+                    children: [
+                      CustomCard('PushUpDetector', PoseDetectorView()),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class CustomCard extends StatelessWidget {
   final String _label;
   final Widget _viewPage;
   final bool featureCompleted;
 
-  const CustomCard(this._label, this._viewPage,
-      {super.key, this.featureCompleted = true});
+  const CustomCard(this._label, this._viewPage, {super.key, this.featureCompleted = true});
 
   @override
   Widget build(BuildContext context) {

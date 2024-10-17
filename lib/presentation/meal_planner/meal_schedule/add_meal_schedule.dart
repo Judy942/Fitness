@@ -14,8 +14,10 @@ import '../meal_planner_detail/meal_planner_detail_screen.dart';
 
 class AddMealSchedule extends StatefulWidget {
   DateTime date;
-
-  AddMealSchedule({super.key, required this.date});
+  Map? obj;
+  String? url;
+  bool? isEdit;
+  AddMealSchedule({super.key, required this.date, this.obj, this.url, this.isEdit});
 
   @override
   State<AddMealSchedule> createState() => _AddMealScheduleState();
@@ -24,12 +26,12 @@ class AddMealSchedule extends StatefulWidget {
 class _AddMealScheduleState extends State<AddMealSchedule> {
   bool isLoading = true; // Biến để theo dõi trạng thái tải dữ liệu
   int mealSelected = 0;
-
   List recommendationArr = [];
 
   @override
   void initState() {
     super.initState();
+        mealSelected =  (widget.obj?['dish_id']['id']??1) - 1;
     getRecommendation().then((value) {
       setState(() {
         recommendationArr = value;
@@ -126,7 +128,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                           );
                           print(widget.date);
                         },
-                        initialDateTime: DateTime.now(),
+                        initialDateTime: widget.date,
                         use24hFormat: false,
                         minuteInterval: 1,
                         mode: CupertinoDatePickerMode.time,
@@ -168,16 +170,6 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                         title: "Save",
                         onPressed: () {
                           print(widget.date);
-
-                          // String formattedTime =
-                          //     '${widget.date.toIso8601String()}+07:00';
-                          // Map<String, dynamic> data = {
-                          //   "meal_time": formattedTime,
-                          //   "dish_id": recommendationArr[mealSelected]['id'],
-                          //   // "difficulty_id": diffArr[diffSelected]['id'],
-                          // };
-                          // print(data);
-                          // addMealSchedule(data, context);
                           DateTime utcDateTime = widget.date.toUtc();
                           String formattedTime = utcDateTime
                               .toIso8601String(); // không cần thêm 'Z'
@@ -188,7 +180,12 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                           };
 
                           print(data);
+                          if (widget.isEdit == true) {
+                            editSchedule(context, data, widget.url!);
+                            print("Edit");
+                          } else {
                           addMealSchedule(data, context);
+                          }
                         }),
                     const SizedBox(
                       height: 20,

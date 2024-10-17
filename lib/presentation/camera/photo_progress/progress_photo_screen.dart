@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
+import '../camera_screen.dart';
 import 'result_view.dart';
 
 class ProgressPhotoScreen extends StatefulWidget {
@@ -46,7 +47,9 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
         title: const Text(
           "Progress Photo",
           style: TextStyle(
-              color: AppColors.blackColor, fontSize: 16, fontWeight: FontWeight.w700),
+              color: AppColors.blackColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w700),
         ),
         actions: [
           InkWell(
@@ -79,7 +82,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
               children: [
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Container(
                     width: double.maxFinite,
                     padding: const EdgeInsets.all(15),
@@ -124,23 +127,13 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                                 ),
                               ]),
                         ),
-                        Container(
-                            height: 60,
-                            alignment: Alignment.topRight,
-                            child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: AppColors.grayColor,
-                                  size: 15,
-                                )))
                       ],
                     ),
                   ),
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Container(
                     width: double.maxFinite,
                     padding: const EdgeInsets.all(20),
@@ -154,31 +147,28 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Column(
+                        Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
-                              Text(
+                              const Text(
                                 "Track Your Progress Each\nMonth With Photo",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 14,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               SizedBox(
-                                width: 110,
+                                width: media.width * 0.45,
                                 height: 35,
-                                // child: RoundButton(
-                                //     title: "Learn More",
-                                //     onPressed: () {}),
                               )
                             ]),
                         Image.asset(
                           "assets/images/progress_each_photo.png",
-                          width: media.width * 0.35,
+                          width: media.width * 0.3,
                           fit: BoxFit.cover,
                         )
                       ],
@@ -191,7 +181,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   decoration: BoxDecoration(
                     color: AppColors.primaryColor2.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(15),
@@ -215,8 +205,9 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                ResultView(date1 : DateTime.now(), date2 : DateTime.now()),
+                                builder: (context) => ResultView(
+                                    date1: DateTime.now(),
+                                    date2: DateTime.now()),
                               ),
                             );
                           },
@@ -227,7 +218,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -243,14 +234,16 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                ResultView(date1 : DateTime.now(), date2 : DateTime.now()),
+                                builder: (context) => ResultView(
+                                    date1: DateTime.now(),
+                                    date2: DateTime.now()),
                               ),
                             );
                           },
                           child: const Text(
                             "See more",
-                            style: TextStyle(color: AppColors.grayColor, fontSize: 12),
+                            style: TextStyle(
+                                color: AppColors.grayColor, fontSize: 12),
                           ))
                     ],
                   ),
@@ -271,8 +264,8 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
                               pObj["time"].toString(),
-                              style:
-                              const TextStyle(color: AppColors.grayColor, fontSize: 12),
+                              style: const TextStyle(
+                                  color: AppColors.grayColor, fontSize: 12),
                             ),
                           ),
                           SizedBox(
@@ -284,7 +277,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                               itemBuilder: ((context, indexRow) {
                                 return Container(
                                   margin:
-                                  const EdgeInsets.symmetric(horizontal: 4),
+                                      const EdgeInsets.symmetric(horizontal: 4),
                                   width: 100,
                                   decoration: BoxDecoration(
                                     color: AppColors.lightGrayColor,
@@ -315,15 +308,15 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
         ),
       ),
       floatingActionButton: InkWell(
-        onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => SleepAddAlarmView(
-          //       date: _selectedDateAppBBar,
-          //     ),
-          //   ),
-          // );
+        onTap: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CameraScreen()),
+          );
+          if (result != null) {
+            // Xử lý đường dẫn ảnh ở đây (nếu cần)
+            print("Ảnh đã chụp: $result");
+          }
         },
         child: Container(
           width: 55,

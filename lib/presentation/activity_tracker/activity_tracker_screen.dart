@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -6,7 +9,7 @@ import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
 import '../../widgets/today_target_cell.dart';
 import '../meal_planner/meal_schedule/meal_schedule.dart';
-
+import '../onboarding_screen/start_screen.dart';
 
 class ActivityTrackerScreen extends StatefulWidget {
   const ActivityTrackerScreen({Key? key}) : super(key: key);
@@ -21,40 +24,68 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   String _status = '?', _steps = '0';
   int touchedIndex = -1;
 
+  Future<void> requestLocationPermission() async {
+    var status = await Permission.location.status;
+    if (status.isDenied) {
+      await Permission.location.request();
+    }
+  }
 
-Future<void> requestLocationPermission() async {
-  var status = await Permission.location.status;
-  if (status.isDenied) {
-    await Permission.location.request();
+Future<List> latestActivity() async {
+  String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+
+  final response = await http.get(
+    Uri.parse('http://162.248.102.236:8055/api/activity/latest?limit=5'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    if (data is Map<String, dynamic> && data['data'] != null) {
+      return List.from(data['data']); // Trả về List từ trường 'data'
+    } else {
+      throw Exception('Invalid data format');
+    }
+  } else {
+    throw Exception('Failed to load data');
   }
 }
 
+
   List latestArr = [
-    {
-      "image": "assets/images/pic_4.png",
-      "title": "Drinking 300ml Water",
-      "time": "About 1 minutes ago"
-    },
-    {
-      "image": "assets/images/pic_5.png",
-      "title": "Eat Snack (Fitbar)",
-      "time": "About 3 hours ago"
-    },
+    // {
+    //   "image": "assets/images/pic_4.png",
+    //   "title": "Drinking 300ml Water",
+    //   "time": "About 1 minutes ago"
+    // },
+    // {
+    //   "image": "assets/images/pic_5.png",
+    //   "title": "Eat Snack (Fitbar)",
+    //   "time": "About 3 hours ago"
+    // },
   ];
 
   int calories = 0;
 
-    @override
+  @override
   void initState() {
     super.initState();
     initPlatformState();
-        getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
+    getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
       setState(() {
-            for (var wObj in value) {
-      wObj["meals"].forEach((sObj) {
-        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
+        for (var wObj in value) {
+          wObj["meals"].forEach((sObj) {
+            calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
+          });
+        }
       });
-    }
+    });
+    latestActivity().then((value) {
+      setState(() {
+        latestArr = value;
       });
     });
   }
@@ -98,39 +129,42 @@ Future<void> requestLocationPermission() async {
 
     return granted;
   }
+
   Future<void> requestPermissions() async {
-  // Yêu cầu quyền truy cập vị trí
-  var locationStatus = await Permission.location.request();
-  if (locationStatus.isDenied) {
-    // Nếu người dùng từ chối quyền, có thể hiển thị thông báo
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Location permission is required.')),
-    );
-  } else if (locationStatus.isPermanentlyDenied) {
-    // Nếu người dùng từ chối vĩnh viễn, hướng dẫn họ mở cài đặt
-    openAppSettings();
-  }
+    // Yêu cầu quyền truy cập vị trí
+    var locationStatus = await Permission.location.request();
+    if (locationStatus.isDenied) {
+      // Nếu người dùng từ chối quyền, có thể hiển thị thông báo
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location permission is required.')),
+      );
+    } else if (locationStatus.isPermanentlyDenied) {
+      // Nếu người dùng từ chối vĩnh viễn, hướng dẫn họ mở cài đặt
+      openAppSettings();
+    }
 
-  // Yêu cầu quyền nhận diện hoạt động
-  var activityStatus = await Permission.activityRecognition.request();
-  if (activityStatus.isDenied) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Activity recognition permission is required.')),
-    );
-  } else if (activityStatus.isPermanentlyDenied) {
-    openAppSettings();
+    // Yêu cầu quyền nhận diện hoạt động
+    var activityStatus = await Permission.activityRecognition.request();
+    if (activityStatus.isDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Activity recognition permission is required.')),
+      );
+    } else if (activityStatus.isPermanentlyDenied) {
+      openAppSettings();
+    }
   }
-}
-
 
   Future<void> initPlatformState() async {
     bool granted = await _checkActivityRecognitionPermission();
-  if (!granted) {
-    await requestPermissions();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Permission to access activity recognition is required.')),
-    );
-  }
+    if (!granted) {
+      await requestPermissions();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Permission to access activity recognition is required.')),
+      );
+    }
 
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     (_pedestrianStatusStream.listen(onPedestrianStatusChanged))
@@ -141,7 +175,6 @@ Future<void> requestLocationPermission() async {
 
     if (!mounted) return;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +240,7 @@ Future<void> requestLocationPermission() async {
             children: [
               Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
                     AppColors.primaryColor2.withOpacity(0.3),
@@ -239,7 +272,8 @@ Future<void> requestLocationPermission() async {
                             ),
                             child: MaterialButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/mealPlannerScreen');
+                                  Navigator.pushNamed(
+                                      context, '/mealPlannerScreen');
                                 },
                                 padding: EdgeInsets.zero,
                                 height: 30,
@@ -263,7 +297,7 @@ Future<void> requestLocationPermission() async {
                     ),
                     Row(
                       children: [
-                         Expanded(
+                        Expanded(
                           child: TodayTargetCell(
                             icon: "assets/icons/water_icon.png",
                             value: calories.toString(),
@@ -288,7 +322,6 @@ Future<void> requestLocationPermission() async {
               SizedBox(
                 height: media.width * 0.05,
               ),
-            
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -299,16 +332,7 @@ Future<void> requestLocationPermission() async {
                         fontSize: 16,
                         fontWeight: FontWeight.w700),
                   ),
-                  // TextButton(
-                  //   onPressed: () {},
-                  //   child: const Text(
-                  //     "See More",
-                  //     style: TextStyle(
-                  //         color: AppColors.grayColor,
-                  //         fontSize: 14,
-                  //         fontWeight: FontWeight.w700),
-                  //   ),
-                  // )
+
                 ],
               ),
               ListView.builder(

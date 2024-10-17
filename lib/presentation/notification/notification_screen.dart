@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/notification_row.dart';
+import '../onboarding_screen/start_screen.dart';
+
 
 class NotificationScreen extends StatefulWidget {
-
   const NotificationScreen({Key? key}) : super(key: key);
 
   @override
@@ -12,107 +16,69 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  List notificationArr = [
-    {
-      "image": "assets/images/Workout1.png",
-      "title": "Hey, it’s time for lunch",
-      "time": "About 1 minutes ago"
-    },
-    {
-      "image": "assets/images/Workout2.png",
-      "title": "Don’t miss your lowerbody workout",
-      "time": "About 3 hours ago"
-    },
-    {
-      "image": "assets/images/Workout3.png",
-      "title": "Hey, let’s add some meals for your b",
-      "time": "About 3 hours ago"
-    },
-    {
-      "image": "assets/images/Workout1.png",
-      "title": "Congratulations, You have finished A..",
-      "time": "29 May"
-    },
-    {
-      "image": "assets/images/Workout2.png",
-      "title": "Hey, it’s time for lunch",
-      "time": "8 April"
-    },
-    {
-      "image": "assets/images/Workout3.png",
-      "title": "Ups, You have missed your Lowerbo...",
-      "time": "8 April"
-    },
-  ];
+  List<dynamic> notificationArr = [];
+
+  Future<void> getNotification() async {
+    String? token = await getToken(); // Đảm bảo phương thức này đã được định nghĩa
+    final response = await http.get(
+      Uri.parse('http://162.248.102.236:8055/api/activity/nearest?limit=5'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        notificationArr = data['data']; 
+              print(data);
+
+      });
+    } else {
+      print('Failed to load notification');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getNotification();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.whiteColor,
+      appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
-        appBar: AppBar(
-          backgroundColor: AppColors.whiteColor,
-          centerTitle: true,
-          elevation: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/back_icon.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          title: const Text(
-            "Notification",
-            style: TextStyle(
-                color: AppColors.blackColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w700),
-          ),
-          actions: [
-            InkWell(
-              onTap: () {},
-              child: Container(
-                margin: const EdgeInsets.all(8),
-                height: 40,
-                width: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: AppColors.lightGrayColor,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Image.asset(
-                  "assets/icons/more_icon.png",
-                  width: 12,
-                  height: 12,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            )
-          ],
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+          icon: Image.asset("assets/icons/back_icon.png", width: 15, height: 15),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-            itemBuilder: ((context, index) {
-              var nObj = notificationArr[index] as Map? ?? {};
-              return NotificationRow(nObj: nObj);
-            }),
-            separatorBuilder: (context, index) {
-              return Divider(
-                color: AppColors.grayColor.withOpacity(0.5),
-                height: 1,
-              );
-            },
-            itemCount: notificationArr.length));
+        title: const Text(
+          "Notification",
+          style: TextStyle(color: AppColors.blackColor, fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        actions: [
+          IconButton(
+            icon: Image.asset("assets/icons/more_icon.png", width: 12, height: 12),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+        itemCount: notificationArr.length,
+        itemBuilder: (context, index) {
+          var nObj = notificationArr[index] as Map<String, dynamic>? ?? {};
+          return NotificationRow(nObj: nObj);
+        },
+        separatorBuilder: (context, index) {
+          return Divider(color: AppColors.grayColor.withOpacity(0.5), height: 1);
+        },
+      ),
+    );
   }
 }

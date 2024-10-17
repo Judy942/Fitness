@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/add_schedule_view.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../core/utils/app_colors.dart';
 import '../core/utils/date_and_time.dart';
@@ -11,38 +14,74 @@ class ShowLog extends StatelessWidget {
   final String title;
   const ShowLog({Key? key, required this.eObj, required this.title})
       : super(key: key);
-void _editEvent() {
-  // Thêm logic sửa sự kiện ở đây
-  print("Edit event");
-}
-
-void _deleteEvent(BuildContext context) async {
-    String? token = await getToken();
+  Future<void> _editEvent(BuildContext context) async {
     final id = eObj["id"]; // Giả sử eObj chứa id
-    final url = 'http://162.248.102.236:8055/items/workout_schedule/$id';
-print(url);
-    final response = await http.delete(Uri.parse(url),
-          headers: {'Authorization': 'Bearer $token'},
-);
-
-    if (response.statusCode == 204) {
-
-      // Navigator.pop(context);
-      const SnackBar(
-        content: Text('Workout deleted successfully!'),
+    String url = "";
+    if (eObj["workout_id"] != null) {
+      url = 'http://162.248.102.236:8055/items/workout_schedule/$id';
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddScheduleView(date: DateFormat("dd/MM/yyyy hh:mm a").parse(eObj["start_time"]), obj: eObj, url: url, isEdit: true,),
+        ),
+      );
+    } else if (eObj["dish_id"] != null) {
+      url = 'http://162.248.102.236:8055/items/meal_schedule/$id';
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddMealSchedule(date: DateFormat("dd/MM/yyyy hh:mm a").parse(eObj["start_time"]), obj: eObj, url: url, isEdit: true,),
+        ),
       );
       
     } else {
-      // Xảy ra lỗi
-      // Navigator.pop(context);
+      print("Not found item id: $id to delete");
+      print(url);
+      return;
+    }
+
+  }
+  void _deleteEvent(BuildContext context) async {
+    String? token = await getToken();
+    final id = eObj["id"]; // Giả sử eObj chứa id
+    String url = "";
+    //kiểm tra phần tử là exercise hay meal
+    if (eObj["workout_id"] != null) {
+      url = 'http://162.248.102.236:8055/items/workout_schedule/$id';
+    } else if (eObj["dish_id"] != null) {
+      url = 'http://162.248.102.236:8055/items/meal_schedule/$id';
+    } else {
+      return;
+    }
+    print(url);
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200 ||
+        response.statusCode == 204 ||
+        response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Deleted successfully!'),
+      ),
+      );
+   
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      Navigator.pop(context);
       print("Failed to delete workout: ${response.body}");
-      // ScaffoldMessenger.of(context).showSnackBar(
-      // const SnackBar(
-      //   content: Text('Failed to delete workout!'),
-      // ),
-    // );
+      ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Failed to delete workout!'),
+      ),
+      );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -88,27 +127,26 @@ print(url);
                       fontSize: 16,
                       fontWeight: FontWeight.w700),
                 ),
-               InkWell(
-            onTap: () {
-                  _showOptionsDialog(context);
-              
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 30,
-              width: 30,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/more_icon.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
+                InkWell(
+                  onTap: () {
+                    _showOptionsDialog(context);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    height: 30,
+                    width: 30,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: AppColors.lightGrayColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Image.asset(
+                      "assets/icons/more_icon.png",
+                      width: 15,
+                      height: 15,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                )
               ],
             ),
             const SizedBox(
@@ -152,41 +190,35 @@ print(url);
       ),
     );
   }
+
   void _showOptionsDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Choose an option"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text("Edit"),
-              onTap: () {
-                Navigator.pop(context);
-                                Navigator.pop(context);
-
-                _editEvent();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text("Delete"),
-              onTap: () {
-                Navigator.pop(context);
-                                Navigator.pop(context);
-
-                // Gọi hàm xóa sự kiện ở đây
-                _deleteEvent(context);
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Choose an option"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text("Edit"),
+                onTap: () {
+                  _editEvent(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text("Delete"),
+                onTap: () {
+                  // Gọi hàm xóa sự kiện ở đây
+                  _deleteEvent(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

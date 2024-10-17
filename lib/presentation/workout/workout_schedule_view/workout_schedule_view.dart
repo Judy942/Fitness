@@ -71,52 +71,54 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _selectedDateAppBBar = DateTime.now();
-    getListWorkout().then((workouts) {
-      workoutArr = workouts;
+void initState() {
+  super.initState();
+  _selectedDateAppBBar = DateTime.now();
 
-      setState(() {});
+  getListWorkout().then((workouts) {
+    setState(() {
+      workoutArr = workouts;
+      setDayEventWorkoutList();
     });
-    getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar));
+  });
+
+  getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar)).then((_) {
     setDayEventWorkoutList();
-  }
+  });
+}
 
   String formatScheduledTime(String time) {
     DateTime dateTime = DateTime.parse(time); // Parse từ chuỗi
     return DateFormat('dd/MM/yyyy hh:mm a').format(dateTime); // Định dạng lại
   }
 
-  void setDayEventWorkoutList() {
-    var date = dateToStartDate(_selectedDateAppBBar);
+void setDayEventWorkoutList() {
+  if (workoutArr.isEmpty) return; // Thêm kiểm tra này
 
-    selectDayEventArr = eventArr.map((wObj) {
-      // Chuyển đổi thời gian từ chuỗi thành DateTime
-      DateTime scheduledTime =
-          DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
-          
-      String workoutName = workoutArr.where((w) {
-        return w["id"] == wObj["workout_id"];
-      }).isNotEmpty
-          ? workoutArr.where((w) {
-              return w["id"] == wObj["workout_id"];
-            }).first["title"]
-          : " Workout"; // Hoặc giá trị mặc định khác
-      return {
-        "id": wObj["id"],
-        "name": workoutName,
-        "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
-        "date": scheduledTime,
-      };
-    }).where((wObj) {
-      return dateToStartDate(wObj["date"] as DateTime) == date;
-    }).toList();
+  var date = dateToStartDate(_selectedDateAppBBar);
 
-    if (mounted) {
-      setState(() {});
-    }
+  selectDayEventArr = eventArr.map((wObj) {
+    DateTime scheduledTime = DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
+
+    String workoutName = workoutArr.where((w) => w["id"] == wObj["workout_id"]).isNotEmpty
+        ? workoutArr.firstWhere((w) => w["id"] == wObj["workout_id"])["title"]
+        : "Workout";
+
+    return {
+      "id": wObj["id"],
+      "workout_id": wObj["workout_id"],
+      "difficulty_id": wObj["difficulty_id"],
+      "name": workoutName,
+      "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
+      "date": scheduledTime,
+    };
+  }).where((wObj) => dateToStartDate(wObj["date"] as DateTime) == date).toList();
+
+  if (mounted) {
+    setState(() {});
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +184,6 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
             dayBGColor: Colors.grey.withOpacity(0.15),
             titleSpaceBetween: 15,
             backgroundColor: Colors.transparent,
-            // fullCalendar: false,
             fullCalendarScroll: FullCalendarScroll.horizontal,
             fullCalendarDay: WeekDay.short,
             selectedDateColor: Colors.white,
@@ -270,21 +271,21 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                                           var sObj = slotArr[index];
                                           return InkWell(
                                             onTap: () {
-                                              print("sObj: $sObj");
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return ShowLog(
-                                                    eObj: sObj,
-                                                    title: "Workout Schedule",
-                                                  );                                                  
-                                                },
-                                              );
-                                              setState(() {});
+                                              setState(() {
+                                                print("sObj: $sObj");
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return ShowLog(
+                                                      eObj: sObj,
+                                                      title: "Workout Schedule",
+                                                    );
+                                                  },
+                                                );
+                                              });
                                             },
                                             child: Container(
                                               height: 35,
-                                              width: availWidth * 0.5,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 8),

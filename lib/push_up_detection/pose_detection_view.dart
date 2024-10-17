@@ -1,10 +1,11 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/push_up_detection/push_up_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
-import 'pose_painter.dart';
 import 'detector_view.dart';
+import 'pose_painter.dart';
 
 class PoseDetectorView extends StatefulWidget {
   const PoseDetectorView({super.key});
@@ -32,7 +33,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
   @override
   Widget build(BuildContext context) {
-    return DetectorView(
+    return  BlocProvider(
+        create: (context) => PushUpCounter(),
+        child:
+    DetectorView(
       posePainter: _posePainter,
       title: 'Pose Detector',
       customPaint: _customPaint,
@@ -40,6 +44,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       onImage: _processImage,
       initialCameraLensDirection: _cameraLensDirection,
       onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
+    )
     );
   }
 

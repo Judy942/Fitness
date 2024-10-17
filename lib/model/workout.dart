@@ -115,7 +115,6 @@ Future<Workout> getWorkoutDetail(int id) async {
       List<Exercise> exercises = (workoutData['exercises'] as List).map((exercise) {
         final exerciseId = exercise['exercise_id'];
         final exerciseDifficulties = exerciseId['exercise_difficulties'] as List<dynamic>? ?? [];
-        print('exerciseDifficulties: ok');
         return Exercise(
           title: exerciseId['title'] ?? 'Unknown Title', // Gán giá trị mặc định nếu null
           description: exerciseId['description'],
@@ -135,7 +134,6 @@ Future<Workout> getWorkoutDetail(int id) async {
         );
         
       }).toList();
-      print('exercises: ok');
       List<Equipment> equipments = (workoutData['equipments'] as List).map((equipment) {
         final equipmentId = equipment['equipment_id'];
         return Equipment(
@@ -144,7 +142,6 @@ Future<Workout> getWorkoutDetail(int id) async {
           image: 'http://162.248.102.236:8055/assets/${equipmentId['image']}',
         );
       }).toList();
-      print('equipments: ok');
       return Workout(
         id: workoutData['id'] ?? 0, // Gán giá trị mặc định nếu null
         name: workoutData['name'] ?? 'Unknown Workout', // Gán giá trị mặc định nếu null

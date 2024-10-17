@@ -66,7 +66,7 @@ class _MealScheduleState extends State<MealSchedule> {
     },
     {
       "title": "Fat",
-      "value": "50 g",
+      "value": "150 g",
     },
   ];
 
@@ -88,8 +88,6 @@ class _MealScheduleState extends State<MealSchedule> {
   }
 
   void setDayEventMealSchedule() {
-    // var date = dateToStartDate(_selectedDateAppBBar);
-
     selectDayEventArr = mealScheduleArr.map((wObj) {
       return {
         'id': wObj['id'],
@@ -99,7 +97,6 @@ class _MealScheduleState extends State<MealSchedule> {
         'meals': wObj['meals']
             .map((sObj) {
               var mealDate = DateTime.parse(sObj['meal_time']).toLocal();
-              // var mealDate = DateTime.parse(sObj['meal_time']);
               return {
                 'id': sObj['id'],
                 'meal_time': DateFormat('dd/MM/yyyy hh:mm a').format(mealDate),
@@ -421,37 +418,36 @@ class _MealScheduleState extends State<MealSchedule> {
                                                             .toString()),
                                                     onPressed: () {
                                                       print(yObj);
-                                                      // showDialog(
-                                                      //   context: context,
-                                                      //   builder: (context) {
-                                                      //     return ShowLog(
-                                                      //       eObj: yObj,
-                                                      //       title:
-                                                      //           "Workout Schedule",
-                                                      //     );
-                                                      //   },
-                                                      // );
                                                       showDialog(
                                                         context: context,
                                                         builder: (context) {
-                                                          // Kiểm tra xem meal_time có phải là null không
                                                           var mealTime =
                                                               yObj["meal_time"];
                                                           String
                                                               formattedMealTime;
+
                                                           if (mealTime !=
                                                               null) {
-                                                            DateTime dateTime =
-                                                                DateTime.parse(
-                                                                    mealTime);
-                                                            formattedMealTime =
-                                                                DateFormat(
-                                                                        "dd/MM/yyyy hh:mm a")
-                                                                    .format(
-                                                                        dateTime);
+                                                            // Giả sử mealTime có định dạng "dd/MM/yyyy hh:mm a"
+                                                            try {
+                                                              DateTime
+                                                                  dateTime =
+                                                                  DateFormat(
+                                                                          "dd/MM/yyyy hh:mm a")
+                                                                      .parse(
+                                                                          mealTime);
+                                                              formattedMealTime =
+                                                                  DateFormat(
+                                                                          "dd/MM/yyyy hh:mm a")
+                                                                      .format(
+                                                                          dateTime);
+                                                            } catch (e) {
+                                                              formattedMealTime =
+                                                                  "Định dạng không hợp lệ"; // Hoặc xử lý lỗi khác
+                                                            }
                                                           } else {
                                                             formattedMealTime =
-                                                                "Không xác định"; // Hoặc xử lý theo cách khác
+                                                                "Không xác định";
                                                           }
 
                                                           return ShowLog(
@@ -468,6 +464,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                                           );
                                                         },
                                                       );
+                                                      
                                                     },
                                                   );
                                                 }),

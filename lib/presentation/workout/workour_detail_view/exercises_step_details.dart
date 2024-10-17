@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/model/workout.dart';
+import 'package:lottie/lottie.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../core/utils/app_colors.dart';
@@ -20,14 +21,6 @@ class ExercisesStepDetails extends StatefulWidget {
 class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
   @override
   Widget build(BuildContext context) {
-    int difficulty;
-    try {
-      difficulty =
-          int.parse(widget.exerciseDetail["exercise_difficulties"][0]["value"]);
-    } catch (e) {
-      print("Lỗi khi phân tích: $e");
-      difficulty = 0; // Hoặc một giá trị mặc định nào đó
-    }
 // int difficulty = int.parse(widget.exerciseDetail["exercise_difficulties"]["value"]);
     var media = MediaQuery.of(context).size;
     return Scaffold(
@@ -90,10 +83,16 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     width: media.width,
                     height: media.width * 0.43,
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: AppColors.primary),
                         borderRadius: BorderRadius.circular(20)),
-                    child: Image.network(
-                      widget.eObj.image,
+                    // child: Image.network(
+                    //   widget.eObj.image,
+                    //   width: media.width,
+                    //   height: media.width * 0.43,
+                    //   fit: BoxFit.contain,
+                    // ),
+                    // child: Lottie.network('http://162.248.102.236:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    child: Lottie.asset(
+                      'assets/Animation - 1725696475335.json',
                       width: media.width,
                       height: media.width * 0.43,
                       fit: BoxFit.contain,
@@ -106,21 +105,12 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         color: AppColors.blackColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  // IconButton(
-                  //   onPressed: () {},
-                  //   icon: Image.asset(
-                  //     "assets/icons/play_icon.png",
-                  //     width: 30,
-                  //     height: 30,
-                  //   ),
-                  // ),
                 ],
               ),
               const SizedBox(
                 height: 15,
               ),
               Text(
-                // widget.eObj["title"].toString(),
                 widget.eObj.title,
                 style: const TextStyle(
                     color: AppColors.blackColor,
@@ -131,7 +121,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 4,
               ),
               Text(
-                // "Easy | 390 Calories Burn",
                 "${widget.eObj.difficulty} | ${widget.eObj.caloriesBurned} Calories Burn",
                 style: const TextStyle(
                   color: AppColors.grayColor,
@@ -152,7 +141,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 4,
               ),
               ReadMoreText(
-                // 'A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide A jumping jack, also known as a star jump and called a side-straddle hop in the US military, is a physical jumping exercise performed by jumping to a position with the legs spread wide',
                 widget.exerciseDetail["description"] ??
                     "No description available",
                 trimLines: 4,
@@ -189,8 +177,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      // "${exerciseDetail.length} Steps",
-                      // "${exerciseDetail["process_steps"].length} Steps",
                       "${(widget.exerciseDetail["process_steps"] as List?)?.length ?? 0} Steps",
 
                       style: const TextStyle(
@@ -249,7 +235,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     ),
                   ),
                   onSelectedItemChanged: (index) {
-                    difficulty = index;
                   },
                   childCount: 100,
                   itemBuilder: (context, index) {
