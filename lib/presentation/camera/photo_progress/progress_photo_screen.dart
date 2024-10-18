@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/camera/photo_progress/comparison_view.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
+import '../../onboarding_screen/start_screen.dart';
 import '../camera_screen.dart';
 import 'result_view.dart';
 
@@ -13,26 +18,58 @@ class ProgressPhotoScreen extends StatefulWidget {
 }
 
 class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
+
+
+Future<List<dynamic>> fetchProcessTracker() async {
+  String? token = await getToken();
+  // Thay $CURRENT_USER bằng userId
+  final url = Uri.parse(
+    // 'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=$userId',
+    'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER'
+  );
+
+  final response = await http.get(url,     headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'application/json' },
+);
+
+  if (response.statusCode == 200) {
+    // Giải mã dữ liệu JSON
+    final jsonResponse = jsonDecode(response.body);
+    return jsonResponse['data']; // Trả về danh sách dữ liệu
+  } else {
+    throw Exception('Failed to load process tracker data');
+  }
+}
+
   List photoArr = [
-    {
-      "time": "2 June",
-      "photo": [
-        "assets/images/pp_1.png",
-        "assets/images/pp_2.png",
-        "assets/images/pp_3.png",
-        "assets/images/pp_4.png",
-      ]
-    },
-    {
-      "time": "5 May",
-      "photo": [
-        "assets/images/pp_5.png",
-        "assets/images/pp_6.png",
-        "assets/images/pp_7.png",
-        "assets/images/pp_8.png",
-      ]
-    }
+    // {
+    //   "time": "2 June",
+    //   "photo": [
+    //     "assets/images/pp_1.png",
+    //     "assets/images/pp_2.png",
+    //     "assets/images/pp_3.png",
+    //     "assets/images/pp_4.png",
+    //   ]
+    // },
+    // {
+    //   "time": "5 May",
+    //   "photo": [
+    //     "assets/images/pp_5.png",
+    //     "assets/images/pp_6.png",
+    //     "assets/images/pp_7.png",
+    //     "assets/images/pp_8.png",
+    //   ]
+    // }
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProcessTracker().then((value) {
+      setState(() {
+        photoArr = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,9 +242,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ResultView(
-                                    date1: DateTime.now(),
-                                    date2: DateTime.now()),
+                                builder: (context) => ComparisonView( ) ,
                               ),
                             );
                           },
@@ -248,57 +283,42 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                     ],
                   ),
                 ),
-                ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: photoArr.length,
-                    itemBuilder: ((context, index) {
-                      var pObj = photoArr[index] as Map? ?? {};
-                      var imaArr = pObj["photo"] as List? ?? [];
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              pObj["time"].toString(),
-                              style: const TextStyle(
-                                  color: AppColors.grayColor, fontSize: 12),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.zero,
-                              itemCount: imaArr.length,
-                              itemBuilder: ((context, indexRow) {
-                                return Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.lightGrayColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset(
-                                      imaArr[indexRow] as String? ?? "",
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: ScrollController(),
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.width * 0.3,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: photoArr.length,
+                        itemBuilder: ((context, index) {
+                          var pObj = photoArr[index] as Map? ?? {};
+                                    return Container(
+                                      margin:
+                                          const EdgeInsets.symmetric(horizontal: 4),
                                       width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                        ],
-                      );
-                    }))
+                                      decoration: BoxDecoration(
+                                        color: AppColors.lightGrayColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          'http://162.248.102.236:8055/assets/${pObj['image']}',
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.width * 0.3,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                  ),
+                ),
               ],
             ),
             SizedBox(
@@ -311,7 +331,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
         onTap: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CameraScreen()),
+            MaterialPageRoute(builder: (context) => const CameraScreen()),
           );
           if (result != null) {
             // Xử lý đường dẫn ảnh ở đây (nếu cần)

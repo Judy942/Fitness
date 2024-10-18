@@ -28,20 +28,60 @@ class _CameraScreenState extends State<CameraScreen> {
     initializeCamera();
   }
 
+  // Future<String> uploadFile(String filePath) async {
+  //   String? token = await getToken();
+  //   var request = http.post(
+  //     // Uri.parse('http://162.248.102.236:8055/$filePath'),
+  //     Uri.parse('http://162.248.102.236:8055/files'),
+  //     headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'multipart/form-data' },
+  //     body: {
+  //       'file':                 File(filePath),
+
+  //     },
+  //   );
+  //   var response = await request;
+  //   print(response.body);
+  //   return jsonDecode(response.body)['data']['id'];
+  // }
+
   Future<String> uploadFile(String filePath) async {
-    String? token = await getToken();
-    var request = http.post(
-      Uri.parse('http://162.248.102.236:8055/$filePath'),
-      headers: { 'Authorization': 'Bearer $token' },
-    );
-    var response = await request;
-    print(response.body);
-    return jsonDecode(response.body)['id'];
+  String? token = await getToken();
+
+  // Tạo MultipartRequest
+  var request = http.MultipartRequest(
+    'POST',
+    Uri.parse('http://162.248.102.236:8055/files'), // Đường dẫn đúng để tải lên
+  );
+
+  // Thêm header Authorization
+  request.headers['Authorization'] = 'Bearer $token';
+
+  // Thêm tệp vào request
+  request.files.add(await http.MultipartFile.fromPath(
+    'file', // Tên trường mà máy chủ mong đợi
+    filePath,
+  ));
+
+  // Gửi request
+  var response = await request.send();
+
+  // Kiểm tra kết quả
+  if (response.statusCode == 200) {
+    // Đọc dữ liệu phản hồi
+    final responseData = await response.stream.bytesToString();
+    print(responseData); // In ra phản hồi
+
+    // Trả về ID từ dữ liệu phản hồi
+    return jsonDecode(responseData)['data']['id'];
+  } else {
+    throw Exception('Upload failed with status: ${response.statusCode}');
   }
+}
 
   Future<void> addProcessTracker(String filePath, int process) async {
     String? token = await getToken();
     String? id = await uploadFile(filePath);
+    print(id);
     var request = http.post(
       Uri.parse('http://162.248.102.236:8055/items/process_tracker'),
       headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'application/json' },
@@ -54,13 +94,13 @@ class _CameraScreenState extends State<CameraScreen> {
     print(response.body);
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tracker position added!')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Tracker position added!')),
+      // );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to add tracker position!')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Failed to add tracker position!')),
+      // );
     }
 
 

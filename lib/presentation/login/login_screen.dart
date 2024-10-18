@@ -18,6 +18,7 @@ Future<void> saveToken(String token) async {
   await prefs.setString('userToken', token);
 }
 
+
 Future<void> printAllStoredInfo() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // Lấy tất cả các key-value từ SharedPreferences
