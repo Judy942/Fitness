@@ -66,7 +66,6 @@ class ShowLog extends StatelessWidget {
         content: Text('Deleted successfully!'),
       ),
       );
-   
       Navigator.pop(context);
       Navigator.pop(context);
       Navigator.pop(context);

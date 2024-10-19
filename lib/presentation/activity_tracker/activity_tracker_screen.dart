@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -187,7 +188,14 @@ Future<List> latestActivity() async {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+             Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DashboardScreen(),
+              ),
+              (route) => false, // Xóa tất cả các route trong stack
+            );
           },
           child: Container(
             margin: const EdgeInsets.all(8),

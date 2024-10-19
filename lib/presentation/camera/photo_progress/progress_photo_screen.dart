@@ -41,24 +41,6 @@ Future<List<dynamic>> fetchProcessTracker() async {
 }
 
   List photoArr = [
-    // {
-    //   "time": "2 June",
-    //   "photo": [
-    //     "assets/images/pp_1.png",
-    //     "assets/images/pp_2.png",
-    //     "assets/images/pp_3.png",
-    //     "assets/images/pp_4.png",
-    //   ]
-    // },
-    // {
-    //   "time": "5 May",
-    //   "photo": [
-    //     "assets/images/pp_5.png",
-    //     "assets/images/pp_6.png",
-    //     "assets/images/pp_7.png",
-    //     "assets/images/pp_8.png",
-    //   ]
-    // }
   ];
 
   @override
@@ -242,7 +224,7 @@ Future<List<dynamic>> fetchProcessTracker() async {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ComparisonView( ) ,
+                                builder: (context) => const ComparisonView( ) ,
                               ),
                             );
                           },
@@ -286,7 +268,7 @@ Future<List<dynamic>> fetchProcessTracker() async {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   controller: ScrollController(),
-                  physics: AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: SizedBox(
                     height: MediaQuery.of(context).size.width * 0.3,
                     width: MediaQuery.of(context).size.width,

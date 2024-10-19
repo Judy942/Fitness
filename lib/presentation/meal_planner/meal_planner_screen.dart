@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
 import 'package:flutter_application_fitness/widgets/find_st_to_eat.dart';
 import 'package:flutter_application_fitness/widgets/round_button.dart';
 import 'package:http/http.dart' as http;
@@ -260,7 +261,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
               elevation: 0,
               leading: InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ActivityTrackerScreen()));
                 },
                 child: Container(
                   margin: const EdgeInsets.all(8),

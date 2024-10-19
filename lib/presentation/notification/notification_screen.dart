@@ -28,9 +28,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        notificationArr = data['data']; 
+        notificationArr = data['data'];
               print(data);
-
       });
     } else {
       print('Failed to load notification');

@@ -4,6 +4,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
@@ -269,14 +271,20 @@ Future<void> editSchedule(
       response.statusCode == 204 ||
       response.statusCode == 201) {
     // Gọi hàm edit ở đây
-    print("Edit workout: ${response.body}");
+    // print("Edit workout: ${response.body}");
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Edit successfully!'),
       ),
     );
-    Navigator.pop(context);
-    Navigator.pop(context);
+        if(eObj["workout_id"] != null){
+        Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => WorkoutScheduleView()));
+        } else {
+          Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => MealSchedule()));
+        }
+    // Navigator.pop(context);
+    // Navigator.pop(context);
     // Navigator.pop(context);
   } else {
     print("Failed to get workout: ${response.body}");
@@ -310,7 +318,9 @@ Future<void> addWorkoutSchedule(
         content: Text('Add schedule success'),
       ),
     );
-    Navigator.pop(context);
+    // Navigator.pop(context);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => WorkoutScheduleView()));
   } else {
     // Xử lý lỗi
     print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');

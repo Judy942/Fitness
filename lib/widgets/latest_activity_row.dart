@@ -30,8 +30,8 @@ class LatestActivityRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
                 wObj["type"] == "MEAL"
-                    ? 'https://162.248.102.236:8055/assets/${wObj["dish_id"]["image"]}'
-                    : 'https://162.248.102.236:8055/assets/${wObj["workout_id"]["image"]}',
+                    ? 'http://162.248.102.236:8055/assets/${wObj["dish_id"]["image"]}'
+                    : 'http://162.248.102.236:8055/assets/${wObj["workout_id"]["image"]}',
                 errorBuilder: (BuildContext context, Object error,
                     StackTrace? stackTrace) {
                   return Container(

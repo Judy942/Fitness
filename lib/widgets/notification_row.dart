@@ -9,6 +9,8 @@ class NotificationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print('https://162.248.102.236:8055/assets/${nObj["dish_id"]["image"]}');
+    print('http://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -17,8 +19,8 @@ class NotificationRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             child: Image.network(
               nObj["type"] == "MEAL"
-                  ? 'https://162.248.102.236:8055/assets/${nObj["dish_id"]["image"]}'
-                  : 'https://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}',
+                  ? 'http://162.248.102.236:8055/assets/${nObj["dish_id"]["image"]}'
+                  : 'http://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}',
               errorBuilder:
                   (BuildContext context, Object error, StackTrace? stackTrace) {
                 return Container(

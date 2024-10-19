@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
@@ -50,7 +51,8 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => MealSchedule()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -215,7 +217,8 @@ Future<void> addMealSchedule(
         content: Text('Add schedule success'),
       ),
     );
-    Navigator.pop(context);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => MealSchedule()));
   } else {
     print(response.body);
 

@@ -134,18 +134,8 @@ class _UserProfileState extends State<UserProfile> {
                     child: RoundButton(
                       title: "Edit",
                       type: RoundButtonType.primaryBG,
-                      // onPressed: () {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => CompleteProfileScreen(isBackToProfile: true,),
-                      //     ),
-
-                      //   );
-
-                      // },
                       onPressed: () async {
-                        final result = await Navigator.push(
+                        final result = await Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>

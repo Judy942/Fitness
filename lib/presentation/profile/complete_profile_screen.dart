@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -37,7 +38,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         print('Update user data success');
         print(response.body);
         if (widget.isBackToProfile) {
-          Navigator.pop(context, true);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
         } else {
           Navigator.pushNamed(context, '/goalsScreen');
         }
@@ -77,12 +78,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             padding: const EdgeInsets.only(right: 15, left: 15),
             child: Column(
               children: [
-                InkWell(
-                  child: const Icon(Icons.arrow_back_ios),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
+                // InkWell(
+                //   child: const Icon(Icons.arrow_back_ios),
+                //   onTap: () {
+                //     Navigator.pop(context);
+                //   },
+                // ),
                 Image.asset("assets/images/complete_profile.png",
                     width: media.width),
                 const SizedBox(
@@ -205,10 +206,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     updateUserData(
                       data,
                     );
-                    //  prefsNotifier.updateUserData('gender', data['gender']);
-                    //  prefsNotifier.updateUserData('birthday', data['birthday']);
-                    //   prefsNotifier.updateUserData('weight', data['weight']);
-                    //   prefsNotifier.updateUserData('height', data['height']);
                       
                   },
                 )

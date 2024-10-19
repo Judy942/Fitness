@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
@@ -191,7 +192,7 @@ class _MealScheduleState extends State<MealSchedule> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MealPlannerScreen()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -563,7 +564,7 @@ class _MealScheduleState extends State<MealSchedule> {
       ),
       floatingActionButton: InkWell(
         onTap: () {
-          Navigator.push(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => AddMealSchedule(
