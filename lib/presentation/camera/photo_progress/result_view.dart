@@ -188,8 +188,24 @@ class _ResultViewState extends State<ResultView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
+                          
+                          // const SizedBox(height: 8),
+                          // Row(
+                          //   children: items.map((item) {
+                          //     return Expanded(
+                          //       child: Text(
+                          //         item['date_upload'],
+                          //         style: const TextStyle(
+                          //             color: AppColors.grayColor,
+                          //             fontSize: 12,
+                          //             fontWeight: FontWeight.w500),
+                          //       ),
+                          //     );
+                          //   }).toList(),
+                          // ),
+                          
                           Row(
-                            children: items.map((item) {
+                            children: items2.map((item) {
                               return Expanded(
                                 child: AspectRatio(
                                   aspectRatio: 1,
@@ -219,20 +235,6 @@ class _ResultViewState extends State<ResultView> {
                               );
                             }).toList(),
                           ),
-                          // const SizedBox(height: 8),
-                          // Row(
-                          //   children: items.map((item) {
-                          //     return Expanded(
-                          //       child: Text(
-                          //         item['date_upload'],
-                          //         style: const TextStyle(
-                          //             color: AppColors.grayColor,
-                          //             fontSize: 12,
-                          //             fontWeight: FontWeight.w500),
-                          //       ),
-                          //     );
-                          //   }).toList(),
-                          // ),
                           const Text(
                             "After",
                             style: TextStyle(
@@ -241,7 +243,7 @@ class _ResultViewState extends State<ResultView> {
                                 fontWeight: FontWeight.w700),
                           ),
                           Row(
-                            children: items2.map((item) {
+                            children: items.map((item) {
                               return Expanded(
                                 child: AspectRatio(
                                   aspectRatio: 1,

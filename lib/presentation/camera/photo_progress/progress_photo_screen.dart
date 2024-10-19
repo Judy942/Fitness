@@ -8,7 +8,6 @@ import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
 import '../../onboarding_screen/start_screen.dart';
 import '../camera_screen.dart';
-import 'result_view.dart';
 
 class ProgressPhotoScreen extends StatefulWidget {
   const ProgressPhotoScreen({Key? key}) : super(key: key);
@@ -251,9 +250,7 @@ Future<List<dynamic>> fetchProcessTracker() async {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ResultView(
-                                    date1: DateTime.now(),
-                                    date2: DateTime.now()),
+                                builder: (context) => ComparisonView(),
                               ),
                             );
                           },

@@ -10,7 +10,7 @@ class NotificationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // print('https://162.248.102.236:8055/assets/${nObj["dish_id"]["image"]}');
-    print('http://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}');
+    // print('http://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
