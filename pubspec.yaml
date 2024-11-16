@@ -53,7 +53,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   http: ^1.2.2
   google_sign_in: ^6.2.1
-  firebase_auth: ^5.2.1
+  firebase_auth: ^4.17.9
   pedometer: ^4.0.2
   permission_handler: ^11.3.1
   date_format: ^2.0.9
@@ -65,7 +65,14 @@ dependencies:
   camera: ^0.10.6
   timeago: ^3.2.2
   image_gallery_saver: ^1.7.1
-
+  flutter_dotenv: ^5.1.0
+  google_generative_ai: ^0.2.2
+  image_picker: ^1.0.7
+  firebase_core: ^2.27.1
+  cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10
+  flutter_riverpod: ^2.5.1
+  uuid: ^4.3.3
   # calendar_agenda:
   #   path: my_lib/calendar_agenda/
 
