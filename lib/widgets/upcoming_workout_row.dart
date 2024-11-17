@@ -1,7 +1,8 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../core/utils/app_colors.dart';
+import '../core/utils/date_and_time.dart';
 
 class UpcomingWorkoutRow extends StatefulWidget {
   final Map wObj;
@@ -14,8 +15,8 @@ class UpcomingWorkoutRow extends StatefulWidget {
 class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
   @override
   Widget build(BuildContext context) {
-    bool positive = false;
-    return Container(
+    return
+    Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
         padding: const EdgeInsets.all( 10),
         decoration: BoxDecoration(
@@ -26,8 +27,9 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: Image.asset(
-                widget.wObj["image"].toString(),
+              child: Image.network(
+                // widget.wObj["image"].toString(),
+                "http://162.248.102.236:8055/assets/${widget.wObj["workout_id"]["image"].toString()}",
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -41,73 +43,28 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.wObj["title"].toString(),
+                      widget.wObj["workout_id"]["name"].toString(),
                       style: const TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 12,
                           fontWeight: FontWeight.w500),
                     ),
+                    // Text(
+                    //   widget.wObj["scheduled_execution_time"].toString(),
+                    //   style: const TextStyle(
+                    //     color: AppColors.grayColor,
+                    //     fontSize: 10,
+                    //   ),
+                    // ),
                     Text(
-                      widget.wObj["time"].toString(),
+                      '${getDayTitle(widget.wObj["scheduled_execution_time"].toString())}|${DateFormat(' hh:mm a').format(DateTime.parse(widget.wObj["scheduled_execution_time"]).toLocal())}',
                       style: const TextStyle(
                         color: AppColors.grayColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ],
                 )),
-
-            CustomAnimatedToggleSwitch<bool>(
-              current: positive,
-              values: const [false, true],
-              indicatorSize: const Size.square(30.0),
-              animationDuration: const Duration(milliseconds: 200),
-              animationCurve: Curves.linear,
-              onChanged: (b) => setState(() => positive = b),
-              iconBuilder: (context, local, global) {
-                return const SizedBox();
-              },
-              onTap: (b) => setState(() => positive = !positive),
-              iconsTappable: false,
-              wrapperBuilder: (context, global, child) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Positioned(
-                        left: 10.0,
-                        right: 10.0,
-                        height: 30.0,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: AppColors.secondary),
-                            borderRadius:
-                            const BorderRadius.all(Radius.circular(50.0)),
-                          ),
-                        )),
-                    child,
-                  ],
-                );
-              },
-              foregroundIndicatorBuilder: (context, global) {
-                return SizedBox.fromSize(
-                  size: const Size(10, 10),
-                  child: const DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.whiteColor,
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(50.0)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black38,
-                            spreadRadius: 0.05,
-                            blurRadius: 1.1,
-                            offset: Offset(0.0, 0.8))
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
           ],
         ));
   }

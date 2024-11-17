@@ -5,6 +5,7 @@ import 'package:flutter_application_fitness/presentation/dashboard/dashboard_scr
 import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
@@ -24,6 +25,24 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   late Stream<PedestrianStatus> _pedestrianStatusStream;
   String _status = '?', _steps = '0';
   int touchedIndex = -1;
+  int totalStepsToday = 0;
+  int totalRunSteps = 0;
+  int totalSleepHours = 0;
+
+
+  Future<void> checkAndResetSteps() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastDate = prefs.getString('lastDate');
+
+    String today =
+        DateTime.now().toIso8601String().substring(0, 10); // Lấy ngày hiện tại
+
+    if (lastDate != today) {
+      // Nếu ngày đã thay đổi, reset tổng số bước
+      totalStepsToday = 0;
+      prefs.setString('lastDate', today); // Cập nhật ngày
+    }
+  }
 
   Future<void> requestLocationPermission() async {
     var status = await Permission.location.status;
@@ -32,48 +51,38 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     }
   }
 
-Future<List> latestActivity() async {
-  String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
+  Future<List> latestActivity() async {
+    String? token =
+        await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
-  final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/api/activity/latest?limit=5'),
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
+    final response = await http.get(
+      Uri.parse('http://162.248.102.236:8055/api/activity/latest?limit=5'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    if (data is Map<String, dynamic> && data['data'] != null) {
-      return List.from(data['data']); // Trả về List từ trường 'data'
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data is Map<String, dynamic> && data['data'] != null) {
+        return List.from(data['data']); // Trả về List từ trường 'data'
+      } else {
+        throw Exception('Invalid data format');
+      }
     } else {
-      throw Exception('Invalid data format');
+      throw Exception('Failed to load data');
     }
-  } else {
-    throw Exception('Failed to load data');
   }
-}
 
-
-  List latestArr = [
-    // {
-    //   "image": "assets/images/pic_4.png",
-    //   "title": "Drinking 300ml Water",
-    //   "time": "About 1 minutes ago"
-    // },
-    // {
-    //   "image": "assets/images/pic_5.png",
-    //   "title": "Eat Snack (Fitbar)",
-    //   "time": "About 3 hours ago"
-    // },
-  ];
+  List latestArr = [];
 
   int calories = 0;
 
   @override
   void initState() {
     super.initState();
+    checkAndResetSteps();
     initPlatformState();
     getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
       setState(() {
@@ -94,6 +103,7 @@ Future<List> latestActivity() async {
   void onStepCount(StepCount event) {
     print(event);
     setState(() {
+      totalStepsToday = event.steps; // Cộng số bước mới vào tổng
       _steps = event.steps.toString();
     });
   }
@@ -189,7 +199,7 @@ Future<List> latestActivity() async {
         leading: InkWell(
           onTap: () {
             // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
-             Navigator.pushAndRemoveUntil(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
                 builder: (context) => const DashboardScreen(),
@@ -220,26 +230,6 @@ Future<List> latestActivity() async {
               fontSize: 16,
               fontWeight: FontWeight.w700),
         ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.lightGrayColor,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/icons/more_icon.png",
-                width: 12,
-                height: 12,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -315,15 +305,48 @@ Future<List> latestActivity() async {
                         const SizedBox(
                           width: 15,
                         ),
+                        // Expanded(
+                        //   child: TodayTargetCell(
+                        //     icon: "assets/icons/foot_icon.png",
+                        //     value: _steps,
+                        //     title: "Foot Steps",
+                        //   ),
+                        // ),
                         Expanded(
                           child: TodayTargetCell(
                             icon: "assets/icons/foot_icon.png",
-                            value: _steps,
+                            value: totalStepsToday
+                                .toString(), // Hiển thị tổng số bước trong ngày
                             title: "Foot Steps",
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    SizedBox(
+                      height: media.width * 0.05,
+                    ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: TodayTargetCell(
+                    //         icon: "assets/icons/run_icon.png",
+                    //         value: totalRunSteps.toString(),
+                    //         title: "Run Steps",
+                    //       ),
+                    //     ),
+                    //     const SizedBox(
+                    //       width: 15,
+                    //     ),
+                    //     Expanded(
+                    //       child: TodayTargetCell(
+                    //         icon: "assets/icons/sleep_icon.png",
+                    //         value: totalSleepHours.toString(),
+                    //         title: "Sleep Hours",
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+
                   ],
                 ),
               ),
@@ -340,7 +363,6 @@ Future<List> latestActivity() async {
                         fontSize: 16,
                         fontWeight: FontWeight.w700),
                   ),
-
                 ],
               ),
               ListView.builder(

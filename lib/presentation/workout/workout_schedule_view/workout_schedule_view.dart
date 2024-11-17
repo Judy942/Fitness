@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_fitness/presentation/workout/workout_tracker/workout_tracker_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -131,7 +132,9 @@ void setDayEventWorkoutList() {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            // Navigator.pop(context);
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const DashboardScreen()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -164,20 +167,20 @@ void setDayEventWorkoutList() {
             controller: _calendarAgendaControllerAppBar,
             appbar: false,
             selectedDayPosition: SelectedDayPosition.center,
-            leading: IconButton(
-                onPressed: () {},
-                icon: Image.asset(
-                  "assets/icons/ArrowLeft.png",
-                  width: 15,
-                  height: 15,
-                )),
-            training: IconButton(
-                onPressed: () {},
-                icon: Image.asset(
-                  "assets/icons/ArrowRight.png",
-                  width: 15,
-                  height: 15,
-                )),
+            // leading: IconButton(
+            //     onPressed: () {},
+            //     icon: Image.asset(
+            //       "assets/icons/ArrowLeft.png",
+            //       width: 15,
+            //       height: 15,
+            //     )),
+            // training: IconButton(
+            //     onPressed: () {},
+            //     icon: Image.asset(
+            //       "assets/icons/ArrowRight.png",
+            //       width: 15,
+            //       height: 15,
+            //     )),
             weekDay: WeekDay.short,
             dayNameFontSize: 12,
             dayNumberFontSize: 16,

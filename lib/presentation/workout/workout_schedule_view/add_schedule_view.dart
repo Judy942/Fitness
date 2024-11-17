@@ -279,9 +279,9 @@ Future<void> editSchedule(
     );
         if(eObj["workout_id"] != null){
         Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => WorkoutScheduleView()));
+        context, MaterialPageRoute(builder: (context) => const WorkoutScheduleView()));
         } else {
-          Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => MealSchedule()));
+          Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => const MealSchedule()));
         }
     // Navigator.pop(context);
     // Navigator.pop(context);
@@ -320,7 +320,7 @@ Future<void> addWorkoutSchedule(
     );
     // Navigator.pop(context);
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => WorkoutScheduleView()));
+        context, MaterialPageRoute(builder: (context) => const WorkoutScheduleView()));
   } else {
     // Xử lý lỗi
     print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');

@@ -1,6 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
 import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/add_schedule_view.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -35,8 +39,6 @@ class ShowLog extends StatelessWidget {
       );
       
     } else {
-      print("Not found item id: $id to delete");
-      print(url);
       return;
     }
 
@@ -66,9 +68,16 @@ class ShowLog extends StatelessWidget {
         content: Text('Deleted successfully!'),
       ),
       );
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pop(context);
+      // Navigator.pop(context);
+      // Navigator.pop(context);
+      // Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(),
+        ),
+      );
+
     } else {
       Navigator.pop(context);
       Navigator.pop(context);

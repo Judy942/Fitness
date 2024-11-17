@@ -78,10 +78,10 @@ class _SignupScreenState extends State<SignupScreen> {
     print('Response body: ${response.body}');
 
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200||response.statusCode == 201||response.statusCode == 202||response.statusCode == 203||response.statusCode == 204) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Register successfully'),
+          content: Text('Register successfully, check your email to verify your account'),
         ),
       );
       Navigator.pushNamed(context, '/loginScreen');
@@ -92,9 +92,6 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     }
-
-
-
 
   }
 

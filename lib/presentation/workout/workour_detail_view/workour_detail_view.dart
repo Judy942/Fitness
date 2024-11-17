@@ -91,26 +91,6 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                   ),
                 ),
               ),
-              actions: [
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: AppColors.lightGrayColor,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset(
-                      "assets/icons/more_icon.png",
-                      width: 15,
-                      height: 15,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                )
-              ],
             ),
             SliverAppBar(
               backgroundColor: Colors.transparent,

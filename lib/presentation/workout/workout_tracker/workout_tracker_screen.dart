@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
-import '../../../widgets/upcoming_workout_row.dart';
 import '../../../widgets/what_train_row.dart';
+import '../../notification/notification_screen.dart';
 import '../../onboarding_screen/start_screen.dart';
 
 
@@ -51,16 +51,16 @@ class WorkoutTrackerScreen extends StatefulWidget {
 
 class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
   List latestArr = [
-    {
-      "image": "assets/images/Workout1.png",
-      "title": "Fullbody Workout",
-      "time": "Today, 03:00pm"
-    },
-    {
-      "image": "assets/images/Workout2.png",
-      "title": "Upperbody Workout",
-      "time": "June 05, 02:00pm"
-    },
+    // {
+    //   "image": "assets/images/Workout1.png",
+    //   "title": "Fullbody Workout",
+    //   "time": "Today, 03:00pm"
+    // },
+    // {
+    //   "image": "assets/images/Workout2.png",
+    //   "title": "Upperbody Workout",
+    //   "time": "June 05, 02:00pm"
+    // },
   ];
 
   List whatArr = [];
@@ -73,6 +73,11 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
     getListWorkout().then((value) {
       setState(() {
         whatArr = value;
+      });
+    });
+    getNotification().then((value) {
+      setState(() {
+        latestArr = value;
       });
     });
   }
@@ -140,14 +145,6 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                         if (response == null || response.lineBarSpots == null) {
                           return;
                         }
-                        // if (event is FlTapUpEvent) {
-                        //   final spotIndex =
-                        //       response.lineBarSpots!.first.spotIndex;
-                        //   showingTooltipOnSpots.clear();
-                        //   setState(() {
-                        //     showingTooltipOnSpots.add(spotIndex);
-                        //   });
-                        // }
                       },
                       mouseCursorResolver:
                           (FlTouchEvent event, LineTouchResponse? response) {
@@ -280,14 +277,6 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                               onPressed: () {
                                 Navigator.pushNamed(
                                     context, '/workoutScheduleView');
-
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) =>
-                                //         const ActivityTrackerView(),
-                                //   ),
-                                // );
                               },
                             ),
                           )
@@ -297,37 +286,27 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                     SizedBox(
                       height: media.width * 0.05,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Upcoming Workout",
-                          style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            "See More",
-                            style: TextStyle(
-                                color: AppColors.grayColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        )
-                      ],
-                    ),
-                    ListView.builder(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: latestArr.length,
-                        itemBuilder: (context, index) {
-                          var wObj = latestArr[index] as Map? ?? {};
-                          return UpcomingWorkoutRow(wObj: wObj);
-                        }),
+                    // const Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text(
+                    //       "Upcoming Workout",
+                    //       style: TextStyle(
+                    //           color: AppColors.blackColor,
+                    //           fontSize: 16,
+                    //           fontWeight: FontWeight.w700),
+                    //     ),
+                    //   ],
+                    // ),
+                    // ListView.builder(
+                    //     padding: EdgeInsets.zero,
+                    //     physics: const NeverScrollableScrollPhysics(),
+                    //     shrinkWrap: true,
+                    //     itemCount: latestArr.length,
+                    //     itemBuilder: (context, index) {
+                    //       var wObj = latestArr[index] as Map? ?? {};
+                    //       return UpcomingWorkoutRow(wObj: wObj);
+                    //     }),
                     SizedBox(
                       height: media.width * 0.05,
                     ),

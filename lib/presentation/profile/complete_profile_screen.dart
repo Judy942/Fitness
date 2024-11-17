@@ -38,7 +38,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         print('Update user data success');
         print(response.body);
         if (widget.isBackToProfile) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
         } else {
           Navigator.pushNamed(context, '/goalsScreen');
         }

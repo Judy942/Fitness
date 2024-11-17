@@ -17,7 +17,6 @@ import 'add_meal_schedule.dart';
 
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
-
   final response = await http.get(
     Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=$date'),
     headers: {
@@ -25,6 +24,7 @@ Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
       'Content-Type': 'application/json',
     },
   );
+  print(response);
 
   if (response.statusCode == 200) {
     // Chuyển đổi body của API thành List<Map<String, dynamic>>
@@ -184,6 +184,7 @@ class _MealScheduleState extends State<MealSchedule> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
+    // print("mealScheduleArr: $mealScheduleArr");
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -280,7 +281,6 @@ class _MealScheduleState extends State<MealSchedule> {
             onDateSelected: (date) {
               // _selectedDateAppBBar = date;
               DateTime now = DateTime.now();
-
               _selectedDateAppBBar = DateTime(
                 date.year,
                 date.month,

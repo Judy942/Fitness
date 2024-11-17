@@ -52,7 +52,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
         leading: InkWell(
           onTap: () {
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => MealSchedule()));
+                context, MaterialPageRoute(builder: (context) => const MealSchedule()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -218,7 +218,7 @@ Future<void> addMealSchedule(
       ),
     );
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => MealSchedule()));
+        context, MaterialPageRoute(builder: (context) => const MealSchedule()));
   } else {
     print(response.body);
 

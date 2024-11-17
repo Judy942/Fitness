@@ -28,22 +28,6 @@ class _CameraScreenState extends State<CameraScreen> {
     initializeCamera();
   }
 
-  // Future<String> uploadFile(String filePath) async {
-  //   String? token = await getToken();
-  //   var request = http.post(
-  //     // Uri.parse('http://162.248.102.236:8055/$filePath'),
-  //     Uri.parse('http://162.248.102.236:8055/files'),
-  //     headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'multipart/form-data' },
-  //     body: {
-  //       'file':                 File(filePath),
-
-  //     },
-  //   );
-  //   var response = await request;
-  //   print(response.body);
-  //   return jsonDecode(response.body)['data']['id'];
-  // }
-
   Future<String> uploadFile(String filePath) async {
   String? token = await getToken();
 
@@ -92,19 +76,6 @@ class _CameraScreenState extends State<CameraScreen> {
     );
     var response = await request;
     print(response.body);
-
-    if (response.statusCode == 200) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Tracker position added!')),
-      // );
-    } else {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Failed to add tracker position!')),
-      // );
-    }
-
-
-    
   }
 
   Future<void> initializeCamera() async {

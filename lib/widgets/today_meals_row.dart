@@ -34,11 +34,6 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
                 height: 50,
                 fit: BoxFit.cover,
               ),
-              // Image.asset(
-              //   widget.wObj['dish_id']["image"].toString(),
-              //   width: 50,
-              //   height: 50,
-              // ),
             ),
             const SizedBox(
               width: 15,

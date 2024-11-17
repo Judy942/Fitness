@@ -250,7 +250,7 @@ Future<List<dynamic>> fetchProcessTracker() async {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ComparisonView(),
+                                builder: (context) => const ComparisonView(),
                               ),
                             );
                           },
