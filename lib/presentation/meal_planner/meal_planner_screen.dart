@@ -499,8 +499,15 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                                 type: RoundButtonType.primaryBG,
                                 title: "Check",
                                 onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, '/mealScheduleScreen');
+                                  // Navigator.pushNamed(
+                                  //     context, '/mealScheduleScreen');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MealSchedule(),
+                                    ),
+                                  );
                                 },
                               ),
                             )

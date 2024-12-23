@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -270,8 +271,14 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                             ),
                             child: MaterialButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, '/mealPlannerScreen');
+                                  // Navigator.pushNamed(
+                                  //     context, '/mealPlannerScreen');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const MealPlannerScreen(),
+                                    ),
+                                  );
                                 },
                                 padding: EdgeInsets.zero,
                                 height: 30,

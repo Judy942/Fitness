@@ -4,12 +4,13 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
+import 'package:flutter_application_fitness/presentation/signup/signup_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../routes/app_routes.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
 
@@ -65,10 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (responseBody["data"] != null && responseBody["data"]["access_token"] != null) {
     final accessToken = responseBody["data"]["access_token"];
     await saveToken(accessToken);
-    // Lưu thông tin người dùng
-        // await saveUserData(responseBody["data"]);
-        // await printAllStoredInfo(); // In thông tin lưu trữ
-    Navigator.pushReplacementNamed(context, AppRoutes.completeProfileScreen);
+    // Navigator.pushReplacementNamed(context, AppRoutes.completeProfileScreen);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  CompleteProfileScreen(isBackToProfile: false,)));
   } else {
     // Xử lý trường hợp không có access_token
     ScaffoldMessenger.of(context).showSnackBar(
@@ -304,7 +303,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/signUpScreen');
+                        // Navigator.pushNamed(context, '/signUpScreen');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return const SignupScreen();
+                        }));
                       },
                       child: RichText(
                         textAlign: TextAlign.center,

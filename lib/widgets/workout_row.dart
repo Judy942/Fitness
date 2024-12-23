@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/workout/finish_workout/finish_workout_screen.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../core/utils/app_colors.dart';
@@ -7,7 +8,8 @@ class WorkoutRow extends StatelessWidget {
   const WorkoutRow({super.key, required this.wObj});
 
     void onButtonIconClick(BuildContext context) {
-     Navigator.pushNamed(context, '/finishWorkoutScreen');
+    //  Navigator.pushNamed(context, '/finishWorkoutScreen');
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const FinishWorkoutScreen()));
   }
 
 

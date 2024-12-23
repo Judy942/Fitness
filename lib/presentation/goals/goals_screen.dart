@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_application_fitness/routes/app_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/welcome/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
 
@@ -158,8 +159,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       title: "Confirm",
                       onPressed: () {
                         setGoal(goal);
-                        Navigator.pushReplacementNamed(
-                            context, AppRoutes.welcomeScreen);
+                        // Navigator.pushReplacementNamed(
+                        //     context, AppRoutes.welcomeScreen);
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const WelcomeScreen();
+                        }));
                       },
                     )
                   ],

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -84,7 +85,8 @@ class _SignupScreenState extends State<SignupScreen> {
           content: Text('Register successfully, check your email to verify your account'),
         ),
       );
-      Navigator.pushNamed(context, '/loginScreen');
+      // Navigator.pushNamed(context, '/loginScreen');
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
@@ -179,8 +180,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           time: "5/27, 09:00 AM",
                           color: AppColors.primaryColor2.withOpacity(0.3),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, '/workoutScheduleView');
+                            // Navigator.pushNamed(
+                            //     context, '/workoutScheduleView');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const WorkoutScheduleView(),
+                              ),
+                            );
                           }),
                       SizedBox(
                         height: media.width * 0.02,

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
 import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/add_schedule_view.dart';
-import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -74,7 +73,7 @@ class ShowLog extends StatelessWidget {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => DashboardScreen(),
+          builder: (context) => const DashboardScreen(),
         ),
       );
 

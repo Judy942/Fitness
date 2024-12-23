@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../routes/app_routes.dart';
 import 'page_widget.dart';
 
 
@@ -93,7 +93,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                   child: IconButton(
                     onPressed: () {
                       if (selectedIndex == pages.length - 1) {
-                        Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
+                        // Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                          return const LoginScreen();
+                        }));
                       } else {
                         selectedIndex =selectedIndex + 1;
                         pageController.animateToPage(selectedIndex, duration: const Duration(milliseconds: 300), curve: Curves.easeInSine);

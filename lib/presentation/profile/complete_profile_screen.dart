@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -40,7 +41,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         if (widget.isBackToProfile) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
         } else {
-          Navigator.pushNamed(context, '/goalsScreen');
+          // Navigator.pushNamed(context, '/goalsScreen');
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GoalsScreen()));
         }
       } else {
         print(response.body);

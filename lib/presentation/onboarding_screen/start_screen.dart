@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/core/utils/app_colors.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
+import 'package:flutter_application_fitness/presentation/onboarding_screen/onboarding_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../routes/app_routes.dart';
 
 Future<String?> getToken() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -78,15 +79,24 @@ class _StartScreenState extends State<StartScreen> {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final userData = responseData['data'];
-        Navigator.pushReplacementNamed(context, AppRoutes.dashboardScreen);
+        // Navigator.pushReplacementNamed(context, AppRoutes.dashboardScreen);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+          return const DashboardScreen();
+        }));
       } else {
         // Lỗi, xóa dữ liệu local và yêu cầu đăng nhập lại
         await clearLocalData();
-        Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
+        // Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+          return const LoginScreen();
+        }));
       }
     } else {
       // Không có token, chuyển đến Login
-      Navigator.pushReplacementNamed(context, AppRoutes.onboardingScreen);
+      // Navigator.pushReplacementNamed(context, AppRoutes.onboardingScreen);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return const OnboardingScreen();
+      }));
     }
     // setState(() {
     //   isLoading = false;

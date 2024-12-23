@@ -5,9 +5,11 @@ import "chat_home_page.dart";
 
 void main() {
   Gemini.init(apiKey: GEMINI_API_KEY,);
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 class MyApp extends StatelessWidget{
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

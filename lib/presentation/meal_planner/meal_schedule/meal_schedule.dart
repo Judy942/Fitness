@@ -184,7 +184,6 @@ class _MealScheduleState extends State<MealSchedule> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    // print("mealScheduleArr: $mealScheduleArr");
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -193,7 +192,10 @@ class _MealScheduleState extends State<MealSchedule> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MealPlannerScreen()));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const MealPlannerScreen()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -319,8 +321,6 @@ class _MealScheduleState extends State<MealSchedule> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    // mainAxisAlignment: MainAxisAlignment.start,
-                    // verticalDirection: VerticalDirection.up,
                     children: [
                       getNutrition[0] == 0
                           ? Column(
@@ -342,15 +342,15 @@ class _MealScheduleState extends State<MealSchedule> {
                                   height: 30,
                                 ),
                               ],
-                            )
-                          : SizedBox(
+                            ): 
+                          SizedBox(
                               width: media.width,
                               // height: media.height * 0.6,
                               child: ListView.builder(
                                 // scrollDirection: Axis.vertical,
                                 physics: const NeverScrollableScrollPhysics(),
                                 padding: const EdgeInsets.only(bottom: 20),
-                                itemCount: 4,
+                                itemCount: 5,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
                                   var slotArr = selectDayEventArr;
@@ -394,29 +394,21 @@ class _MealScheduleState extends State<MealSchedule> {
                                                 physics:
                                                     const NeverScrollableScrollPhysics(),
                                                 shrinkWrap: true,
-                                                itemCount:
-                                                    // slotArr[index]["set"].length,
-                                                    slotArr[index]["meals"]
-                                                        .length,
+                                                itemCount: slotArr[index]
+                                                        ["meals"]
+                                                    .length,
                                                 itemBuilder:
                                                     (context, itemIndex) {
-                                                  // var yObj = slotArr[index]["set"][itemIndex];
                                                   var yObj = slotArr[index]
                                                       ["meals"][itemIndex];
                                                   return ExercisesRow(
                                                     ImagePadding: 10,
                                                     eObj: Exercise(
-                                                        title: yObj["dish_id"]
-                                                            ["name"],
-                                                        image: yObj["dish_id"]
-                                                            ["image"],
-                                                        caloriesBurned: yObj[
-                                                                    "dish_id"]
-                                                                ["nutritions"]
-                                                            [0]["value"],
+                                                        title: yObj["dish_id"]["name"],
+                                                        image: yObj["dish_id"]["image"],
+                                                        caloriesBurned: yObj["dish_id"]["nutritions"][0]["value"],
                                                         id: yObj["id"],
-                                                        value: yObj["meal_time"]
-                                                            .toString()),
+                                                        value: yObj["meal_time"].toString()),
                                                     onPressed: () {
                                                       print(yObj);
                                                       showDialog(
@@ -426,22 +418,14 @@ class _MealScheduleState extends State<MealSchedule> {
                                                               yObj["meal_time"];
                                                           String
                                                               formattedMealTime;
-
                                                           if (mealTime !=
                                                               null) {
-                                                            // Giả sử mealTime có định dạng "dd/MM/yyyy hh:mm a"
                                                             try {
                                                               DateTime
                                                                   dateTime =
-                                                                  DateFormat(
-                                                                          "dd/MM/yyyy hh:mm a")
-                                                                      .parse(
-                                                                          mealTime);
+                                                                  DateFormat("dd/MM/yyyy hh:mm a").parse(mealTime);
                                                               formattedMealTime =
-                                                                  DateFormat(
-                                                                          "dd/MM/yyyy hh:mm a")
-                                                                      .format(
-                                                                          dateTime);
+                                                                  DateFormat("dd/MM/yyyy hh:mm a").format(dateTime);
                                                             } catch (e) {
                                                               formattedMealTime =
                                                                   "Định dạng không hợp lệ"; // Hoặc xử lý lỗi khác
@@ -465,7 +449,6 @@ class _MealScheduleState extends State<MealSchedule> {
                                                           );
                                                         },
                                                       );
-                                                      
                                                     },
                                                   );
                                                 }),

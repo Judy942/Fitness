@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../chat_box/chat_home_page.dart';
 import '../../core/utils/app_colors.dart';
 import '../camera/photo_progress/progress_photo_screen.dart';
 import '../home/home_screen.dart';
@@ -29,7 +30,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.whiteColor,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ChatHomePage(),
+            ),
+          );
+        },
         child: SizedBox(
           width: 70,
           height: 70,
@@ -42,7 +50,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 boxShadow: const [
                   BoxShadow(color: Colors.black12, blurRadius: 2)
                 ]),
-            child: const Icon(Icons.search_sharp,
+            child: const Icon(Icons.message_rounded,
                 color: AppColors.whiteColor, size: 32),
           ),
         ),

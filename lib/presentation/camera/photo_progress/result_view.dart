@@ -77,11 +77,6 @@ class _ResultViewState extends State<ResultView> {
 
   @override
   Widget build(BuildContext context) {
-    // Kiểm tra xem có dữ liệu không
-    // if (statArr.isEmpty || imaArr.isEmpty) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
-
     var groupedData = <int, List<dynamic>>{};
     for (var item in statArr) {
       int positionId = item['tracker_position_id'];
@@ -143,27 +138,15 @@ class _ResultViewState extends State<ResultView> {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount:
-                    4, //groupedData.length>groupedData2.length?groupedData.length:groupedData2.length,
+                itemCount: 4,
                 itemBuilder: (context, index) {
                   int positionId = index + 1;
                   if (!groupedData.containsKey(positionId) &&
                       !groupedData2.containsKey(positionId)) {
                     return const SizedBox();
                   }
-                  List<dynamic> items; //= groupedData[positionId]!;
-                  List<dynamic> items2; //= groupedData2[positionId]!;
-                  if (groupedData.length < index) {
-                    items = [];
-                  } else {
-                    items = groupedData[positionId]!;
-                  }
-
-                  if (groupedData2.length < index+1) {
-                    items2 = [];
-                  } else {
-                    items2 = groupedData2[positionId]!;
-                  }
+                  List<dynamic> items = groupedData[positionId] ?? [];
+                  List<dynamic> items2 = groupedData2[positionId] ?? [];
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,52 +171,42 @@ class _ResultViewState extends State<ResultView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                          
-                          // const SizedBox(height: 8),
-                          // Row(
-                          //   children: items.map((item) {
-                          //     return Expanded(
-                          //       child: Text(
-                          //         item['date_upload'],
-                          //         style: const TextStyle(
-                          //             color: AppColors.grayColor,
-                          //             fontSize: 12,
-                          //             fontWeight: FontWeight.w500),
-                          //       ),
-                          //     );
-                          //   }).toList(),
-                          // ),
-                          
-                          Row(
-                            children: items2.map((item) {
-                              return Expanded(
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.lightGrayColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.network(
-                                        'http://162.248.102.236:8055/assets/${item['image']}',
-                                        errorBuilder: (BuildContext context,
-                                            Object error,
-                                            StackTrace? stackTrace) {
-                                          return Container(
-                                            color: Colors.grey,
-                                            child:
-                                                const Icon(Icons.error_outline),
-                                          );
-                                        },
-                                        fit: BoxFit.cover,
-                                      ),
+                          const SizedBox(height: 8),
+                          GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: items2.length,
+                            itemBuilder: (context, i) {
+                              return AspectRatio(
+                                aspectRatio: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightGrayColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.network(
+                                      'http://162.248.102.236:8055/assets/${items2[i]['image']}',
+                                      errorBuilder: (BuildContext context,
+                                          Object error,
+                                          StackTrace? stackTrace) {
+                                        return Container(
+                                          color: Colors.grey,
+                                          child: const Icon(Icons.error_outline),
+                                        );
+                                      },
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            },
                           ),
                           const Text(
                             "After",
@@ -242,36 +215,42 @@ class _ResultViewState extends State<ResultView> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                          Row(
-                            children: items.map((item) {
-                              return Expanded(
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.lightGrayColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.network(
-                                        'http://162.248.102.236:8055/assets/${item['image']}',
-                                        errorBuilder: (BuildContext context,
-                                            Object error,
-                                            StackTrace? stackTrace) {
-                                          return Container(
-                                            color: Colors.grey,
-                                            child:
-                                                const Icon(Icons.error_outline),
-                                          );
-                                        },
-                                        fit: BoxFit.cover,
-                                      ),
+                          const SizedBox(height: 8),
+                          GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: items.length,
+                            itemBuilder: (context, i) {
+                              return AspectRatio(
+                                aspectRatio: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightGrayColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.network(
+                                      'http://162.248.102.236:8055/assets/${items[i]['image']}',
+                                      errorBuilder: (BuildContext context,
+                                          Object error,
+                                          StackTrace? stackTrace) {
+                                        return Container(
+                                          color: Colors.grey,
+                                          child: const Icon(Icons.error_outline),
+                                        );
+                                      },
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            },
                           ),
                         ],
                       ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/workout_schedule_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
@@ -275,8 +276,14 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                               type: RoundButtonType.primaryBG,
                               title: "Check",
                               onPressed: () {
-                                Navigator.pushNamed(
-                                    context, '/workoutScheduleView');
+                                // Navigator.pushNamed(
+                                //     context, '/workoutScheduleView');
+
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const WorkoutScheduleView()));
                               },
                             ),
                           )

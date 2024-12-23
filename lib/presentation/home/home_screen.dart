@@ -4,12 +4,13 @@ import 'dart:convert';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
+import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import '../../core/utils/app_colors.dart';
-import '../../routes/app_routes.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import '../onboarding_screen/start_screen.dart';
@@ -134,7 +135,10 @@ class TopBar extends StatelessWidget {
         ),
         IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/notificationScreen');
+            // Navigator.pushNamed(context, '/notificationScreen');
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const NotificationScreen();
+            }));
           },
           icon: Image.asset(
             "assets/icons/notification_icon.png",
@@ -661,7 +665,10 @@ class TodayTargetSection extends StatelessWidget {
               title: "Check",
               type: RoundButtonType.primaryBG,
               onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.activityTrackerScreen);
+              // Navigator.pushNamed(context, AppRoutes.activityTrackerScreen);
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const ActivityTrackerScreen();
+              }));
 
               },
             ),
