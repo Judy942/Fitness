@@ -1,13 +1,37 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../onboarding_screen/start_screen.dart';
+
+final storage = FlutterSecureStorage();
+
+// Kiểm tra và tạo key/iv trong Keystore nếu chưa có
+Future<Map<String, String>> getKeyAndIv() async {
+  String? key = await storage.read(key: 'encryption_key');
+  String? iv = await storage.read(key: 'encryption_iv');
+  if (key == null || iv == null) {
+    final key = encrypt.Key.fromLength(32);
+    final iv = encrypt.IV.fromLength(16);
+    await storage.write(key: 'encryption_key', value: key.base64);
+    await storage.write(key: 'encryption_iv', value: iv.base64);
+    print("đã tạo key và iv");
+
+    return {'key': key.base64, 'iv': iv.base64};
+  }
+  print("đã có key và iv");
+  return {'key': key, 'iv': iv};
+}
+// final key = encrypt.Key.fromUtf8('my 32 length key................'); // 32 chars key for AES-256
+// final iv = encrypt.IV.fromLength(16); // AES sử dụng 16 byte IV
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -28,39 +52,125 @@ class _CameraScreenState extends State<CameraScreen> {
     initializeCamera();
   }
 
-  Future<String> uploadFile(String filePath) async {
-  String? token = await getToken();
+  Uint8List addPadding(Uint8List input) {
+    int blockSize = 16; // Kích thước block của AES
+    int paddingLength = blockSize - (input.length % blockSize);
+    if (paddingLength == 0)
+      return input; // Không cần padding nếu đã là bội số của blockSize
 
-  // Tạo MultipartRequest
-  var request = http.MultipartRequest(
-    'POST',
-    Uri.parse('http://162.248.102.236:8055/files'), // Đường dẫn đúng để tải lên
-  );
+    Uint8List paddedInput = Uint8List(input.length + paddingLength);
+    paddedInput.setAll(0, input);
 
-  // Thêm header Authorization
-  request.headers['Authorization'] = 'Bearer $token';
-
-  // Thêm tệp vào request
-  request.files.add(await http.MultipartFile.fromPath(
-    'file', // Tên trường mà máy chủ mong đợi
-    filePath,
-  ));
-
-  // Gửi request
-  var response = await request.send();
-
-  // Kiểm tra kết quả
-  if (response.statusCode == 200) {
-    // Đọc dữ liệu phản hồi
-    final responseData = await response.stream.bytesToString();
-    print(responseData); // In ra phản hồi
-
-    // Trả về ID từ dữ liệu phản hồi
-    return jsonDecode(responseData)['data']['id'];
-  } else {
-    throw Exception('Upload failed with status: ${response.statusCode}');
+    // Padding theo chuẩn PKCS7: điền paddingLength vào cuối dữ liệu
+    for (int i = 0; i < paddingLength; i++) {
+      paddedInput[input.length + i] = paddingLength;
+    }
+    print(paddingLength);
+    return paddedInput;
   }
-}
+
+  Future<String> encryptImage(String imagePath) async {
+    // Đọc hình ảnh dưới dạng byte
+    File imageFile = File(imagePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+
+    // Thêm padding vào dữ liệu hình ảnh
+    print("độ dài sau khi thêm padding: ${imageBytes.length}");
+
+    Uint8List paddedImageBytes = addPadding(imageBytes);
+
+    final keyAndIv = await getKeyAndIv();
+
+// Ensure that both key and iv are not null before using them
+    String? encryptionKey = keyAndIv['key'];
+    String? encryptionIv = keyAndIv['iv'];
+
+    if (encryptionKey == null || encryptionIv == null) {
+      // Handle the case where the key or iv is missing
+      throw Exception("Key or IV is missing in storage");
+    }
+
+    final key = encrypt.Key.fromBase64(encryptionKey);
+    final iv = encrypt.IV.fromBase64(encryptionIv);
+
+    final encrypter =
+        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+
+    // Mã hóa dữ liệu hình ảnh đã được padding
+    final encrypted = encrypter.encryptBytes(paddedImageBytes, iv: iv);
+    // Chuyển đổi dữ liệu đã mã hóa thành Base64
+    String base64Encrypted = base64.encode(encrypted.bytes);
+    print("độ dài sau khi mã hóa: ${encrypted.bytes.length}");
+    print("Độ dài Base64 sau khi mã hóa: ${base64Encrypted.length}");
+
+    // Lưu vào file văn bản
+    String encryptedFilePath = '${imagePath}_encrypted.txt';
+    File encryptedFile = File(encryptedFilePath);
+    await encryptedFile.writeAsString(base64Encrypted);
+
+    return encryptedFilePath;
+  }
+  // Future<String> uploadFile(String filePath) async {
+  //   String? token = await getToken();
+
+  //   // Tạo MultipartRequest
+  //   var request = http.MultipartRequest(
+  //     'POST',
+  //     Uri.parse(
+  //         'http://162.248.102.236:8055/files'), // Đường dẫn đúng để tải lên
+  //   );
+
+  //   // Thêm header Authorization
+  //   request.headers['Authorization'] = 'Bearer $token';
+
+  //   // Thêm tệp vào request
+  //   request.files.add(await http.MultipartFile.fromPath(
+  //     'file', // Tên trường mà máy chủ mong đợi
+  //     filePath,
+  //   ));
+
+  //   // Gửi request
+  //   var response = await request.send();
+
+  //   // Kiểm tra kết quả
+  //   if (response.statusCode == 200) {
+  //     // Đọc dữ liệu phản hồi
+  //     final responseData = await response.stream.bytesToString();
+  //     print(responseData); // In ra phản hồi
+
+  //     // Trả về ID từ dữ liệu phản hồi
+  //     return jsonDecode(responseData)['data']['id'];
+  //   } else {
+  //     throw Exception('Upload failed with status: ${response.statusCode}');
+  //   }
+  // }
+
+  Future<String> uploadFile(String filePath) async {
+    String? token = await getToken();
+
+    // Encrypt the image before uploading
+    String encryptedFilePath = await encryptImage(filePath);
+
+    // Now use the encrypted file for upload
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('http://162.248.102.236:8055/files'),
+    );
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    request.files
+        .add(await http.MultipartFile.fromPath('file', encryptedFilePath));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      return jsonDecode(responseData)['data']['id'];
+    } else {
+      throw Exception('Upload failed with status: ${response.statusCode}');
+    }
+  }
 
   Future<void> addProcessTracker(String filePath, int process) async {
     String? token = await getToken();
@@ -68,7 +178,10 @@ class _CameraScreenState extends State<CameraScreen> {
     print(id);
     var request = http.post(
       Uri.parse('http://162.248.102.236:8055/items/process_tracker'),
-      headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
       body: jsonEncode({
         'image': id,
         'tracker_position_id': process,
@@ -95,19 +208,7 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  Future<void> switchCamera() async {
-    if (selectedCamera == cameras[0]) {
-      selectedCamera = cameras[1]; // Chọn camera trước
-    } else {
-      selectedCamera = cameras[0]; // Chọn camera sau
-    }
-    _controller.dispose();
-    _controller = CameraController(selectedCamera!, ResolutionPreset.high);
-    _initializeControllerFuture = _controller.initialize();
-    setState(() {});
-  }
-
-   Future<void> tracker_position(String imagePath) async {
+  Future<void> tracker_position(String imagePath) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -121,9 +222,9 @@ class _CameraScreenState extends State<CameraScreen> {
                 onTap: () {
                   addProcessTracker(imagePath, 1);
                   Navigator.of(context).pop(); // Đóng hộp thoại
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Saved')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Saved')),
+                  );
                 },
               ),
               ListTile(
@@ -131,9 +232,9 @@ class _CameraScreenState extends State<CameraScreen> {
                 onTap: () {
                   addProcessTracker(imagePath, 2);
                   Navigator.of(context).pop(); // Đóng hộp thoại
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Saved')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Saved')),
+                  );
                 },
               ),
               ListTile(
@@ -141,20 +242,19 @@ class _CameraScreenState extends State<CameraScreen> {
                 onTap: () {
                   addProcessTracker(imagePath, 3);
                   Navigator.of(context).pop(); // Đóng hộp thoại
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Saved')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Saved')),
+                  );
                 },
               ),
-
               ListTile(
                 title: const Text('Right Facing'),
                 onTap: () {
                   addProcessTracker(imagePath, 4);
                   Navigator.of(context).pop(); // Đóng hộp thoại
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Saved')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Saved')),
+                  );
                 },
               ),
             ],
@@ -166,9 +266,6 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _saveImage(String imagePath, String bodyPart) async {
     final result = await ImageGallerySaver.saveFile(imagePath);
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text('Ảnh đã được lưu với bộ phận: $bodyPart!')),
-    // );
   }
 
   @override
@@ -220,12 +317,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Camera'), actions: [
-          IconButton(
-            icon: const Icon(Icons.switch_camera),
-            onPressed: switchCamera,
-          ),
-        ],),
+      appBar: AppBar(title: const Text('Camera')),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {

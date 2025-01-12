@@ -7,13 +7,27 @@ import '../../widgets/round_button.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
 import '../home/home_screen.dart';
+import '../login/login_screen.dart';
 import 'complete_profile_screen.dart';
-
-Future<String?> getGoal() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('goal');
+Future<void> logout(BuildContext context) async {
+  try {
+    // Clear the locally stored token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    // Redirect to Login Screen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
+  } catch (e) {
+    // Handle errors gracefully
+    print("Error during logout: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Error occurred during logout')),
+    );
+  }
 }
-
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
 
@@ -21,9 +35,9 @@ class UserProfile extends StatefulWidget {
   State<UserProfile> createState() => _UserProfileState();
 }
 
+
 class _UserProfileState extends State<UserProfile> {
   Map<String, dynamic> userData = {};
-  String? goal;
   @override
   void initState() {
     super.initState();
@@ -32,9 +46,16 @@ class _UserProfileState extends State<UserProfile> {
         userData = data;
       });
     });
-    getGoal().then((value) {
-      goal = value;
-    });
+  }
+
+  Future<void> handleLogout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Xóa tất cả thông tin lưu trữ
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false, // Xóa toàn bộ stack điều hướng
+    );
   }
 
   bool positive = false;
@@ -66,11 +87,39 @@ class _UserProfileState extends State<UserProfile> {
       "tag": "6"
     },
     {"image": "assets/icons/p_setting.png", "name": "Setting", "tag": "7"},
+    {
+      "image": "assets/icons/p_personal.png",
+      "name": "Logout",
+      "tag": "8",
+      "action": (BuildContext context) => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Confirm Logout"),
+              content: const Text("Are you sure you want to log out?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Close the dialog
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                    
+                    final state =
+                        context.findAncestorStateOfType<_UserProfileState>();
+                    state?.handleLogout();
+                    logout(context);
+                  },
+                  child: const Text("Logout"),
+                ),
+              ],
+            ),
+          ),
+    }
   ];
 
   @override
   Widget build(BuildContext context) {
-    // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -118,13 +167,6 @@ class _UserProfileState extends State<UserProfile> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Text(
-                          goal ?? "Goal",
-                          style: const TextStyle(
-                            color: AppColors.grayColor,
-                            fontSize: 12,
-                          ),
-                        )
                       ],
                     ),
                   ),
@@ -142,7 +184,6 @@ class _UserProfileState extends State<UserProfile> {
                                 CompleteProfileScreen(isBackToProfile: true),
                           ),
                         );
-
                         // Kiểm tra xem có giá trị trả về không
                         if (result != null) {
                           getUserData().then((data) {
@@ -378,10 +419,34 @@ class _UserProfileState extends State<UserProfile> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (iObj["action"] != null) {
+                              iObj["action"](
+                                  context); // Pass only the context as expected
+                            }
+                          },
                         );
                       },
-                    )
+                    ),
+
+                    // ListView.builder(
+                    //   physics: const NeverScrollableScrollPhysics(),
+                    //   padding: EdgeInsets.zero,
+                    //   shrinkWrap: true,
+                    //   itemCount: otherArr.length,
+                    //   itemBuilder: (context, index) {
+                    //     var iObj = otherArr[index] as Map? ?? {};
+                    //     return SettingRow(
+                    //       icon: iObj["image"].toString(),
+                    //       title: iObj["name"].toString(),
+                    //       onPressed: () {
+                    //         if (iObj["action"] != null) {
+                    //           iObj["action"](context);
+                    //         }
+                    //       },
+                    //     );
+                    //   },
+                    // )
                   ],
                 ),
               )

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/camera/photo_progress/comparison_view.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../widgets/round_button.dart';
@@ -17,30 +18,32 @@ class ProgressPhotoScreen extends StatefulWidget {
 }
 
 class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
+  Future<List<dynamic>> fetchProcessTracker() async {
+    await Permission.storage.request();
+    String? token = await getToken();
+    // Thay $CURRENT_USER bằng userId
+    final url = Uri.parse(
+        // 'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=$userId',
+        'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
 
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+    );
 
-Future<List<dynamic>> fetchProcessTracker() async {
-  String? token = await getToken();
-  // Thay $CURRENT_USER bằng userId
-  final url = Uri.parse(
-    // 'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=$userId',
-    'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER'
-  );
-
-  final response = await http.get(url,     headers: { 'Authorization': 'Bearer $token', 'Content-Type': 'application/json' },
-);
-
-  if (response.statusCode == 200) {
-    // Giải mã dữ liệu JSON
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data']; // Trả về danh sách dữ liệu
-  } else {
-    throw Exception('Failed to load process tracker data');
+    if (response.statusCode == 200) {
+      // Giải mã dữ liệu JSON
+      final jsonResponse = jsonDecode(response.body);
+      return jsonResponse['data']; // Trả về danh sách dữ liệu
+    } else {
+      throw Exception('Failed to load process tracker data');
+    }
   }
-}
 
-  List photoArr = [
-  ];
+  List photoArr = [];
 
   @override
   void initState() {
@@ -223,7 +226,7 @@ Future<List<dynamic>> fetchProcessTracker() async {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ComparisonView( ) ,
+                                builder: (context) => const ComparisonView(),
                               ),
                             );
                           },
@@ -270,32 +273,31 @@ Future<List<dynamic>> fetchProcessTracker() async {
                     height: MediaQuery.of(context).size.width * 0.3,
                     width: MediaQuery.of(context).size.width,
                     child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: photoArr.length,
-                        itemBuilder: ((context, index) {
-                          var pObj = photoArr[index] as Map? ?? {};
-                                    return Container(
-                                      margin:
-                                          const EdgeInsets.symmetric(horizontal: 4),
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.lightGrayColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          'http://162.248.102.236:8055/assets/${pObj['image']}',
-                                          width: MediaQuery.of(context).size.width * 0.3,
-                                          height: MediaQuery.of(context).size.width * 0.3,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: photoArr.length,
+                      itemBuilder: ((context, index) {
+                        var pObj = photoArr[index] as Map? ?? {};
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: AppColors.lightGrayColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              'http://162.248.102.236:8055/assets/${pObj['image']}',
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              height: MediaQuery.of(context).size.width * 0.3,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
                   ),
                 ),
               ],
@@ -308,13 +310,26 @@ Future<List<dynamic>> fetchProcessTracker() async {
       ),
       floatingActionButton: InkWell(
         onTap: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CameraScreen()),
-          );
-          if (result != null) {
-            // Xử lý đường dẫn ảnh ở đây (nếu cần)
-            print("Ảnh đã chụp: $result");
+          PermissionStatus status = await Permission.camera.request();
+          if (status.isGranted) {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CameraScreen()),
+            );
+            if (result != null) {
+              // Xử lý đường dẫn ảnh ở đây (nếu cần)
+              print("Ảnh đã chụp: $result");
+            }
+          } else if (status.isDenied) {
+            // Quyền bị từ chối, hiển thị thông báo
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Camera permission is required to take photos.'),
+              ),
+            );
+          } else if (status.isPermanentlyDenied) {
+            // Quyền bị từ chối vĩnh viễn, hướng dẫn người dùng mở cài đặt
+            openAppSettings();
           }
         },
         child: Container(

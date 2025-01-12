@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
-
 import 'dart:convert';
 
+import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
@@ -19,12 +18,11 @@ Future<void> saveToken(String token) async {
   await prefs.setString('userToken', token);
 }
 
-
 Future<void> printAllStoredInfo() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // Lấy tất cả các key-value từ SharedPreferences
   final keys = prefs.getKeys();
-  
+
   for (String key in keys) {
     final value = prefs.get(key);
     print('$key: $value');
@@ -47,68 +45,63 @@ class _LoginScreenState extends State<LoginScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   void fetchData() async {
-  String url = "http://162.248.102.236:8055/auth/login";
-  print("Email: $email");
-  print("Password: $password");
-  
-  try {
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
+    String url = "http://162.248.102.236:8055/auth/login";
+    print("Email: $email");
+    print("Password: $password");
 
-    print('Response: ${response.body}');
-    print('Status Code: ${response.statusCode}');
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
 
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      if (responseBody["data"] != null && responseBody["data"]["access_token"] != null) {
-    final accessToken = responseBody["data"]["access_token"];
-    await saveToken(accessToken);
-    // Navigator.pushReplacementNamed(context, AppRoutes.completeProfileScreen);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  CompleteProfileScreen(isBackToProfile: false,)));
-  } else {
-    // Xử lý trường hợp không có access_token
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Access token not found')),
-    );
-  }
-    } else {
+      print('Response: ${response.body}');
+      print('Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody["data"] != null &&
+            responseBody["data"]["access_token"] != null) {
+          final otpSent = await EmailOTP.sendOTP(email: email);
+          // final generatedOtp = await EmailOTP.generateOTP(email: email);
+          if (otpSent) {
+              print('OTP sent successfully');
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("OTP has been sent")),
+            );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtpVerificationScreen(
+                    email: email, responseBody: responseBody),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Failed to send OTP")),
+            );
+          }
+        } else {
+          // Xử lý trường hợp không có access_token
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Access token not found')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+    } catch (e) {
+      print("Error details: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
+        const SnackBar(content: Text('Network error occurred')),
       );
     }
-  } catch (e) {
-    print("Error details: $e"); 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Network error occurred')),
-    );
   }
-}
-
-
-
-
-  // Future<bool> loginWithGoogle() async {
-  //   try {
-  //     GoogleSignIn googleSignIn = GoogleSignIn();
-  //     GoogleSignInAccount? account = await googleSignIn.signIn();
-  //     if(account == null )
-  //       return false;
-  //     GoogleSignInAuthentication googleSignInAuthentication = await account.authentication;
-  //     AuthCredential credential = GoogleAuthProvider.credential(
-  //       accessToken: googleSignInAuthentication.accessToken,
-  //       idToken: googleSignInAuthentication.idToken,
-  //     );
-  //     await FirebaseAuth.instance.signInWithCredential(credential);
-  //     return true;
-  //   } catch (e) {
-  //     print(e);
-  //     return false;
-  //   }
-  //
-  // }
 
   Future<UserCredential> loginWithGoogle() async {
     // Trigger the authentication flow
@@ -304,7 +297,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                       onPressed: () {
                         // Navigator.pushNamed(context, '/signUpScreen');
-                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
                           return const SignupScreen();
                         }));
                       },
@@ -330,5 +324,83 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               )),
         )));
+  }
+}
+
+class OtpVerificationScreen extends StatelessWidget {
+  final String email;
+  final Map<String, dynamic> responseBody;
+
+  OtpVerificationScreen({required this.email, required this.responseBody});
+
+  final TextEditingController otpController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('OTP Verification')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Enter the OTP sent to $email",
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: otpController,
+              decoration: const InputDecoration(
+                labelText: 'OTP',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+            onPressed: () async {
+              if (await EmailOTP.sendOTP(email: email)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("OTP has been sent")));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("OTP failed sent")));
+              }
+            },
+            child: const Text('Send OTP'),
+          ),
+            ElevatedButton(
+              onPressed: () async {
+                final isVerified = EmailOTP.verifyOTP(
+                  otp: otpController.text,
+                );
+                if (isVerified) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("OTP verified successfully")),
+                  );
+                  final accessToken = responseBody["data"]["access_token"];
+                  await saveToken(accessToken);
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CompleteProfileScreen(
+                                isBackToProfile: false,
+                              )));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Invalid OTP")),
+                  );
+                }
+              },
+              child: const Text('Verify OTP'),
+            ),
+
+
+          ],
+        ),
+      ),
+    );
   }
 }
