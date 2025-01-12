@@ -1,10 +1,13 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_fitness/core/utils/navigator_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 =======
+=======
+>>>>>>> Stashed changes
 import 'package:email_otp/email_otp.dart';
 import "package:flutter/material.dart";
 import "package:flutter_application_fitness/chat_box/consts.dart";
@@ -22,6 +25,7 @@ import 'theme/bloc/theme_bloc.dart';
 var golobalMessage = GlobalKey<ScaffoldMessengerState>();
 void main() {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   WidgetsFlutterBinding.ensureInitialized();
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
@@ -30,6 +34,8 @@ void main() {
     runApp(MyApp());
   });
 =======
+=======
+>>>>>>> Stashed changes
     EmailOTP.config(
     appName: 'Fitness App',
     otpType: OTPType.numeric,
@@ -92,6 +98,9 @@ class MyApp extends StatelessWidget {
       ),
       // home: const StartScreen(),
       home: DashboardScreen(),
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     );
 }
