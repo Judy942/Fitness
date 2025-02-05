@@ -13,7 +13,7 @@ import '../onboarding_screen/start_screen.dart';
   Future<List> getNotification() async {
     String? token = await getToken(); // Đảm bảo phương thức này đã được định nghĩa
     final response = await http.get(
-      Uri.parse('http://162.248.102.236:8055/api/activity/nearest?limit=5'),
+      Uri.parse('http://192.168.95.1:8055/api/activity/nearest?limit=5'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -77,7 +77,7 @@ Future<void> scheduleNotification(DateTime eventTime, String title, String body)
 Future<List> getNotification() async {
   String? token = await getToken(); // Đảm bảo phương thức này đã được định nghĩa
   final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/api/activity/nearest?limit=5'),
+    Uri.parse('http://192.168.95.1:8055/api/activity/nearest?limit=5'),
     headers: {'Authorization': 'Bearer $token'},
   );
 
@@ -103,7 +103,7 @@ Future<List> getNotification() async {
   // Future<void> getNotification() async {
   //   String? token = await getToken(); // Đảm bảo phương thức này đã được định nghĩa
   //   final response = await http.get(
-  //     Uri.parse('http://162.248.102.236:8055/api/activity/nearest?limit=5'),
+  //     Uri.parse('http://192.168.95.1:8055/api/activity/nearest?limit=5'),
   //     headers: {'Authorization': 'Bearer $token'},
   //   );
 

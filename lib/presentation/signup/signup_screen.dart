@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart'; // Gói crypto
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 import 'package:http/http.dart' as http;
@@ -34,8 +35,13 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
       return;
-    } 
-    if(!email.contains('@')||!email.contains('.')||email.characters.last=='.'||email.characters.last=='@'||email.characters.first=='.'||email.characters.first=='@'){
+    }
+    if (!email.contains('@') ||
+        !email.contains('.') ||
+        email.characters.last == '.' ||
+        email.characters.last == '@' ||
+        email.characters.first == '.' ||
+        email.characters.first == '@') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Invalid email'),
@@ -44,10 +50,15 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
     //password validation: gồm cả số , chữ hoa, chữ thường, ký tự đặc biệt
-    if(password.length<6||!password.contains(RegExp(r'[0-9]'))||!password.contains(RegExp(r'[A-Z]'))||!password.contains(RegExp(r'[a-z]'))||!password.contains(RegExp(r'[!@#%^&*(),.?":{}|<>]'))){
+    if (password.length < 6 ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[a-z]')) ||
+        !password.contains(RegExp(r'[!@#%^&*(),.?":{}|<>]'))) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password must contain at least 8 characters, including uppercase, lowercase, number and special character'),
+          content: Text(
+              'Password must contain at least 8 characters, including uppercase, lowercase, number and special character'),
         ),
       );
       return;
@@ -57,20 +68,22 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void fetchData() async {
-    // var url = Uri.parse('http://162.248.102.236:8055/auth/login');
-    String url = "http://162.248.102.236:8055/users/register";
+    // var url = Uri.parse('http://192.168.95.1:8055/auth/login');
+    String url = "http://192.168.95.1:8055/users/register";
     print("Email: $email");
     print("Password: $password");
     print("First Name: $firstName");
     print("Last Name: $lastName");
-
+    var bytes = utf8.encode(email); // Chuyển chuỗi thành mảng byte
+    var digest = sha256.convert(bytes); // Tạo hàm băm
+    print("digest: $digest");
     var response = await http.post(Uri.parse(url),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({
           "email": email,
-          "password": password,
+          "password": digest.toString() + "aA@",
           // "firstName": firstName,
           // "lastName": lastName
         }));
@@ -78,15 +91,20 @@ class _SignupScreenState extends State<SignupScreen> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-
-    if (response.statusCode == 200||response.statusCode == 201||response.statusCode == 202||response.statusCode == 203||response.statusCode == 204) {
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202 ||
+        response.statusCode == 203 ||
+        response.statusCode == 204) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Register successfully, check your email to verify your account'),
+          content: Text(
+              'Register successfully, check your email to verify your account'),
         ),
       );
       // Navigator.pushNamed(context, '/loginScreen');
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -94,7 +112,6 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     }
-
   }
 
   @override
@@ -221,7 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     )
                   ],
                 ),
-                 SizedBox(
+                SizedBox(
                   height: MediaQuery.of(context).size.height * 0.1,
                 ),
                 RoundGradientButton(

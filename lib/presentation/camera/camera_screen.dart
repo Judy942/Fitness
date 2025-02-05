@@ -110,40 +110,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
     return encryptedFilePath;
   }
-  // Future<String> uploadFile(String filePath) async {
-  //   String? token = await getToken();
 
-  //   // Tạo MultipartRequest
-  //   var request = http.MultipartRequest(
-  //     'POST',
-  //     Uri.parse(
-  //         'http://162.248.102.236:8055/files'), // Đường dẫn đúng để tải lên
-  //   );
-
-  //   // Thêm header Authorization
-  //   request.headers['Authorization'] = 'Bearer $token';
-
-  //   // Thêm tệp vào request
-  //   request.files.add(await http.MultipartFile.fromPath(
-  //     'file', // Tên trường mà máy chủ mong đợi
-  //     filePath,
-  //   ));
-
-  //   // Gửi request
-  //   var response = await request.send();
-
-  //   // Kiểm tra kết quả
-  //   if (response.statusCode == 200) {
-  //     // Đọc dữ liệu phản hồi
-  //     final responseData = await response.stream.bytesToString();
-  //     print(responseData); // In ra phản hồi
-
-  //     // Trả về ID từ dữ liệu phản hồi
-  //     return jsonDecode(responseData)['data']['id'];
-  //   } else {
-  //     throw Exception('Upload failed with status: ${response.statusCode}');
-  //   }
-  // }
 
   Future<String> uploadFile(String filePath) async {
     String? token = await getToken();
@@ -154,7 +121,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://162.248.102.236:8055/files'),
+      Uri.parse('http://192.168.95.1:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -177,7 +144,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://162.248.102.236:8055/items/process_tracker'),
+      Uri.parse('http://192.168.95.1:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'

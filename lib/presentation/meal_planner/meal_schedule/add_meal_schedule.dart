@@ -203,7 +203,7 @@ Future<void> addMealSchedule(
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   String json = jsonEncode(data);
   final response = await http.post(
-    Uri.parse('http://162.248.102.236:8055/items/meal_schedule'),
+    Uri.parse('http://192.168.95.1:8055/items/meal_schedule'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

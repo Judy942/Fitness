@@ -18,7 +18,7 @@ import 'add_meal_schedule.dart';
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/api/meal_schedule?date=$date'),
+    Uri.parse('http://192.168.95.1:8055/api/meal_schedule?date=$date'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ class _MealScheduleState extends State<MealSchedule> {
                   'name': sObj['dish_id']['name'],
                   'description': sObj['dish_id']['description'],
                   'image':
-                      'http://162.248.102.236:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
+                      'http://192.168.95.1:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
                   'nutritions': sObj['dish_id']['nutritions'],
                 },
               };

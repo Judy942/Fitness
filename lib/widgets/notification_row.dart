@@ -17,8 +17,8 @@ class NotificationRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             child: Image.network(
               nObj["type"] == "MEAL"
-                  ? 'http://162.248.102.236:8055/assets/${nObj["dish_id"]["image"]}'
-                  : 'http://162.248.102.236:8055/assets/${nObj["workout_id"]["image"]}',
+                  ? 'http://192.168.95.1:8055/assets/${nObj["dish_id"]["image"]}'
+                  : 'http://192.168.95.1:8055/assets/${nObj["workout_id"]["image"]}',
               errorBuilder:
                   (BuildContext context, Object error, StackTrace? stackTrace) {
                 return Container(

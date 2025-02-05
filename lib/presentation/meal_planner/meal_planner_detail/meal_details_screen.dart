@@ -12,7 +12,7 @@ import '../meal_schedule/add_meal_schedule.dart';
 
 Future<Map<String, dynamic>> getDishDetails(int id) async {
   String url =
-      'http://162.248.102.236:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
+      'http://192.168.95.1:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
 
   Map<String, dynamic> dishDetails = {};
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -247,7 +247,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                             // ),
 
                                             Image.network(
-                                              'http://162.248.102.236:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
+                                              'http://192.168.95.1:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
                                               width: 20,
                                               height: 20,
                                               fit: BoxFit.contain,
@@ -348,7 +348,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                             //   fit: BoxFit.contain,
                                             // ),
                                             child: Image.network(
-                                              'http://162.248.102.236:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
+                                              'http://192.168.95.1:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
                                               width: 50,
                                               height: 50,
                                               fit: BoxFit.contain,

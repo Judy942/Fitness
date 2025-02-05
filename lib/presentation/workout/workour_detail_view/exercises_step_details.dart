@@ -90,7 +90,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     //   height: media.width * 0.43,
                     //   fit: BoxFit.contain,
                     // ),
-                    // child: Lottie.network('http://162.248.102.236:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    // child: Lottie.network('http://192.168.95.1:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
                     child: Lottie.asset(
                       'assets/Animation - 1725696475335.json',
                       width: media.width,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart'; // Gói crypto
 import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
+
+
+
 
 Future<void> saveToken(String token) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -45,15 +49,17 @@ class _LoginScreenState extends State<LoginScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   void fetchData() async {
-    String url = "http://162.248.102.236:8055/auth/login";
+    String url = "http://192.168.95.1:8055/auth/login";
     print("Email: $email");
     print("Password: $password");
-
+      var bytes = utf8.encode(email); // Chuyển chuỗi thành mảng byte
+      var digest = sha256.convert(bytes); // Tạo hàm băm
+    print("digest: $digest");
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'email': email, 'password': digest.toString() + "aA@"}),
       );
 
       print('Response: ${response.body}');

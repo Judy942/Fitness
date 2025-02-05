@@ -17,7 +17,7 @@ Future<List> getRecommendation() async {
   List recommendationArr = [];
   
   final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/items/dish_recommendation?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived'),
+    Uri.parse('http://192.168.95.1:8055/items/dish_recommendation?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived'),
     headers: {'Authorization': 'Bearer $token'},
   );
 
@@ -32,7 +32,7 @@ Future<List> getRecommendation() async {
         'name': dish['name'],
         'description': dish['description'],
         'cooking_time': dish['cooking_time'],
-        'image': 'http://162.248.102.236:8055/assets/${dish['image']}',
+        'image': 'http://192.168.95.1:8055/assets/${dish['image']}',
         'difficulty': dish['difficulty_id']?['name'], // Thêm độ khó
         'nutritions': dish['nutritions'] // Thêm thông tin dinh dưỡng nếu cần
       });
@@ -48,7 +48,7 @@ Future<List> getListPopular() async {
   String? token = await getToken(); 
   List popularArr = [];
   final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/items/dish_popular?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived'),
+    Uri.parse('http://192.168.95.1:8055/items/dish_popular?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived'),
         headers: {'Authorization': 'Bearer $token'},
   );
 
@@ -63,7 +63,7 @@ Future<List> getListPopular() async {
         'name': dish['name'],
         'description': dish['description'],
         'cooking_time': dish['cooking_time'],
-        'image': 'http://162.248.102.236:8055/assets/${dish['image']}',
+        'image': 'http://192.168.95.1:8055/assets/${dish['image']}',
         'difficulty_id': dish['difficulty_id'],
         'nutritions': dish['nutritions'] // Thêm thông tin dinh dưỡng nếu cần
       });
@@ -98,7 +98,7 @@ Future<void> getListCategory() async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
   final response = await http.get(
-    Uri.parse('http://162.248.102.236:8055/items/dish_category?filter[status][_neq]=archived'),
+    Uri.parse('http://192.168.95.1:8055/items/dish_category?filter[status][_neq]=archived'),
     headers: {'Authorization': 'Bearer $token'},
   );
 
@@ -108,7 +108,7 @@ Future<void> getListCategory() async {
       categoryArr = (jsonResponse['data'] as List).map((item) {
         return {
           'id': item['id'],
-          'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+          'image': 'http://192.168.95.1:8055/assets/${item['image']}',
           "name": item['name'],
         };
       }).toList();

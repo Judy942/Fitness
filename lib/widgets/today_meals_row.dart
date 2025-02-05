@@ -29,7 +29,7 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
               // borderRadius: BorderRadius.circular(30),
               
               child: Image.network(
-                'http://162.248.102.236:8055/assets/${widget.wObj['dish_id']["image"]}',
+                'http://192.168.95.1:8055/assets/${widget.wObj['dish_id']["image"]}',
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,

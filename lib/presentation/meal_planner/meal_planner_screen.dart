@@ -20,7 +20,7 @@ Future<List> getMealType() async {
   String? token = await getToken();
   final response = await http.get(
     Uri.parse(
-        'http://162.248.102.236:8055/items/meal_type?filter[status][_neq]=archived'),
+        'http://192.168.95.1:8055/items/meal_type?filter[status][_neq]=archived'),
     headers: {'Authorization': 'Bearer $token'},
   );
   if (response.statusCode == 200) {
@@ -29,7 +29,7 @@ Future<List> getMealType() async {
     somethingToEat = (jsonResponse['data'] as List).map((item) {
       return {
         'id': item['id'],
-        'image': 'http://162.248.102.236:8055/assets/${item['image']}',
+        'image': 'http://192.168.95.1:8055/assets/${item['image']}',
         "title": item['name'],
         "countFoods": item['dishes'].length,
       };

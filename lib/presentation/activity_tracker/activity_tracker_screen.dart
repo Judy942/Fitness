@@ -57,7 +57,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
         await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://162.248.102.236:8055/api/activity/latest?limit=5'),
+      Uri.parse('http://192.168.95.1:8055/api/activity/latest?limit=5'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

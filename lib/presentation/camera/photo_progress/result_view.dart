@@ -49,7 +49,7 @@ class _ResultViewState extends State<ResultView> {
   Future<List<dynamic>> fetchProcessTrackerByMounth(String m) async {
     String? token = await getToken();
     final url = Uri.parse(
-        'http://162.248.102.236:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$m&filter[year(date_upload)][_eq]=${widget.date1.year}');
+        'http://192.168.95.1:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$m&filter[year(date_upload)][_eq]=${widget.date1.year}');
 
     try {
       final response = await http.get(
@@ -151,7 +151,7 @@ class _ResultViewState extends State<ResultView> {
 
   Future<Uint8List> decryptAndSaveImageFromTextFile(
       String filePath, String fileName) async {
-    final fileUrl = 'http://162.248.102.236:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.95.1:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       // Kiểm tra xem file có tồn tại không
