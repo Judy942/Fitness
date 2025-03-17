@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_fitness/model/workout.dart';
+import 'package:flutter_application_fitness/models/workout.dart';
 import 'package:lottie/lottie.dart';
 import 'package:readmore/readmore.dart';
 

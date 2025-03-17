@@ -47,12 +47,12 @@ class WorkoutRow extends StatelessWidget {
                           fontSize: 12),
                     ),
 
-                    Text(
-                      "${ wObj["kcal"].toString() } Calories Burn | ${wObj["time"].toString()}minutes",
-                      style: const TextStyle(
-                        color: AppColors.grayColor,
-                        fontSize: 10,),
-                    ),
+                    // Text(
+                    //   "${ wObj["kcal"].toString() } Calories Burn | ${wObj["time"].toString()}minutes",
+                    //   style: const TextStyle(
+                    //     color: AppColors.grayColor,
+                    //     fontSize: 10,),
+                    // ),
 
                     const SizedBox(height: 4,),
 

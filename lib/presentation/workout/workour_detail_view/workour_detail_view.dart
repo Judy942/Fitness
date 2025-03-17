@@ -5,7 +5,7 @@ import 'package:flutter_application_fitness/presentation/workout/workout_schedul
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
-import '../../../model/workout.dart';
+import '../../../models/workout.dart';
 import '../../../push_up_detection/pose_detection_view.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';

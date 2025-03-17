@@ -1,21 +1,15 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart'; // Gói crypto
 import 'package:email_otp/email_otp.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
 import 'package:flutter_application_fitness/presentation/signup/signup_screen.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
-
-
-
 
 Future<void> saveToken(String token) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -46,98 +40,76 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   String email = "";
   String password = "";
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  final EmailOTP myAuth = EmailOTP();
 
-  void fetchData() async {
-    String url = "http://192.168.95.1:8055/auth/login";
-    print("Email: $email");
-    print("Password: $password");
-      var bytes = utf8.encode(email); // Chuyển chuỗi thành mảng byte
-      var digest = sha256.convert(bytes); // Tạo hàm băm
-    print("digest: $digest");
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: jsonEncode({'email': email, 'password': digest.toString() + "aA@"}),
-      );
+void fetchData() async {
+  String url = "http://192.168.95.1:8055/auth/login";
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
 
-      print('Response: ${response.body}');
-      print('Status Code: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      final accessToken = responseBody["data"]?["access_token"];
 
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        if (responseBody["data"] != null &&
-            responseBody["data"]["access_token"] != null) {
-          final otpSent = await EmailOTP.sendOTP(email: email);
-          // final generatedOtp = await EmailOTP.generateOTP(email: email);
-          if (otpSent) {
-              print('OTP sent successfully');
+      if (accessToken != null) {
+        await saveToken(accessToken);
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("OTP has been sent")),
-            );
+        // ✅ Send OTP directly using EmailOTP
+        bool otpSent = await EmailOTP.sendOTP(email: email);
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OtpVerificationScreen(
-                    email: email, responseBody: responseBody),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Failed to send OTP")),
-            );
-          }
-        } else {
-          // Xử lý trường hợp không có access_token
+        if (otpSent) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Access token not found')),
+            const SnackBar(content: Text("OTP has been sent")),
+          );
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OtpVerificationScreen(
+                email: email,
+                responseBody: {"data": responseBody["data"]},
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to send OTP")),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+          const SnackBar(content: Text('Access token not found')),
         );
       }
-    } catch (e) {
-      print("Error details: $e");
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Network error occurred')),
+        const SnackBar(content: Text('Invalid email or password')),
       );
     }
-  }
-
-  Future<UserCredential> loginWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Network error occurred')),
     );
-
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
+}
 
-  void _onLoginButtonPressed(
-      dynamic email, BuildContext context, dynamic password) {
-    fetchData();
 
-    // Navigator.pushNamed(context, '/completeProfileScreen');
+  void _onLoginButtonPressed() {
+    setState(() {
+      email = emailController.text; // ✅ Fetch email from controller
+      password = passwordController.text; // ✅ Fetch password from controller
+    });
+
+    fetchData(); // ✅ Call fetchData() after setting values
   }
 
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
     return Scaffold(
         backgroundColor: AppColors.whiteColor,
         body: SafeArea(
@@ -171,25 +143,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: media.width * 0.05),
                   RoundTextField(
-                      onChanged: (value) {
-                        email = value;
-                        // setEmail();
-                      },
-                      textEditingController: emailController,
+                      // onChanged: (value) {
+                      //   setState(() {
+                      //     email = value;
+                      //   });
+                      // },
+                      controller: emailController,
                       hintText: "Email",
                       icon: "assets/icons/message_icon.png",
                       textInputType: TextInputType.emailAddress),
                   SizedBox(height: media.width * 0.05),
                   RoundTextField(
-                    onChanged: (value) {
-                      password = value;
-                      // setPassword();
-                    },
+                    // onChanged: (value) {
+                    //   password = value;
+                    //   // setPassword();
+                    // },
                     hintText: "Password",
                     icon: "assets/icons/lock_icon.png",
                     textInputType: TextInputType.text,
                     isObscureText: hidePassword,
-                    textEditingController: passwordController,
+                    controller: passwordController,
                     rightIcon: TextButton(
                         onPressed: () {
                           setState(() {
@@ -218,84 +191,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   RoundGradientButton(
                     title: "Login",
                     onPressed: () {
-                      _onLoginButtonPressed(email, context, password);
+                      _onLoginButtonPressed();
                       // Navigator.pushNamed(context, '/completeProfileScreen');
                     },
-                  ),
-                  SizedBox(height: media.width * 0.01),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        width: double.maxFinite,
-                        height: 1,
-                        color: AppColors.grayColor.withOpacity(0.5),
-                      )),
-                      const Text("  Or  ",
-                          style: TextStyle(
-                              color: AppColors.grayColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400)),
-                      Expanded(
-                          child: Container(
-                        width: double.maxFinite,
-                        height: 1,
-                        color: AppColors.grayColor.withOpacity(0.5),
-                      )),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          loginWithGoogle();
-                        },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: AppColors.primaryColor1.withOpacity(0.5),
-                              width: 1,
-                            ),
-                          ),
-                          child: Image.asset(
-                            "assets/icons/google_icon.png",
-                            width: 20,
-                            height: 20,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: AppColors.primaryColor1.withOpacity(0.5),
-                              width: 1,
-                            ),
-                          ),
-                          child: Image.asset(
-                            "assets/icons/facebook_icon.png",
-                            width: 20,
-                            height: 20,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                   const SizedBox(
                     height: 20,
@@ -365,29 +263,34 @@ class OtpVerificationScreen extends StatelessWidget {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-            onPressed: () async {
-              if (await EmailOTP.sendOTP(email: email)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("OTP has been sent")));
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("OTP failed sent")));
-              }
-            },
-            child: const Text('Send OTP'),
-          ),
+
+            // Resend OTP Button
             ElevatedButton(
               onPressed: () async {
-                final isVerified = EmailOTP.verifyOTP(
-                  otp: otpController.text,
-                );
+                bool otpSent = await EmailOTP.sendOTP(email: email);
+                if (otpSent) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("OTP has been resent")));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Failed to resend OTP")));
+                }
+              },
+              child: const Text('Resend OTP'),
+            ),
+
+            // Verify OTP Button
+            ElevatedButton(
+              onPressed: () async {
+                bool isVerified = await EmailOTP.verifyOTP(otp: otpController.text);
                 if (isVerified) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("OTP verified successfully")),
                   );
+
                   final accessToken = responseBody["data"]["access_token"];
                   await saveToken(accessToken);
+
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -402,8 +305,6 @@ class OtpVerificationScreen extends StatelessWidget {
               },
               child: const Text('Verify OTP'),
             ),
-
-
           ],
         ),
       ),

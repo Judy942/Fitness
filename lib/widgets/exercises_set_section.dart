@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_fitness/model/workout.dart';
+import 'package:flutter_application_fitness/models/workout.dart';
 
 import '../core/utils/app_colors.dart';
 import 'exercises_row.dart';

@@ -261,7 +261,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
               elevation: 0,
               leading: InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ActivityTrackerScreen()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  ActivityTrackerScreen()));
                 },
                 child: Container(
                   margin: const EdgeInsets.all(8),

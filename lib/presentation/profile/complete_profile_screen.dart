@@ -62,15 +62,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     });
   }
 
-  // Future<void> loadUserData() async {
-  //   allData = await getAllData() as Map<String, dynamic>;
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
-        // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
-        // Map<String, dynamic> usetData = prefsNotifier.userData;
+
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -147,7 +141,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           isExpanded: true,
                           hint: Text(userData['gender'] ?? (userData['gender'] == 'null'? 'Choose Gender': 'Choose gender'),
 
-                              // usetData['gender'] ?? '',
                               style: const TextStyle(
                                   color: AppColors.grayColor, fontSize: 12)),
                         ),
@@ -167,7 +160,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     });
                   },
                   hintText: 
-                   userData['birthday'] ?? (userData['birthday'] == 'null'? 'dd/mm/yyyy': 'dd/mm/yyyy'),
+                   userData['birthday'] ?? (userData['birthday'] == 'null'? 'yyyy-dd-mm': 'yyyy-dd-mm' ),
                   icon: "assets/icons/calendar_icon.png",
                   textInputType: TextInputType.datetime,
                 ),

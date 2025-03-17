@@ -1,62 +1,176 @@
+// import 'package:flutter/material.dart';
+
+// import '../core/utils/app_colors.dart';
+
+
+// class RoundTextField extends StatelessWidget {
+//   final TextEditingController? textEditingController;
+//   final String hintText;
+//   final String icon;
+//   final TextInputType textInputType;
+//   final bool isObscureText;
+//   final Widget? rightIcon;
+//   final Function(String) onChanged;
+
+
+//   const RoundTextField(
+//       {Key? key,
+//       this.textEditingController,
+//       required this.hintText,
+//       required this.icon,
+//       required this.textInputType,
+//       this.isObscureText = false,
+//         this.rightIcon,
+//       required this.onChanged 
+//       })
+//       : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//           color: AppColors.lightGrayColor,
+//           borderRadius: BorderRadius.circular(15)),
+//       child: TextField(
+//         controller: textEditingController,
+//         keyboardType: textInputType,
+//         obscureText: isObscureText,
+//         onChanged: (value) {
+//           onChanged(value);
+//         },
+//         decoration: InputDecoration(
+//             contentPadding:
+//                 const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+//             enabledBorder: InputBorder.none,
+//             focusedBorder: InputBorder.none,
+//             hintText: hintText,
+//             prefixIcon: Container(
+//                 alignment: Alignment.center,
+//                 width: 20,
+//                 height: 20,
+//                 child: Image.asset(
+//                   icon,
+//                   width: 20,
+//                   height: 20,
+//                   fit: BoxFit.contain,
+//                   color: AppColors.grayColor,
+//                 )),
+//             suffixIcon: rightIcon,
+//             hintStyle: const TextStyle(fontSize: 12, color: AppColors.grayColor)),
+//       ),
+//     );
+//   }
+// }
+
+
+// import 'package:flutter/material.dart';
+// import '../../core/utils/app_colors.dart';
+
+// class RoundTextField extends StatelessWidget {
+//   final TextEditingController? controller;
+//   final String hintText;
+//   final String icon;
+//   final TextInputType textInputType;
+//   final bool isObscureText;
+//   final Widget? rightIcon;
+
+//   const RoundTextField({
+//     Key? key,
+//     this.controller,
+//     required this.hintText,
+//     required this.icon,
+//     required this.textInputType,
+//     this.isObscureText = false,
+//     this.rightIcon,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: AppColors.lightGrayColor,
+//         borderRadius: BorderRadius.circular(15),
+//       ),
+//       child: TextField(
+//         controller: controller,
+//         keyboardType: textInputType,
+//         obscureText: isObscureText,
+//         decoration: InputDecoration(
+//           contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+//           enabledBorder: InputBorder.none,
+//           focusedBorder: InputBorder.none,
+//           hintText: hintText,
+//           prefixIcon: Padding(
+//             padding: const EdgeInsets.all(12),
+//             child: Image.asset(
+//               icon,
+//               width: 20,
+//               height: 20,
+//               fit: BoxFit.contain,
+//               color: AppColors.grayColor,
+//             ),
+//           ),
+//           suffixIcon: rightIcon,
+//           hintStyle: const TextStyle(fontSize: 12, color: AppColors.grayColor),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
 import 'package:flutter/material.dart';
-
-import '../core/utils/app_colors.dart';
-
+import '../../core/utils/app_colors.dart';
 
 class RoundTextField extends StatelessWidget {
-  final TextEditingController? textEditingController;
+  final TextEditingController? controller;
   final String hintText;
   final String icon;
   final TextInputType textInputType;
   final bool isObscureText;
   final Widget? rightIcon;
-  final Function(String) onChanged;
+  final Function(String)? onChanged;
 
-
-  const RoundTextField(
-      {Key? key,
-      this.textEditingController,
-      required this.hintText,
-      required this.icon,
-      required this.textInputType,
-      this.isObscureText = false,
-        this.rightIcon,
-      required this.onChanged 
-      })
-      : super(key: key);
+  const RoundTextField({
+    Key? key,
+    this.controller,
+    required this.hintText,
+    required this.icon,
+    required this.textInputType,
+    this.isObscureText = false,
+    this.rightIcon,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.lightGrayColor,
-          borderRadius: BorderRadius.circular(15)),
+        color: AppColors.lightGrayColor,
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: TextField(
-        controller: textEditingController,
+        controller: controller,
         keyboardType: textInputType,
         obscureText: isObscureText,
-        onChanged: (value) {
-          onChanged(value);
-        },
+        onChanged: onChanged,
         decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            hintText: hintText,
-            prefixIcon: Container(
-                alignment: Alignment.center,
-                width: 20,
-                height: 20,
-                child: Image.asset(
-                  icon,
-                  width: 20,
-                  height: 20,
-                  fit: BoxFit.contain,
-                  color: AppColors.grayColor,
-                )),
-            suffixIcon: rightIcon,
-            hintStyle: const TextStyle(fontSize: 12, color: AppColors.grayColor)),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          border: InputBorder.none,
+          hintText: hintText,
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Image.asset(
+              icon,
+              width: 20,
+              height: 20,
+              fit: BoxFit.contain,
+              color: AppColors.grayColor,
+            ),
+          ),
+          suffixIcon: rightIcon,
+          hintStyle: const TextStyle(fontSize: 12, color: AppColors.grayColor),
+        ),
       ),
     );
   }

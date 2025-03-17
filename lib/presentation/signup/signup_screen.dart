@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:crypto/crypto.dart'; // Gói crypto
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 import 'package:http/http.dart' as http;
@@ -18,99 +16,86 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   bool isCheck = false;
-  String email = "";
-  String password = "";
-  String firstName = "";
-  String lastName = "";
-  // TextEditingController emailController = TextEditingController();
-  // TextEditingController passwordController = TextEditingController();
-  // TextEditingController firstNameController = TextEditingController();
-  // TextEditingController lastNameController = TextEditingController();
 
-  void onRegisterButtonPressed() {
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Email and password are required'),
-        ),
-      );
-      return;
-    }
-    if (!email.contains('@') ||
-        !email.contains('.') ||
-        email.characters.last == '.' ||
-        email.characters.last == '@' ||
-        email.characters.first == '.' ||
-        email.characters.first == '@') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email'),
-        ),
-      );
-      return;
-    }
-    //password validation: gồm cả số , chữ hoa, chữ thường, ký tự đặc biệt
-    if (password.length < 6 ||
-        !password.contains(RegExp(r'[0-9]')) ||
-        !password.contains(RegExp(r'[A-Z]')) ||
-        !password.contains(RegExp(r'[a-z]')) ||
-        !password.contains(RegExp(r'[!@#%^&*(),.?":{}|<>]'))) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Password must contain at least 8 characters, including uppercase, lowercase, number and special character'),
-        ),
-      );
-      return;
-    }
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
 
-    fetchData();
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    super.dispose();
   }
 
-  void fetchData() async {
-    // var url = Uri.parse('http://192.168.95.1:8055/auth/login');
-    String url = "http://192.168.95.1:8055/users/register";
-    print("Email: $email");
-    print("Password: $password");
-    print("First Name: $firstName");
-    print("Last Name: $lastName");
-    var bytes = utf8.encode(email); // Chuyển chuỗi thành mảng byte
-    var digest = sha256.convert(bytes); // Tạo hàm băm
-    print("digest: $digest");
-    var response = await http.post(Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return emailRegex.hasMatch(email);
+  }
+
+  bool isValidPassword(String password) {
+    return password.length >= 8 &&
+        password.contains(RegExp(r'[0-9]')) &&
+        password.contains(RegExp(r'[A-Z]')) &&
+        password.contains(RegExp(r'[a-z]')) &&
+        password.contains(RegExp(r'[!@#%^&*(),.?":{}|<>]'));
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void onRegisterButtonPressed() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      showSnackBar('Email and password are required');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showSnackBar('Invalid email format');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      showSnackBar('Password must be at least 8 characters long, including uppercase, lowercase, number, and special character');
+      return;
+    }
+
+    await registerUser(email, password);
+  }
+
+  Future<void> registerUser(String email, String password) async {
+    const String url = "http://192.168.95.1:8055/users/register";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode({
           "email": email,
-          "password": digest.toString() + "aA@",
-          // "firstName": firstName,
-          // "lastName": lastName
-        }));
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
-    if (response.statusCode == 200 ||
-        response.statusCode == 201 ||
-        response.statusCode == 202 ||
-        response.statusCode == 203 ||
-        response.statusCode == 204) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Register successfully, check your email to verify your account'),
-        ),
+          "password": password,
+        }),
       );
-      // Navigator.pushNamed(context, '/loginScreen');
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Register failed'),
-        ),
-      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        showSnackBar('Register successfully, check your email to verify your account');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        showSnackBar('Register failed: ${jsonDecode(response.body)['message'] ?? "Unknown error"}');
+      }
+    } catch (e) {
+      showSnackBar('Failed to register. Please try again later.');
     }
   }
 
@@ -120,237 +105,94 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: AppColors.whiteColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 15,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 15),
+              const Text("Hey there,", style: TextStyle(color: AppColors.blackColor, fontSize: 16)),
+              const SizedBox(height: 5),
+              const Text("Create an Account",
+                  style: TextStyle(color: AppColors.blackColor, fontSize: 20, fontFamily: "Poppins", fontWeight: FontWeight.w700)),
+              const SizedBox(height: 15),
+
+              RoundTextField(
+                controller: firstNameController,
+                hintText: "First Name",
+                icon: "assets/icons/profile_icon.png",
+                textInputType: TextInputType.name,
+              ),
+              const SizedBox(height: 15),
+
+              RoundTextField(
+                controller: lastNameController,
+                hintText: "Last Name",
+                icon: "assets/icons/profile_icon.png",
+                textInputType: TextInputType.name,
+              ),
+              const SizedBox(height: 15),
+
+              RoundTextField(
+                controller: emailController,
+                hintText: "Email",
+                icon: "assets/icons/message_icon.png",
+                textInputType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 15),
+
+              RoundTextField(
+                controller: passwordController,
+                hintText: "Password",
+                icon: "assets/icons/lock_icon.png",
+                textInputType: TextInputType.text,
+                isObscureText: true,
+                rightIcon: TextButton(
+                  onPressed: () {},
+                  child: Image.asset("assets/icons/hide_pwd_icon.png", width: 20, height: 20, color: AppColors.grayColor),
                 ),
-                const Text(
-                  "Hey there,",
-                  style: TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 16,
+              ),
+              const SizedBox(height: 15),
+
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => setState(() => isCheck = !isCheck),
+                    icon: Icon(isCheck ? Icons.check_box_outline_blank_outlined : Icons.check_box_outlined, color: AppColors.grayColor),
+                  ),
+                  const Expanded(
+                    child: Text("By continuing you accept our Privacy Policy and\nTerm of Use",
+                        style: TextStyle(color: AppColors.grayColor, fontSize: 10)),
+                  ),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+
+              RoundGradientButton(title: "Register", onPressed: onRegisterButtonPressed),
+              const SizedBox(height: 10),
+
+              Row(
+                children: [
+                  Expanded(child: Divider(color: AppColors.grayColor.withOpacity(0.5))),
+                  const Text("  Or  ", style: TextStyle(color: AppColors.grayColor, fontSize: 12, fontWeight: FontWeight.w400)),
+                  Expanded(child: Divider(color: AppColors.grayColor.withOpacity(0.5))),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: const TextSpan(
+                    style: TextStyle(color: AppColors.blackColor, fontSize: 14, fontWeight: FontWeight.w400),
+                    children: [
+                      TextSpan(text: "Already have an account? "),
+                      TextSpan(text: "Login", style: TextStyle(color: AppColors.secondaryColor1, fontSize: 14, fontWeight: FontWeight.w800)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Create an Account",
-                  style: TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 20,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                RoundTextField(
-                  onChanged: (value) {
-                    setState(() {
-                      firstName = value;
-                    });
-                  },
-                  hintText: "First Name",
-                  icon: "assets/icons/profile_icon.png",
-                  textInputType: TextInputType.name,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                RoundTextField(
-                    onChanged: (p0) {
-                      setState(() {
-                        lastName = p0;
-                      });
-                    },
-                    hintText: "Last Name",
-                    icon: "assets/icons/profile_icon.png",
-                    textInputType: TextInputType.name),
-                const SizedBox(
-                  height: 15,
-                ),
-                RoundTextField(
-                    onChanged: (p0) {
-                      setState(() {
-                        email = p0;
-                      });
-                    },
-                    hintText: "Email",
-                    icon: "assets/icons/message_icon.png",
-                    textInputType: TextInputType.emailAddress),
-                const SizedBox(
-                  height: 15,
-                ),
-                RoundTextField(
-                  onChanged: (p0) {
-                    setState(() {
-                      password = p0;
-                    });
-                  },
-                  hintText: "Password",
-                  icon: "assets/icons/lock_icon.png",
-                  textInputType: TextInputType.text,
-                  isObscureText: true,
-                  rightIcon: TextButton(
-                      onPressed: () {},
-                      child: Container(
-                          alignment: Alignment.center,
-                          width: 20,
-                          height: 20,
-                          child: Image.asset(
-                            "assets/icons/hide_pwd_icon.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                            color: AppColors.grayColor,
-                          ))),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isCheck = !isCheck;
-                          });
-                        },
-                        icon: Icon(
-                          isCheck
-                              ? Icons.check_box_outline_blank_outlined
-                              : Icons.check_box_outlined,
-                          color: AppColors.grayColor,
-                        )),
-                    const Expanded(
-                      child: Text(
-                          "By continuing you accept our Privacy Policy and\nTerm of Use",
-                          style: TextStyle(
-                            color: AppColors.grayColor,
-                            fontSize: 10,
-                          )),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                ),
-                RoundGradientButton(
-                  title: "Register",
-                  onPressed: () {
-                    // Navigator.pushNamed(context, '/completeProfileScreen');
-                    onRegisterButtonPressed();
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: Container(
-                      width: double.maxFinite,
-                      height: 1,
-                      color: AppColors.grayColor.withOpacity(0.5),
-                    )),
-                    const Text("  Or  ",
-                        style: TextStyle(
-                            color: AppColors.grayColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400)),
-                    Expanded(
-                        child: Container(
-                      width: double.maxFinite,
-                      height: 1,
-                      color: AppColors.grayColor.withOpacity(0.5),
-                    )),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: AppColors.primaryColor1.withOpacity(0.5),
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset(
-                          "assets/icons/google_icon.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: AppColors.primaryColor1.withOpacity(0.5),
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset(
-                          "assets/icons/facebook_icon.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: const TextSpan(
-                          style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
-                          children: [
-                            TextSpan(
-                              text: "Already have an account? ",
-                            ),
-                            TextSpan(
-                                text: "Login",
-                                style: TextStyle(
-                                    color: AppColors.secondaryColor1,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w800)),
-                          ]),
-                    )),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

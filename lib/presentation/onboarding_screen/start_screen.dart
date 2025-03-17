@@ -8,7 +8,7 @@ import 'package:flutter_application_fitness/presentation/onboarding_screen/onboa
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<String?> getToken() async {
+  Future<String?> getToken() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('userToken');
 }

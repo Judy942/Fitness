@@ -9,7 +9,7 @@ import 'package:lottie/lottie.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../../../core/utils/app_colors.dart';
-import '../../../model/workout.dart';
+import '../../../models/workout.dart';
 import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
 import '../../onboarding_screen/start_screen.dart';

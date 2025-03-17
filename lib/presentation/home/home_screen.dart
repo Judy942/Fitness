@@ -1,4 +1,6 @@
 
+// ignore_for_file: must_be_immutable
+
 import 'dart:convert';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -6,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../services/user_service.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import '../onboarding_screen/start_screen.dart';
@@ -351,7 +355,7 @@ class TodayTargetSection extends StatelessWidget {
               onPressed: () {
               // Navigator.pushNamed(context, AppRoutes.activityTrackerScreen);
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const ActivityTrackerScreen();
+                return  ActivityTrackerScreen();
               }));
 
               },
@@ -363,54 +367,48 @@ class TodayTargetSection extends StatelessWidget {
   }
 }
 
-class LatestWorkoutSection extends StatelessWidget {
-  List lastWorkoutArr = [
-    {
-      "name": "Full Body Workout",
-      "image": "assets/images/Workout1.png",
-      "kcal": "180",
-      "time": "20",
-      "progress": 0.3
-    },
-    {
-      "name": "Lower Body Workout",
-      "image": "assets/images/Workout2.png",
-      "kcal": "200",
-      "time": "30",
-      "progress": 0.4
-    },
-    {
-      "name": "Ab Workout",
-      "image": "assets/images/Workout3.png",
-      "kcal": "300",
-      "time": "40",
-      "progress": 0.7
-    },
-  ];
+class LatestWorkoutSection extends StatefulWidget {
+  const LatestWorkoutSection({super.key});
 
-  LatestWorkoutSection({super.key});
+  @override
+  State<LatestWorkoutSection> createState() => _LatestWorkoutSectionState();
+}
+
+class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
+  final UserService _userService = UserService(); // Create an instance
+  List lastWorkoutArr = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWorkoutData();
+  }
+
+Future<void> _fetchWorkoutData() async {
+  List<dynamic> workouts = await _userService.fetchData(
+    'http://192.168.95.1:8055/items/workout_schedule',
+  );
+
+  List<Map<String, dynamic>> formattedWorkouts = workouts.map((workout) {
+    return {
+      "id": workout["id"],
+      "difficulty": workout["difficulty_id"].toString(),
+      "workout_id": workout["workout_id"].toString(),
+    };
+  }).toList();
+
+  setState(() {
+    lastWorkoutArr = formattedWorkouts;
+  });
+} 
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Latest Workout", style: sectionTitleStyle),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                "See More",
-                style: TextStyle(
-                  color: AppColors.grayColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ],
-        ),
+        const Text("Your Activity", style: sectionTitleStyle),
         ListView.builder(
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),

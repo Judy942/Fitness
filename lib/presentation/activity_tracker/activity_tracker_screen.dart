@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
-import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -10,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
-import '../../widgets/today_target_cell.dart';
 import '../meal_planner/meal_schedule/meal_schedule.dart';
 import '../onboarding_screen/start_screen.dart';
 
@@ -29,7 +27,6 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   int totalStepsToday = 0;
   int totalRunSteps = 0;
   int totalSleepHours = 0;
-
 
   Future<void> checkAndResetSteps() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -83,8 +80,8 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   @override
   void initState() {
     super.initState();
-    checkAndResetSteps();
-    initPlatformState();
+    // checkAndResetSteps();
+    // initPlatformState();
     getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
       setState(() {
         for (var wObj in value) {
@@ -216,11 +213,22 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
             decoration: BoxDecoration(
                 color: AppColors.lightGrayColor,
                 borderRadius: BorderRadius.circular(10)),
-            child: Image.asset(
-              "assets/icons/back_icon.png",
-              width: 15,
-              height: 15,
-              fit: BoxFit.contain,
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: AppColors.blackColor,
+                size: 20,
+              ),
+              onPressed: () {
+                // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ),
+                  (route) => false, // Xóa tất cả các route trong stack
+                );
+              },
             ),
           ),
         ),
@@ -233,159 +241,172 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
-          child: Column(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    AppColors.primaryColor2.withOpacity(0.3),
-                    AppColors.primaryColor1.withOpacity(0.3)
-                  ]),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  AppColors.primaryColor2.withOpacity(0.3),
+                  AppColors.primaryColor1.withOpacity(0.3)
+                ]),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          "Today Target",
-                          style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700),
+                        Container(
+                          width: double.maxFinite,
+                          height: MediaQuery.of(context).size.width * 0.45,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 25, horizontal: 20),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Colors.black12, blurRadius: 2)
+                              ]),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Sleep",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                ShaderMask(
+                                  blendMode: BlendMode.srcIn,
+                                  shaderCallback: (bounds) {
+                                    return LinearGradient(
+                                            colors: AppColors.primary,
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight)
+                                        .createShader(Rect.fromLTRB(0, 0,
+                                            bounds.width, bounds.height));
+                                  },
+                                  child: Text(
+                                    "8h 20m",
+                                    style: TextStyle(
+                                        color: AppColors.whiteColor
+                                            .withOpacity(0.7),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                                // const Spacer(),
+                                Image.asset("assets/images/sleep_graph.png",
+                                    height: 100,
+                                    width:
+                                        MediaQuery.of(context).size.width *
+                                            0.8,
+                                    fit: BoxFit.fill),
+                              ]),
                         ),
-                        SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: AppColors.primary,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildInfoCard(Icons.favorite, 'Heart Pts',
+                                '60/100', Colors.grey[500]),
+                            _buildInfoCard(Icons.directions_walk, 'Steps',
+                                '8225', Colors.pink[100],
+                                textColor: Colors.pink),
+                            
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildInfoCard(null, 'Cal', '300', Colors.white,
+                                textColor: Colors.black),
+                            _buildInfoCard(null, 'km', '15', Colors.white,
+                                textColor: Colors.black),
+                            _buildInfoCard(
+                                null, 'Move Min', '56', Colors.white,
+                                textColor: Colors.black),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Latest Activity",
+                              style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            child: MaterialButton(
-                                onPressed: () {
-                                  // Navigator.pushNamed(
-                                  //     context, '/mealPlannerScreen');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const MealPlannerScreen(),
-                                    ),
-                                  );
-                                },
-                                padding: EdgeInsets.zero,
-                                height: 30,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25)),
-                                textColor: AppColors.primaryColor1,
-                                minWidth: double.maxFinite,
-                                elevation: 0,
-                                color: Colors.transparent,
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 15,
-                                )),
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TodayTargetCell(
-                            icon: "assets/icons/water_icon.png",
-                            value: calories.toString(),
-                            title: "Calories",
-                          ),
+                          ],
                         ),
-                        const SizedBox(
-                          width: 15,
+                        ListView.builder(
+                            padding: EdgeInsets.zero,
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: latestArr.length,
+                            itemBuilder: (context, index) {
+                              var wObj = latestArr[index] as Map? ?? {};
+                              return LatestActivityRow(wObj: wObj);
+                            }),
+                        SizedBox(
+                          height: media.width * 0.1,
                         ),
-                        // Expanded(
-                        //   child: TodayTargetCell(
-                        //     icon: "assets/icons/foot_icon.png",
-                        //     value: _steps,
-                        //     title: "Foot Steps",
-                        //   ),
-                        // ),
-                        Expanded(
-                          child: TodayTargetCell(
-                            icon: "assets/icons/foot_icon.png",
-                            value: totalStepsToday
-                                .toString(), // Hiển thị tổng số bước trong ngày
-                            title: "Foot Steps",
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: TodayTargetCell(
-                    //         icon: "assets/icons/run_icon.png",
-                    //         value: totalRunSteps.toString(),
-                    //         title: "Run Steps",
-                    //       ),
-                    //     ),
-                    //     const SizedBox(
-                    //       width: 15,
-                    //     ),
-                    //     Expanded(
-                    //       child: TodayTargetCell(
-                    //         icon: "assets/icons/sleep_icon.png",
-                    //         value: totalSleepHours.toString(),
-                    //         title: "Sleep Hours",
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-
-                  ],
+                      ]),
                 ),
               ),
-              SizedBox(
-                height: media.width * 0.05,
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(
+      IconData? icon, String title, String value, Color? color,
+      {Color textColor = Colors.black}) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            const BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            if (icon != null) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Latest Activity",
-                    style: TextStyle(
-                        color: AppColors.blackColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700),
-                  ),
+                  Icon(icon, color: textColor),
+                  const SizedBox(width: 8),
+                  Text(title, style: TextStyle(color: textColor, fontSize: 18)),
                 ],
               ),
-              ListView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: latestArr.length,
-                  itemBuilder: (context, index) {
-                    var wObj = latestArr[index] as Map? ?? {};
-                    return LatestActivityRow(wObj: wObj);
-                  }),
-              SizedBox(
-                height: media.width * 0.1,
-              ),
-            ],
-          ),
+              const SizedBox(height: 6),
+            ] else
+              Text(title, style: TextStyle(color: textColor, fontSize: 18)),
+            Text(value,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: textColor)),
+          ],
         ),
       ),
     );
