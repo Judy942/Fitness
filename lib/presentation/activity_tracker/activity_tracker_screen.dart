@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/latest_activity_row.dart';
+import '../../widgets/round_button.dart';
 import '../meal_planner/meal_schedule/meal_schedule.dart';
 import '../onboarding_screen/start_screen.dart';
 
@@ -334,8 +336,47 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                                 textColor: Colors.black),
                           ],
                         ),
+                        SizedBox(
+                      height: media.width * 0.05,
+                    ),
+                        Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor2.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Daily Workout Schedule",
+                            style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            height: 30,
+                            child: RoundButton(
+                              type: RoundButtonType.primaryBG,
+                              title: "Check",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MealPlannerScreen()));
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    
                         const SizedBox(height: 20),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
@@ -379,8 +420,8 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            const BoxShadow(
+          boxShadow: const [
+            BoxShadow(
               color: Colors.black12,
               blurRadius: 10,
               offset: Offset(0, 5),

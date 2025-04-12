@@ -8,7 +8,10 @@ import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
 import '../home/home_screen.dart';
 import '../login/login_screen.dart';
+import '../meal_planner/meal_history/meal_history_screen.dart';
+import '../workout/workout_history/workout_history_screen.dart';
 import 'complete_profile_screen.dart';
+
 Future<void> logout(BuildContext context) async {
   try {
     // Clear the locally stored token
@@ -28,13 +31,13 @@ Future<void> logout(BuildContext context) async {
     );
   }
 }
+
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
 
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
-
 
 class _UserProfileState extends State<UserProfile> {
   Map<String, dynamic> userData = {};
@@ -63,13 +66,29 @@ class _UserProfileState extends State<UserProfile> {
   List accountArr = [
     {
       "image": "assets/icons/p_personal.png",
-      "name": "Personal Data",
-      "tag": "1"
+      "name": "Lịch sử tập luyện",
+      "tag": "1",
+      "action": (BuildContext context) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const WorkoutHistoryScreen(),
+            ),
+          ),
     },
-    {"image": "assets/icons/p_achi.png", "name": "Achievement", "tag": "2"},
+    {
+      "image": "assets/icons/p_achi.png",
+      "name": "Lịch sử bữa ăn",
+      "tag": "2",
+      "action": (BuildContext context) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MealHistoryScreen(),
+            ),
+          ),
+    },
     {
       "image": "assets/icons/p_activity.png",
-      "name": "Activity History",
+      "name": "Lịch sử hoạt động",
       "tag": "3"
     },
     {
@@ -104,7 +123,7 @@ class _UserProfileState extends State<UserProfile> {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // Close the dialog
-                    
+
                     final state =
                         context.findAncestorStateOfType<_UserProfileState>();
                     state?.handleLogout();
@@ -264,7 +283,11 @@ class _UserProfileState extends State<UserProfile> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (iObj["action"] != null) {
+                              iObj["action"](context);
+                            }
+                          },
                         );
                       },
                     )

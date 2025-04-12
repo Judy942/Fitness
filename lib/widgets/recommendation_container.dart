@@ -24,6 +24,7 @@ class RecommendationContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Giá trị của difficulty trong wObj: ${wObj["difficulty"]}');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
@@ -35,13 +36,8 @@ class RecommendationContainer extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Image.asset(
-              //   height: MediaQuery.of(context).size.width * 0.2,
-              //   width: MediaQuery.of(context).size.width * 0.2,
-              //   wObj["image"].toString(),
-              // ),
               Image.network(
-                wObj["image"].toString(),
+                'http://192.168.95.1:8055/assets/${wObj["image"]}',
                 height: MediaQuery.of(context).size.width * 0.2,
                 width: MediaQuery.of(context).size.width * 0.2,
               ),
@@ -56,11 +52,15 @@ class RecommendationContainer extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               Text(
-                "${wObj["difficulty"]} | ${wObj["cooking_time"]} | ${wObj["nutritions"][0]['value']} Kcal",
+                wObj["description"].toString(),
                 style: const TextStyle(
                     color: AppColors.grayColor,
                     fontSize: 14,
+                    
+                    overflow: TextOverflow.ellipsis,
                     fontWeight: FontWeight.w400),
+                                          maxLines: 5,
+
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),

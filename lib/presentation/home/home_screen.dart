@@ -1,4 +1,3 @@
-
 // ignore_for_file: must_be_immutable
 
 import 'dart:convert';
@@ -8,14 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../services/user_service.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import '../onboarding_screen/start_screen.dart';
-import 'how_to_calculate_bmi.dart';
 
  Future<Map<String, dynamic>> getUserData() async {
     String? token = await getToken();
@@ -70,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
 
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
@@ -87,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: media.width * 0.05),
                 const TodayTargetSection(),
                 SizedBox(height: media.width * 0.05),
-                LatestWorkoutSection(),
+                const LatestWorkoutSection(),
                 SizedBox(height: media.width * 0.1),
               ],
             ),
@@ -130,7 +126,6 @@ class TopBar extends StatelessWidget {
         ),
         IconButton(
           onPressed: () {
-            // Navigator.pushNamed(context, '/notificationScreen');
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return const NotificationScreen();
             }));
@@ -151,6 +146,22 @@ class ContainerBmi extends StatelessWidget {
   String bmi;
   ContainerBmi({super.key, required this.bmi});
 
+  String _getBMICategory(String bmiValue) {
+    if (bmiValue == "0") return "Chưa có dữ liệu";
+    
+    double bmiDouble;
+    try {
+      bmiDouble = double.parse(bmiValue);
+    } catch (e) {
+      return "Không hợp lệ";
+    }
+    
+    if (bmiDouble < 18.5) return "Bạn nên tăng cân";
+    if (bmiDouble < 23) return "Nên duy trì chế độ ăn uống và tập luyện";
+    if (bmiDouble < 30) return "Bạn nên giảm cân";
+    return "Bạn cần giảm cân";
+  }
+
   @override
   Widget build(BuildContext context) {
     List<PieChartSectionData> showingSections(String bmi) {
@@ -159,8 +170,6 @@ class ContainerBmi extends StatelessWidget {
       return List.generate(
         2,
         (i) {
-
-
           switch (i) {
             case 0:
               return PieChartSectionData(
@@ -192,7 +201,7 @@ class ContainerBmi extends StatelessWidget {
     }
 
     return Container(
-      height: MediaQuery.of(context).size.width * 0.4,
+      height: MediaQuery.of(context).size.width * 0.38,
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: AppColors.primary),
         borderRadius:
@@ -203,7 +212,6 @@ class ContainerBmi extends StatelessWidget {
   }
 
   Widget _buildBMIContent(String bmi, BuildContext context) {
-        // final prefsNotifier = Provider.of<PreferencesNotifier>(context);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -214,7 +222,7 @@ class ContainerBmi extends StatelessWidget {
           fit: BoxFit.fitHeight,
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,35 +240,30 @@ class ContainerBmi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    bmi == "0" ? "Enter your height and weight": bmi,
+                    bmi == "0" ? "Enter your height and weight" : bmi,
                     style: TextStyle(
                       color: AppColors.whiteColor.withOpacity(0.7),
-                      fontSize: 12,
+                      fontSize: 14,
                       fontFamily: "Poppins",
                       fontWeight: FontWeight.w400,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.width * 0.05),
-                  Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: SizedBox(
-                      height: 35,
-                      width: 100,
-                      child: RoundButton(
-                        title: "View More",
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const AlertDialog(
-                                title: Text("How to calculate BMI"),
-                                content: HowToCalculateBmi(),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                  Text(
+                    _getBMICategory(bmi).replaceAllMapped(
+                      RegExp(r'(.{1,25})(\s|$)'),
+                      (match) => '${match.group(0)}\n',
                     ),
+                    style: TextStyle(
+                      color: AppColors.whiteColor.withOpacity(0.8),
+                      fontSize: 14,
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -275,7 +278,7 @@ class ContainerBmi extends StatelessWidget {
                     borderData: FlBorderData(show: false),
                     sectionsSpace: 1,
                     centerSpaceRadius: 0,
-                    sections: showingSections(bmi), // Use the BMI value here
+                    sections: showingSections(bmi),
                   ),
                 ),
               ),
@@ -297,12 +300,10 @@ class ContainerBmi extends StatelessWidget {
           case 0:
             return PieChartSectionData(
                 color: color0,
-                // color: AppColors.blackColor,
                 value: double.parse(bmi),
                 title: '',
                 radius: 55,
                 titlePositionPercentageOffset: 0.55,
-                // badgeWidget: const Text("20.1", style: TextStyle(
                 badgeWidget: Text(
                   bmi,
                   style: const TextStyle(
@@ -353,9 +354,8 @@ class TodayTargetSection extends StatelessWidget {
               title: "Check",
               type: RoundButtonType.primaryBG,
               onPressed: () {
-              // Navigator.pushNamed(context, AppRoutes.activityTrackerScreen);
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return  ActivityTrackerScreen();
+                return  const ActivityTrackerScreen();
               }));
 
               },
@@ -386,19 +386,12 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
 Future<void> _fetchWorkoutData() async {
   List<dynamic> workouts = await _userService.fetchData(
-    'http://192.168.95.1:8055/items/workout_schedule',
+    // 'http://192.168.95.1:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+    'http://192.168.95.1:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
   );
 
-  List<Map<String, dynamic>> formattedWorkouts = workouts.map((workout) {
-    return {
-      "id": workout["id"],
-      "difficulty": workout["difficulty_id"].toString(),
-      "workout_id": workout["workout_id"].toString(),
-    };
-  }).toList();
-
   setState(() {
-    lastWorkoutArr = formattedWorkouts;
+    lastWorkoutArr = workouts;
   });
 } 
 
@@ -416,7 +409,7 @@ Future<void> _fetchWorkoutData() async {
           itemCount: lastWorkoutArr.length,
           itemBuilder: (context, index) {
             var wObj = lastWorkoutArr[index] as Map? ?? {};
-            return WorkoutRow(wObj: wObj);
+               return WorkoutRow(wObj: wObj);
           },
         ),
       ],

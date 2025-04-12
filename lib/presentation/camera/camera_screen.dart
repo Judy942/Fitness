@@ -12,7 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../onboarding_screen/start_screen.dart';
 
-final storage = FlutterSecureStorage();
+const storage = FlutterSecureStorage();
 
 // Kiểm tra và tạo key/iv trong Keystore nếu chưa có
 Future<Map<String, String>> getKeyAndIv() async {
@@ -55,8 +55,9 @@ class _CameraScreenState extends State<CameraScreen> {
   Uint8List addPadding(Uint8List input) {
     int blockSize = 16; // Kích thước block của AES
     int paddingLength = blockSize - (input.length % blockSize);
-    if (paddingLength == 0)
+    if (paddingLength == 0) {
       return input; // Không cần padding nếu đã là bội số của blockSize
+    }
 
     Uint8List paddedInput = Uint8List(input.length + paddingLength);
     paddedInput.setAll(0, input);

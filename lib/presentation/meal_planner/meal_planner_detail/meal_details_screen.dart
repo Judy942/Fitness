@@ -92,26 +92,6 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   ),
                 ),
               ),
-              actions: [
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: AppColors.lightGrayColor,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset(
-                      "assets/icons/more_icon.png",
-                      width: 15,
-                      height: 15,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                )
-              ],
             ),
             SliverAppBar(
               backgroundColor: Colors.transparent,
@@ -125,10 +105,9 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
-                  widget.dObj["image"].toString(),
-                  width: media.width * 0.5,
+                  'http://192.168.95.1:8055/assets/${widget.dObj["image"]}',
                   height: media.width * 0.5,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitHeight,
                 ),
               ),
             ),
@@ -179,23 +158,16 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                             fontWeight: FontWeight.w700),
                                       ),
                                       Text(
-                                        "${widget.dObj["cooking_time"].toString()}hours | ${widget.dObj["nutritions"][0]['value']} Kcal",
+                                        "${widget.dObj["cooking_time"].toString()} mins | ${dishDetails["nutritions"]?[0]?["value"] ?? '-'} Kcal",
                                         style: const TextStyle(
-                                            color: AppColors.grayColor,
-                                            fontSize: 12),
+                                          color: AppColors.grayColor,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () {},
-                                  child: Image.asset(
-                                    "assets/icons/fav_icon.png",
-                                    width: 15,
-                                    height: 15,
-                                    fit: BoxFit.contain,
-                                  ),
-                                )
+                                
                               ],
                             ),
                             SizedBox(
@@ -239,13 +211,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                                 BorderRadius.circular(10)),
                                         child: Row(
                                           children: [
-                                            // Image.asset(
-                                            //   yObj["image"].toString(),
-                                            //   width: 20,
-                                            //   height: 20,
-                                            //   fit: BoxFit.contain,
-                                            // ),
-
+                                           
                                             Image.network(
                                               'http://192.168.95.1:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
                                               width: 20,
@@ -313,7 +279,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                             ),
 
                             SizedBox(
-                              height: media.width * 0.5,
+                              height: 162,
                               child: ListView.builder(
                                   padding: EdgeInsets.zero,
                                   scrollDirection: Axis.horizontal,
@@ -341,12 +307,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                                 color: AppColors.lightGrayColor,
                                                 borderRadius:
                                                     BorderRadius.circular(15)),
-                                            // child: Image.asset(
-                                            //   yObj["image"].toString(),
-                                            //   width: 50,
-                                            //   height: 50,
-                                            //   fit: BoxFit.contain,
-                                            // ),
+                                            
                                             child: Image.network(
                                               'http://192.168.95.1:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
                                               width: 50,
@@ -378,9 +339,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                     );
                                   }),
                             ),
-                            SizedBox(
-                              height: media.width * 0.03,
-                            ),
+                            
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

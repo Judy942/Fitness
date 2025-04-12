@@ -17,7 +17,7 @@ class FindStToEat extends StatelessWidget {
         context,
         MaterialPageRoute(
             builder: (context) => MealPlannerDetailScreen(
-                  title: wObj["title"].toString(),
+                  popularDishes: wObj["popularDishes"],
                 )));
   }
 
@@ -28,9 +28,7 @@ class FindStToEat extends StatelessWidget {
         Container(
           // padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color:type == RoundButtonType.secondaryBG
-                  ? AppColors.secondaryColor2.withOpacity(0.2)
-                  : AppColors.primaryColor1.withOpacity(0.2),
+            color: AppColors.primaryColor1.withOpacity(0.2),
             borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(100),
                 bottomRight: Radius.circular(20),
@@ -45,8 +43,8 @@ class FindStToEat extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                                    wObj["image"].toString(),
+                Image.asset(
+                  'assets/images/steak.png',
                   width: MediaQuery.of(context).size.width * 0.25,
                   height: MediaQuery.of(context).size.width * 0.25,
                 )

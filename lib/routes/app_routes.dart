@@ -5,7 +5,6 @@ import 'package:flutter_application_fitness/presentation/dashboard/dashboard_scr
 import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart';
 import 'package:flutter_application_fitness/presentation/home/home_screen.dart';
 import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
-import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_detail/meal_planner_detail_screen.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_planner_screen.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
@@ -69,7 +68,6 @@ class AppRoutes {
     userProfile: (context) => const UserProfile(),
     addScheduleView : (context) => AddScheduleView(date: DateTime.now()),
     mealPlannerScreen: (context) => const MealPlannerScreen(),
-    mealPlannerDetailScreen: (context) =>  const MealPlannerDetailScreen( title: "title",),
     mealScheduleScreen: (context) =>  const MealSchedule(),
 
 

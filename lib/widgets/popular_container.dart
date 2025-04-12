@@ -19,6 +19,7 @@ class PopularContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Giá trị của wObj trong popular:$wObj');
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 10, 20),
       // margin: const EdgeInsets.only(right: 20),
@@ -39,7 +40,7 @@ class PopularContainer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: Image.network(
-                wObj["image"].toString(),
+                'http://192.168.95.1:8055/assets/${wObj["image"]}',
                 height: MediaQuery.of(context).size.width * 0.1,
                 width: MediaQuery.of(context).size.width * 0.1,
                 fit: BoxFit.fill,
@@ -55,13 +56,7 @@ class PopularContainer extends StatelessWidget {
                       fontSize: 17,
                       fontWeight: FontWeight.w500),
                 ),
-                Text(
-                  "${wObj["difficulty_id"]['name']} | ${wObj["cooking_time"]} | ${wObj["nutritions"][0]['value']} Kcal",
-                  style: const TextStyle(
-                      color: AppColors.grayColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                ),
+                
               ],
             ),
             const Spacer(),

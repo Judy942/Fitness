@@ -11,14 +11,15 @@ import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
 import '../../onboarding_screen/start_screen.dart';
 import '../../workout/workout_schedule_view/add_schedule_view.dart';
-import '../meal_planner_detail/meal_planner_detail_screen.dart';
+import '../meal_planner_screen.dart';
 
 class AddMealSchedule extends StatefulWidget {
   DateTime date;
   Map? obj;
   String? url;
   bool? isEdit;
-  AddMealSchedule({super.key, required this.date, this.obj, this.url, this.isEdit});
+  AddMealSchedule(
+      {super.key, required this.date, this.obj, this.url, this.isEdit});
 
   @override
   State<AddMealSchedule> createState() => _AddMealScheduleState();
@@ -32,11 +33,12 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
   @override
   void initState() {
     super.initState();
-        mealSelected =  (widget.obj?['dish_id']['id']??1) - 1;
-    getRecommendation().then((value) {
+    mealSelected = (widget.obj?['dish_id']['id'] ?? 1) - 1;
+    getListPopular().then((value) {
       setState(() {
         recommendationArr = value;
         isLoading = false;
+        print("recommendationArr: $recommendationArr");
       });
     });
   }
@@ -51,8 +53,8 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => const MealSchedule()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const MealSchedule()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -153,16 +155,23 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                         icon: "assets/icons/difficulity_icon.png",
                         title: "Meal",
                         time: (recommendationArr.isNotEmpty &&
-                                recommendationArr[0] != null)
-                            ? recommendationArr[0]['name']
+                                recommendationArr[mealSelected] != null)
+                            ? recommendationArr[mealSelected]['name']
                             : '',
                         color: AppColors.lightGrayColor,
                         onPressed: () async {
-                          mealSelected = await showWorkoutDialog(
-                                  context, recommendationArr) -
-                              1;
-                          print(mealSelected);
-                          setState(() {});
+                          print("Meal selected index: $mealSelected");
+                          print(
+                              "Meal name: ${recommendationArr[mealSelected]['name']}");
+
+                          int? result = await showWorkoutDialog(
+                              context, recommendationArr);
+                          if (result != null && result > 0) {
+                            setState(() {
+                              print("Selected meal index: $result");
+                              mealSelected = result-1;
+                            });
+                          }
                         }),
                     const SizedBox(
                       height: 10,
@@ -186,7 +195,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                             editSchedule(context, data, widget.url!);
                             print("Edit");
                           } else {
-                          addMealSchedule(data, context);
+                            addMealSchedule(data, context);
                           }
                         }),
                     const SizedBox(

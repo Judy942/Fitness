@@ -1,12 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:email_otp/email_otp.dart';
-import "package:flutter/material.dart";
 
 import "package:flutter_gemini/flutter_gemini.dart";
 import 'chat_box/consts.dart';
-import 'core/utils/pref_utils.dart';
 import 'presentation/onboarding_screen/start_screen.dart';
 
 void main() {

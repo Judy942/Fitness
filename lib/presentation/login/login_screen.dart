@@ -235,7 +235,7 @@ class OtpVerificationScreen extends StatelessWidget {
   final String email;
   final Map<String, dynamic> responseBody;
 
-  OtpVerificationScreen({required this.email, required this.responseBody});
+  OtpVerificationScreen({super.key, required this.email, required this.responseBody});
 
   final TextEditingController otpController = TextEditingController();
 
@@ -282,7 +282,7 @@ class OtpVerificationScreen extends StatelessWidget {
             // Verify OTP Button
             ElevatedButton(
               onPressed: () async {
-                bool isVerified = await EmailOTP.verifyOTP(otp: otpController.text);
+                bool isVerified = EmailOTP.verifyOTP(otp: otpController.text);
                 if (isVerified) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("OTP verified successfully")),
