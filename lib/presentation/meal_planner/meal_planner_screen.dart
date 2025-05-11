@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
 import '../../core/utils/app_colors.dart';
+import '../../services/user_service.dart';
 import '../../widgets/popular_container.dart';
 import '../../widgets/today_meals_row.dart';
-import '../onboarding_screen/start_screen.dart';
 import 'meal_planner_detail/meal_planner_detail_screen.dart';
 import 'meal_schedule/meal_schedule.dart';
 
@@ -34,7 +34,7 @@ Future<List> fetchDishes(String endpoint) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.95.1:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.194.186:8055/assets/${dish['image']}',
       //   // 'difficulty': dish['difficulty_id'],
       //   'difficulty': dish['difficulty_id']
       //       is Map, //&& dish['difficulty_id'].containsKey('name')) ? dish['difficulty_id']['name'] : null, // Thêm độ khó
@@ -52,7 +52,7 @@ Future<List> fetchDishes(String endpoint) async {
 
 Future<List> getListPopular() async {
   return await fetchDishes(
-      'http://192.168.95.1:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
+      'http://192.168.194.186:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
 }
 
 class MealPlannerScreen extends StatefulWidget {
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
               child: Container(
                 height: media.height * 0.9,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
@@ -301,19 +301,19 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                               child: const Text("View All"))
                         ],
                       ),
-                      SizedBox(
-                        height: media.width * 0.05,
+                      const SizedBox(
+                        height: 15,
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.width *
                             0.25 *
                             popularArr.length,
-                        width: MediaQuery.of(context).size.width * 0.95,
+                        width: MediaQuery.of(context).size.width * 0.98,
                         child: ListView.builder(
                           itemBuilder: (context, position) {
                             var wObj = popularArr[position] as Map? ?? {};
                             return Container(
-                                margin: const EdgeInsets.only(bottom: 15),
+                                margin: const EdgeInsets.only(bottom: 15, left: 10,right: 10),
                                 child: PopularContainer(wObj: wObj));
                           },
                           padding: EdgeInsets.zero,

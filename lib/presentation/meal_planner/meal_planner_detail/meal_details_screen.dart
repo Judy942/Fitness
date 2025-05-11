@@ -6,13 +6,13 @@ import 'package:readmore/readmore.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../widgets/round_gradient_button.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/step_detail_row.dart';
-import '../../onboarding_screen/start_screen.dart';
 import '../meal_schedule/add_meal_schedule.dart';
 
 Future<Map<String, dynamic>> getDishDetails(int id) async {
   String url =
-      'http://192.168.95.1:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
+      'http://192.168.194.186:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
 
   Map<String, dynamic> dishDetails = {};
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -105,7 +105,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
-                  'http://192.168.95.1:8055/assets/${widget.dObj["image"]}',
+                  'http://192.168.194.186:8055/assets/${widget.dObj["image"]}',
                   height: media.width * 0.5,
                   fit: BoxFit.fitHeight,
                 ),
@@ -167,7 +167,6 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                     ],
                                   ),
                                 ),
-                                
                               ],
                             ),
                             SizedBox(
@@ -211,9 +210,8 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                                 BorderRadius.circular(10)),
                                         child: Row(
                                           children: [
-                                           
                                             Image.network(
-                                              'http://192.168.95.1:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
+                                              'http://192.168.194.186:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
                                               width: 20,
                                               height: 20,
                                               fit: BoxFit.contain,
@@ -302,14 +300,13 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.all(20),
+                                            padding: const EdgeInsets.all(5),
                                             decoration: BoxDecoration(
                                                 color: AppColors.lightGrayColor,
                                                 borderRadius:
                                                     BorderRadius.circular(15)),
-                                            
                                             child: Image.network(
-                                              'http://192.168.95.1:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
+                                              'http://192.168.194.186:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
                                               width: 50,
                                               height: 50,
                                               fit: BoxFit.contain,
@@ -339,7 +336,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                     );
                                   }),
                             ),
-                            
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

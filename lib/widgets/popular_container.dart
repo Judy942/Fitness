@@ -21,7 +21,7 @@ class PopularContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     print('Giá trị của wObj trong popular:$wObj');
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 10, 20),
+      padding: const EdgeInsets.all(5),
       // margin: const EdgeInsets.only(right: 20),
       decoration: BoxDecoration(
           color: AppColors.whiteColor,
@@ -39,25 +39,26 @@ class PopularContainer extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(right: 20),
-              child: Image.network(
-                'http://192.168.95.1:8055/assets/${wObj["image"]}',
-                height: MediaQuery.of(context).size.width * 0.1,
-                width: MediaQuery.of(context).size.width * 0.1,
-                fit: BoxFit.fill,
+
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                child: Image.network(
+                  'http://192.168.194.186:8055/assets/${wObj["image"]}',
+                  height: 55,
+                  width: 55,
+                  fit: BoxFit.fill,
+                ),
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  wObj["name"].toString(),
-                  style: const TextStyle(
-                      color: AppColors.blackColor,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500),
-                ),
-                
-              ],
+            Text(
+              wObj["name"].toString(),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              
+              style: const TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
             ),
             const Spacer(),
             InkWell(
@@ -66,12 +67,14 @@ class PopularContainer extends StatelessWidget {
               },
               child: Image.asset(
                 "assets/images/next_go.png",
-                // height: MediaQuery.of(context).size.width * 0.1,
-                // width: double.maxFinite,
+                height: 25,
+                width: 25,
                 // fit: BoxFit.fitHeight,
                 color: AppColors.secondaryColor1,
               ),
+
             ),
+            SizedBox(width: 5,)
           ],
         ),
       ),

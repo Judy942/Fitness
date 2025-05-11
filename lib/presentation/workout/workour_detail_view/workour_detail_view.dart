@@ -6,16 +6,15 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../models/workout.dart';
-import '../../../push_up_detection/pose_detection_view.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
-import '../../onboarding_screen/start_screen.dart';
 import 'exercises_step_details.dart';
 
 Future<Map<String, dynamic>> getExerciseDetail(int id) async {
   String url =
-      'http://192.168.95.1:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+      'http://192.168.194.186:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
 
   String? token = await getToken();
 
@@ -325,12 +324,12 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                       RoundGradientButton(
                           title: "Start Workout",
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AiHome(),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => const AiHome(),
+                            //   ),
+                            // );
                           })
                     ],
                   ),
@@ -357,39 +356,39 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
   );
 }
 
-class AiHome extends StatelessWidget {
-  const AiHome({super.key});
+// class AiHome extends StatelessWidget {
+//   const AiHome({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Finess App'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: const SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  ExpansionTile(
-                    title: Text('Gyms'),
-                    children: [
-                      CustomCard('PushUpDetector', PoseDetectorView()),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Finess App'),
+//         centerTitle: true,
+//         elevation: 0,
+//       ),
+//       body: const SafeArea(
+//         child: Center(
+//           child: SingleChildScrollView(
+//             child: Padding(
+//               padding: EdgeInsets.symmetric(horizontal: 16),
+//               child: Column(
+//                 children: [
+//                   ExpansionTile(
+//                     title: Text('Gyms'),
+//                     children: [
+//                       CustomCard('PushUpDetector', PoseDetectorView()),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class CustomCard extends StatelessWidget {
   final String _label;

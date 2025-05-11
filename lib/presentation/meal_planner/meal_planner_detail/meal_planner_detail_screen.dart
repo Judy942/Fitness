@@ -5,6 +5,7 @@ import 'package:flutter_application_fitness/widgets/recommendation_container.dar
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/category_container.dart';
 import '../../../widgets/popular_container.dart';
 import '../../../widgets/round_button.dart';
@@ -33,7 +34,7 @@ Future<List> getRecommendation(List popularDishes) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.95.1:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.194.186:8055/assets/${dish['image']}',
       //   'difficulty': dish['difficulty_id'],
       //   'nutritions': dish['nutritions']
       // });
@@ -64,7 +65,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.95.1:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.194.186:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -74,7 +75,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.95.1:8055/assets/${item['image']}',
+            'image': 'http://192.168.194.186:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();
@@ -166,7 +167,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
               child: Container(
                 height: MediaQuery.of(context).size.height,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -244,8 +245,8 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             )
                           : SizedBox(
                               height: MediaQuery.of(context).size.width > 450
-                                  ? MediaQuery.of(context).size.width * 0.55
-                                  : MediaQuery.of(context).size.width * 0.65,
+                                  ? MediaQuery.of(context).size.width * 0.60
+                                  : MediaQuery.of(context).size.width * 0.7,
                               width: MediaQuery.of(context).size.width * 0.9,
                               child: ListView.builder(
                                 itemBuilder: (context, position) {
@@ -263,7 +264,8 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                                                         .size
                                                         .width *
                                                     0.45
-                                                : MediaQuery.of(context)
+                                                : 
+                                                MediaQuery.of(context)
                                                         .size
                                                         .width *
                                                     0.55,
@@ -283,10 +285,9 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                                                         .size
                                                         .width *
                                                     0.45
-                                                : MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.55,
+                                                :
+                                            MediaQuery.of(context).size.width *
+                                                0.55,
                                         child: RecommendationContainer(
                                             wObj: wObj,
                                             type: RoundButtonType.secondaryBG));
@@ -322,7 +323,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             var wObj =
                                 widget.popularDishes[position] as Map? ?? {};
                             return Container(
-                                margin: const EdgeInsets.only(bottom: 15),
+                                margin: const EdgeInsets.all(5),
                                 child: PopularContainer(wObj: wObj));
                           },
                           padding: EdgeInsets.zero,

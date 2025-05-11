@@ -7,10 +7,10 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../onboarding_screen/start_screen.dart';
+import '../../services/user_service.dart';
+
 
 const storage = FlutterSecureStorage();
 
@@ -122,7 +122,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.95.1:8055/files'),
+      Uri.parse('http://192.168.194.186:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -145,7 +145,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.95.1:8055/items/process_tracker'),
+      Uri.parse('http://192.168.194.186:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'
@@ -232,9 +232,9 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Future<void> _saveImage(String imagePath, String bodyPart) async {
-    final result = await ImageGallerySaver.saveFile(imagePath);
-  }
+  // Future<void> _saveImage(String imagePath, String bodyPart) async {
+  //   final result = await ImageGallerySaver.saveFile(imagePath);
+  // }
 
   @override
   void dispose() {
@@ -263,7 +263,7 @@ class _CameraScreenState extends State<CameraScreen> {
           actions: [
             TextButton(
               onPressed: () async {
-                final result = await ImageGallerySaver.saveFile(imagePath);
+                // final result = await ImageGallerySaver.saveFile(imagePath);
                 Navigator.of(context).pop(); // Đóng hộp thoại
                 Navigator.of(context).pop(); // Đóng hộp thoại
                 tracker_position(imagePath);

@@ -342,10 +342,10 @@ class _FullCalendarState extends State<FullCalendar> {
                   const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
               itemBuilder: (context, index) {
                 DateTime date = dates[index];
-
+      
                 bool outOfRange =
                     date.isBefore(startDate) || date.isAfter(endDate);
-
+      
                 if (date.isBefore(first)) {
                   return Container(
                     width: width / 7,

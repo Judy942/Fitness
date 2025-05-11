@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/showlog.dart';
 import '../../onboarding_screen/start_screen.dart';
 import 'add_schedule_view.dart';
@@ -68,7 +69,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     String startDate = "${formattedDate}T00:00:00%2B07:00";
     String endDate = "${formattedDate}T23:59:00%2B07:00";
 
-    return 'http://192.168.95.1:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
+    return 'http://192.168.194.186:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
   }
 
   @override
@@ -239,7 +240,6 @@ void setDayEventWorkoutList() {
                       child: ListView.separated(
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            var availWidth = (media.width * 1.2) - (80 + 40);
                             var slotArr = selectDayEventArr.where((wObj) {
                               return (wObj["date"] as DateTime).hour == index;
                             }).toList();

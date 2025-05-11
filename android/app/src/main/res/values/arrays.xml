@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="health_permissions">
+        <!-- Dưới đây là ví dụ, bạn sửa theo quyền thực tế bạn cần -->
+        <item>android.permission.health.READ_STEPS</item>
+        <item>android.permission.health.READ_HEART_RATE</item>
+    </string-array>
+</resources>

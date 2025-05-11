@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/core/utils/app_colors.dart';
@@ -8,22 +9,9 @@ import 'package:flutter_application_fitness/presentation/onboarding_screen/onboa
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-  Future<String?> getToken() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('userToken');
-}
+import '../../services/user_service.dart';
 
-// Future<void> saveUserData(Map<String, dynamic> userData) async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   // Lưu dữ liệu người dùng
-//   await prefs.setString('first_name', userData['first_name'] ?? '');
-//   await prefs.setString('last_name', userData['last_name'] ?? '');
-//   await prefs.setString('email', userData['email'] ?? '');
-//   await prefs.setString('height', userData['height']?.toString() ?? '');
-//   await prefs.setString('weight', userData['weight']?.toString() ?? '');
-//   await prefs.setString('birthday', userData['birthday'] ?? '');
-//   await prefs.setString('gender', userData['gender'] ?? '');
-// }
+
 
 Future<void> clearLocalData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -36,7 +24,7 @@ Future<String> getBmi() async {
   try {
     final response = await http.get(
       Uri.parse(
-          'http://192.168.95.1:8055/api/users/bmi'), // Thay đổi URL nếu cần
+          'http://192.168.194.186:8055/api/users/bmi'), // Thay đổi URL nếu cần
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -72,13 +60,12 @@ class _StartScreenState extends State<StartScreen> {
     if (token != null) {
       // Gọi API để lấy thông tin người dùng
       final response = await http.get(
-        Uri.parse('http://192.168.95.1:8055/users/me'),
+        Uri.parse('http://192.168.194.186:8055/users/me'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final userData = responseData['data'];
+        // final responseData = json.decode(response.body);
         // Navigator.pushReplacementNamed(context, AppRoutes.dashboardScreen);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
           return const DashboardScreen();

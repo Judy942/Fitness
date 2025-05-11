@@ -19,66 +19,65 @@ class RecommendationContainer extends StatelessWidget {
             builder: (context) => MealDetailsScreen(
                   dObj: wObj,
                 )));
-                
   }
 
   @override
   Widget build(BuildContext context) {
     print('Giá trị của difficulty trong wObj: ${wObj["difficulty"]}');
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
           color: type == RoundButtonType.secondaryBG
               ? AppColors.secondaryColor2.withOpacity(0.2)
               : AppColors.primaryColor2.withOpacity(0.2),
           borderRadius: const BorderRadius.all(Radius.circular(20))),
-          child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.network(
-                'http://192.168.95.1:8055/assets/${wObj["image"]}',
-                height: MediaQuery.of(context).size.width * 0.2,
-                width: MediaQuery.of(context).size.width * 0.2,
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Text(
-                wObj["name"].toString(),
-                style: const TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500),
-              ),
-              Text(
-                wObj["description"].toString(),
-                style: const TextStyle(
-                    color: AppColors.grayColor,
-                    fontSize: 14,
-                    
-                    overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.w400),
-                                          maxLines: 5,
-
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                child: SizedBox(
-                  height: 35,
-                  width: 100,
-                  child: RoundButton(
-                    type: RoundButtonType.primaryBG,
-                    title: "View",
-                    onPressed: () {
-                      onViewMoreClick(context);
-                    },
-                  ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 10,),
+            Image.network(
+              'http://192.168.194.186:8055/assets/${wObj["image"]}',
+              height: 60,
+              width: 60,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              wObj["name"].toString(),
+              style: const TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500),
+            ),
+            Text(
+              wObj["description"].toString(),
+              style: const TextStyle(
+                  color: AppColors.grayColor,
+                  fontSize: 14,
+                  overflow: TextOverflow.ellipsis,
+                  fontWeight: FontWeight.w400),
+              maxLines: 4,
+            ),
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: SizedBox(
+                height: 30,
+                width: 100,
+                child: RoundButton(
+                  type: RoundButtonType.primaryBG,
+                  title: "View",
+                  onPressed: () {
+                    onViewMoreClick(context);
+                  },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 }

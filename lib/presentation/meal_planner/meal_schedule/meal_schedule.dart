@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/my_lib/calendar_agenda/lib/calendar_agenda.dart';
@@ -10,22 +11,22 @@ import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart
 
 import '../../../core/utils/app_colors.dart';
 import '../../../models/workout.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
-import '../../onboarding_screen/start_screen.dart';
 import 'add_meal_schedule.dart';
 
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   final response = await http.get(
-    Uri.parse('http://192.168.95.1:8055/api/meal_schedule?date=$date'),
+    Uri.parse('http://192.168.194.186:8055/api/meal_schedule?date=$date'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     },
   );
   print(response);
-
+  log("response: ${response.body}");
   if (response.statusCode == 200) {
     // Chuyển đổi body của API thành List<Map<String, dynamic>>
     final Map<String, dynamic> responseBody = json.decode(response.body);
@@ -106,7 +107,7 @@ class _MealScheduleState extends State<MealSchedule> {
                   'name': sObj['dish_id']['name'],
                   'description': sObj['dish_id']['description'],
                   'image':
-                      'http://192.168.95.1:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
+                      'http://192.168.194.186:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
                   'nutritions': sObj['dish_id']['nutritions'],
                 },
               };
@@ -150,15 +151,30 @@ class _MealScheduleState extends State<MealSchedule> {
     return protein;
   }
 
+  // int sumCarbs() {
+  //   int carbs = 0;
+  //   for (var wObj in selectDayEventArr) {
+  //     wObj["meals"].forEach((sObj) {
+  //       carbs += (sObj["dish_id"]["nutritions"][3]["value"] as int);
+  //     });
+  //   }
+  //   return carbs;
+  // }
+
   int sumCarbs() {
-    int carbs = 0;
-    for (var wObj in selectDayEventArr) {
-      wObj["meals"].forEach((sObj) {
-        carbs += (sObj["dish_id"]["nutritions"][3]["value"] as int);
-      });
+  int carbs = 0;
+  for (var wObj in selectDayEventArr) {
+    for (var sObj in wObj["meals"]) {
+      var nuts = sObj["dish_id"]["nutritions"] as List;
+      if (nuts.length > 3) {
+        carbs += (nuts[3]["value"] as int);
+      }
+      // else: bỏ qua, hoặc cộng thêm 0
     }
-    return carbs;
   }
+  return carbs;
+}
+
 
   int sumFat() {
     int fat = 0;
@@ -172,14 +188,40 @@ class _MealScheduleState extends State<MealSchedule> {
 
   List getNutrition = [0, 0, 0, 0];
 
-  void getNutritionData() {
-    getNutrition = [
-      sumCalories(), //calories
-      sumProtein(), //protein
-      sumCarbs(), //carbs
-      sumFat(), //fat
-    ];
+  int sumByCode(String code) {
+  int total = 0;
+  for (var wObj in selectDayEventArr) {
+    for (var sObj in wObj["meals"]) {
+      var nuts = sObj["dish_id"]["nutritions"] as List<dynamic>;
+      var match = nuts.firstWhere(
+        (n) => n["nutrition_id"]["code"] == code,
+        orElse: () => null
+      );
+      if (match != null) {
+        total += (match["value"] as int);
+      }
+    }
   }
+  return total;
+}
+void getNutritionData() {
+  getNutrition = [
+    sumByCode("CAL"),
+    sumByCode("PROTEINS"),
+    sumByCode("Carbo"),
+    sumByCode("FATS"),
+  ];
+}
+
+
+  // void getNutritionData() {
+  //   getNutrition = [
+  //     sumCalories(), //calories
+  //     sumProtein(), //protein
+  //     sumCarbs(), //carbs
+  //     sumFat(), //fat
+  //   ];
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -519,7 +561,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                       height: 15,
                                       width: media.width * 0.5,
                                       backgroundColor: Colors.grey.shade100,
-                                      foregrondColor: Colors.purple,
+                                      foregroundColor: Colors.purple,
                                       // ratio: wObj["progress"] as double? ?? 0.0,
                                       ratio: getNutrition[index] /
                                           int.parse(nutritionGoalArr[index]

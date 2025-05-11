@@ -1,15 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
+import '../../../main.dart';
+import '../../../services/push_notification/NotificationCacheService.dart';
+import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
-import '../../onboarding_screen/start_screen.dart';
 import '../../workout/workout_schedule_view/add_schedule_view.dart';
 import '../meal_planner_screen.dart';
 
@@ -33,13 +40,23 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
   @override
   void initState() {
     super.initState();
-    mealSelected = (widget.obj?['dish_id']['id'] ?? 1) - 1;
+    // mealSelected = (widget.obj?['dish_id']['id'] ?? 1) - 1;
+    // getListPopular().then((value) {
+    //   setState(() {
+    //     recommendationArr = value;
+    //     isLoading = false;
+    //     print("recommendationArr: $recommendationArr");
+    //   });
+    // });
     getListPopular().then((value) {
-      setState(() {
-        recommendationArr = value;
-        isLoading = false;
-        print("recommendationArr: $recommendationArr");
-      });
+      recommendationArr = value;
+      if (widget.obj != null) {
+        final editId = widget.obj!['dish_id']['id'] as int;
+        final idx = recommendationArr.indexWhere((e) => e['id'] == editId);
+        if (idx >= 0) mealSelected = idx;
+      }
+      isLoading = false;
+      setState(() {});
     });
   }
 
@@ -152,27 +169,41 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                       height: 8,
                     ),
                     IconTitleNextRow(
-                        icon: "assets/icons/difficulity_icon.png",
-                        title: "Meal",
-                        time: (recommendationArr.isNotEmpty &&
-                                recommendationArr[mealSelected] != null)
-                            ? recommendationArr[mealSelected]['name']
-                            : '',
-                        color: AppColors.lightGrayColor,
-                        onPressed: () async {
-                          print("Meal selected index: $mealSelected");
-                          print(
-                              "Meal name: ${recommendationArr[mealSelected]['name']}");
+                      icon: "assets/icons/difficulity_icon.png",
+                      title: "Meal",
+                      time: (recommendationArr.isNotEmpty &&
+                              recommendationArr[mealSelected] != null)
+                          ? recommendationArr[mealSelected]['name']
+                          : '',
+                      color: AppColors.lightGrayColor,
+                      // onPressed: () async {
+                      //   print("Meal selected index: $mealSelected");
+                      //   print(
+                      //       "Meal name: ${recommendationArr[mealSelected]['name']}");
+                      //   int? result = await showWorkoutDialog(
+                      //       context, recommendationArr);
+                      //   if (result != null && result > 0) {
+                      //     setState(() {
+                      //       print("Selected meal index: $result");
+                      //       mealSelected = result - 1;
+                      //     });
+                      //   }
+                      // }
 
-                          int? result = await showWorkoutDialog(
-                              context, recommendationArr);
-                          if (result != null && result > 0) {
+                      onPressed: () async {
+                        int? resultId =
+                            await showWorkoutDialog(context, recommendationArr);
+                        if (resultId != null) {
+                          final newIndex = recommendationArr
+                              .indexWhere((e) => e['id'] == resultId);
+                          if (newIndex >= 0) {
                             setState(() {
-                              print("Selected meal index: $result");
-                              mealSelected = result-1;
+                              mealSelected = newIndex;
                             });
                           }
-                        }),
+                        }
+                      },
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -212,7 +243,8 @@ Future<void> addMealSchedule(
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   String json = jsonEncode(data);
   final response = await http.post(
-    Uri.parse('http://192.168.95.1:8055/items/meal_schedule'),
+    Uri.parse(
+        'http://192.168.194.186:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -221,6 +253,18 @@ Future<void> addMealSchedule(
   );
   if (response.statusCode == 200) {
     print(response.body);
+    // Phân tích cú pháp JSON từ response.body
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+    // Sử dụng dữ liệu đã phân tích cú pháp
+    DateTime mealTime = DateTime.parse(data['meal_time']);
+    int notificationId = mealTime.millisecondsSinceEpoch ~/ 1000;
+    String mealName = responseData['data']['dish_id']['name'];
+    await scheduleMealNotification(
+        mealTime, mealName, notificationId); // hoặc workout
+    await NotificationCacheService.saveMealNotificationId(
+        responseData['data']['id'].toString(), notificationId);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Add schedule success'),
@@ -233,4 +277,67 @@ Future<void> addMealSchedule(
 
     print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
   }
+}
+
+Future<void> scheduleMealNotification(
+  DateTime mealTime,
+  String mealName,
+  int notificationId,
+) async {
+  tz.initializeTimeZones();
+  final tz.TZDateTime scheduledDate = tz.TZDateTime.from(mealTime, tz.local)
+      .subtract(const Duration(minutes: 30));
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    notificationId,
+    "Đến giờ ăn rồi 🍽️",
+    "Hôm nay bạn có bữa $mealName lúc ${mealTime.toLocal().hour}:${mealTime.minute}",
+    scheduledDate,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'meal_channel_id',
+        'Nhắc nhở ăn uống',
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: 'app_icon',
+      ),
+    ),
+    matchDateTimeComponents: DateTimeComponents.time,
+    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+  );
+}
+
+void scheduleMotivationalNotification() async {
+  final tz.TZDateTime scheduledDate = tz.TZDateTime.local(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+    21,
+    0,
+  ).add(const Duration(days: 1)); // Lên lịch cho ngày mai
+
+  const motivationalMessages = [
+    "Hôm nay bạn đã cố gắng rất nhiều! 💪",
+    "Hãy nghỉ ngơi sớm để ngày mai thật năng lượng 🌙",
+    "Bạn đang tiến bộ từng ngày, đừng bỏ cuộc nhé! 🚀",
+  ];
+
+  final random =
+      motivationalMessages[DateTime.now().day % motivationalMessages.length];
+
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    88888,
+    "💡 Lời nhắc động viên",
+    random,
+    scheduledDate,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'motivation_channel',
+        'Lời động viên',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+    ),
+    matchDateTimeComponents: DateTimeComponents.time,
+    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+  );
 }

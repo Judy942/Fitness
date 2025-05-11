@@ -14,28 +14,29 @@ import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import '../onboarding_screen/start_screen.dart';
 
- Future<Map<String, dynamic>> getUserData() async {
-    String? token = await getToken();
-    Map<String, dynamic> userData = {};
 
-    if (token != null) {
-      // Gọi API để lấy thông tin người dùng
-      final response = await http.get(
-        Uri.parse('http://192.168.95.1:8055/users/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        userData = responseData['data'];
-        return userData;
-      } else {
-        await clearLocalData();
-        return userData;
-      }
+Future<Map<String, dynamic>> getUserData() async {
+  String? token = await getToken();
+  Map<String, dynamic> userData = {};
+
+  if (token != null) {
+    // Gọi API để lấy thông tin người dùng
+    final response = await http.get(
+      Uri.parse('http://192.168.194.186:8055/users/me'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      userData = responseData['data'];
+      return userData;
     } else {
+      await clearLocalData();
       return userData;
     }
+  } else {
+    return userData;
   }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -45,9 +46,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-    Map<String, dynamic> userData = {};
-    String bmi = '0';
+  Map<String, dynamic> userData = {};
+  String bmi = '0';
   @override
   void initState() {
     super.initState();
@@ -58,11 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     getBmi().then((value) {
       setState(() {
-        bmi = value =="null"? '0': value;
+        bmi = value == "null" ? '0' : value;
       });
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 TopBar(userData['last_name'] ?? ""),
+                TopBar(userData['last_name'] ?? ""),
                 SizedBox(height: media.width * 0.05),
-                 ContainerBmi(bmi: bmi),
+                ContainerBmi(bmi: bmi),
                 SizedBox(height: media.width * 0.05),
                 const TodayTargetSection(),
                 SizedBox(height: media.width * 0.05),
@@ -148,14 +147,14 @@ class ContainerBmi extends StatelessWidget {
 
   String _getBMICategory(String bmiValue) {
     if (bmiValue == "0") return "Chưa có dữ liệu";
-    
+
     double bmiDouble;
     try {
       bmiDouble = double.parse(bmiValue);
     } catch (e) {
       return "Không hợp lệ";
     }
-    
+
     if (bmiDouble < 18.5) return "Bạn nên tăng cân";
     if (bmiDouble < 23) return "Nên duy trì chế độ ăn uống và tập luyện";
     if (bmiDouble < 30) return "Bạn nên giảm cân";
@@ -164,51 +163,50 @@ class ContainerBmi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<PieChartSectionData> showingSections(String bmi) {
-                const color0 = AppColors.secondaryColor2;
-          const color1 = AppColors.whiteColor;
-      return List.generate(
-        2,
-        (i) {
-          switch (i) {
-            case 0:
-              return PieChartSectionData(
-                  color: color0,
-                  value: 33,
-                  title: '',
-                  radius: 55,
-                  titlePositionPercentageOffset: 0.55,
-                  badgeWidget: Text(
-                    bmi,
-                    style: const TextStyle(
-                        color: AppColors.whiteColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12),
-                  ));
-            case 1:
-              return PieChartSectionData(
-                color: color1,
-                value: 75,
-                title: '',
-                radius: 42,
-                titlePositionPercentageOffset: 0.55,
-              );
-            default:
-              throw Error();
-          }
-        },
-      );
-    }
+    // List<PieChartSectionData> showingSections(String bmi) {
+    //   const color0 = AppColors.secondaryColor2;
+    //   const color1 = AppColors.whiteColor;
+    //   return List.generate(
+    //     2,
+    //     (i) {
+    //       switch (i) {
+    //         case 0:
+    //           return PieChartSectionData(
+    //               color: color0,
+    //               value: 33,
+    //               title: '',
+    //               radius: 55,
+    //               titlePositionPercentageOffset: 0.55,
+    //               badgeWidget: Text(
+    //                 bmi,
+    //                 style: const TextStyle(
+    //                     color: AppColors.whiteColor,
+    //                     fontWeight: FontWeight.w700,
+    //                     fontSize: 12),
+    //               ));
+    //         case 1:
+    //           return PieChartSectionData(
+    //             color: color1,
+    //             value: 75,
+    //             title: '',
+    //             radius: 42,
+    //             titlePositionPercentageOffset: 0.55,
+    //           );
+    //         default:
+    //           throw Error();
+    //       }
+    //     },
+    //   );
+    // }
 
     return Container(
-      height: MediaQuery.of(context).size.width * 0.38,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: AppColors.primary),
-        borderRadius:
-            BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
-      ),
-      child: _buildBMIContent(bmi , context)
-    );
+        height: MediaQuery.of(context).size.width * 0.38,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: AppColors.primary),
+          borderRadius:
+              BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
+        ),
+        child: _buildBMIContent(bmi, context));
   }
 
   Widget _buildBMIContent(String bmi, BuildContext context) {
@@ -240,7 +238,7 @@ class ContainerBmi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    bmi == "0" ? "Enter your height and weight" : bmi,
+                    bmi == "0" ? "No data height and weight" : bmi,
                     style: TextStyle(
                       color: AppColors.whiteColor.withOpacity(0.7),
                       fontSize: 14,
@@ -326,6 +324,7 @@ class ContainerBmi extends StatelessWidget {
     );
   }
 }
+
 class TodayTargetSection extends StatelessWidget {
   const TodayTargetSection({super.key});
 
@@ -354,10 +353,9 @@ class TodayTargetSection extends StatelessWidget {
               title: "Check",
               type: RoundButtonType.primaryBG,
               onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return  const ActivityTrackerScreen();
-              }));
-
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const ActivityTrackerScreen();
+                }));
               },
             ),
           ),
@@ -384,17 +382,15 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
     _fetchWorkoutData();
   }
 
-Future<void> _fetchWorkoutData() async {
-  List<dynamic> workouts = await _userService.fetchData(
-    // 'http://192.168.95.1:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-    'http://192.168.95.1:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
-  );
+  Future<void> _fetchWorkoutData() async {
+    List<dynamic> workouts = await _userService.fetchData(
+        // 'http://192.168.194.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.194.186:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
-  setState(() {
-    lastWorkoutArr = workouts;
-  });
-} 
-
+    setState(() {
+      lastWorkoutArr = workouts;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -409,7 +405,7 @@ Future<void> _fetchWorkoutData() async {
           itemCount: lastWorkoutArr.length,
           itemBuilder: (context, index) {
             var wObj = lastWorkoutArr[index] as Map? ?? {};
-               return WorkoutRow(wObj: wObj);
+            return WorkoutRow(wObj: wObj);
           },
         ),
       ],

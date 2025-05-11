@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "490400399649",
-    "project_id": "ragforfitness",
-    "storage_bucket": "ragforfitness.firebasestorage.app"
+    "project_number": "655372762225",
+    "project_id": "fitness-594a2",
+    "storage_bucket": "fitness-594a2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:490400399649:android:ad502c32911fee46cebe60",
+        "mobilesdk_app_id": "1:655372762225:android:f3ccc912191bdb9636efd0",
         "android_client_info": {
           "package_name": "com.example.flutter_application_fitness"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAa-SOO7L25keXwLUAQWKrD0XniSeeZTSs"
+          "current_key": "AIzaSyDUarmv_FyJ8nOqKFNNgIqWOrCaPQMkCsI"
         }
       ],
       "services": {

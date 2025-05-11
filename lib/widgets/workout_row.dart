@@ -19,17 +19,12 @@ class _WorkoutRowState extends State<WorkoutRow> {
   @override
   void initState() {
     super.initState();
-    print("completedExercise in WorkoutRow: ${widget.wObj}"); // In ra màn hình để kiểm tra
     for (var item in widget.wObj["completed_exercise"]) {
-      // if (item["exercise_id"] != null && item["set_completed_in"] != null) {
         completedExercise.add(item);
-      // }
     }
-  print("completedExercise Map  in WorkoutRow: $completedExercise");
   }
 
   void onButtonIconClick(BuildContext context) {
-    print("completedExercise  in WorkoutRow: $completedExercise");
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -62,7 +57,7 @@ class _WorkoutRowState extends State<WorkoutRow> {
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
-                'http://192.168.95.1:8055/assets/${widget.wObj["workout_id"]["image"]}',
+                'http://192.168.194.186:8055/assets/${widget.wObj["workout_id"]["image"]}',
                 width: 60,
                 height: 60,
                 fit: BoxFit.fitHeight,
@@ -87,7 +82,7 @@ class _WorkoutRowState extends State<WorkoutRow> {
                   height: 15,
                   width: media.width * 0.5,
                   backgroundColor: Colors.grey.shade100,
-                  foregrondColor: Colors.purple,
+                  foregroundColor: Colors.purple,
                   ratio: completedExercise.length.toDouble() /
                       totalExercises.toDouble(),
                   direction: Axis.horizontal,

@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
-import 'package:flutter_application_fitness/presentation/goals/goals_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
+import '../../services/user_service.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
 import '../home/home_screen.dart';
-import '../onboarding_screen/start_screen.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   bool isBackToProfile;
@@ -29,7 +28,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     String json = jsonEncode(data);
     print(json);
       final response = await http.patch(
-          Uri.parse('http://192.168.95.1:8055/users/me'),
+          Uri.parse('http://192.168.194.186:8055/users/me'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -42,7 +41,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
         } else {
           // Navigator.pushNamed(context, '/goalsScreen');
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GoalsScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GoalsScreen()));
         }
       } else {
         print(response.body);
