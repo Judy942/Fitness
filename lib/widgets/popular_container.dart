@@ -43,7 +43,7 @@ class PopularContainer extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
                 child: Image.network(
-                  'http://192.168.194.186:8055/assets/${wObj["image"]}',
+                  'http://192.168.64.186:8055/assets/${wObj["image"]}',
                   height: 55,
                   width: 55,
                   fit: BoxFit.fill,

@@ -23,7 +23,7 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
   Future<void> _fetchMealHistory() async {
     // Thay đổi URL API để lấy lịch sử bữa ăn
     List<dynamic> meals = await _userService.fetchData(
-      'http://192.168.194.186:8055/items/meal?fields=*&sort=-date'
+      'http://192.168.64.186:8055/items/meal?fields=*&sort=-date'
     );
 
     setState(() {

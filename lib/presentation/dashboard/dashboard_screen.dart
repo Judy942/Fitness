@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../chat_box/chat_home_page.dart';
 import '../../core/utils/app_colors.dart';
 import '../camera/photo_progress/progress_photo_screen.dart';
+import '../chatbot_RAG/chatScreen.dart';
 import '../home/home_screen.dart';
 import '../profile/user_profile.dart';
 import '../workout/workout_tracker/workout_tracker_screen.dart';
@@ -31,12 +31,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChatHomePage(),
-            ),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => const ChatWidget(),
+          //   ),
+          // );
+              Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ChatScreen(),
+      ),
+    );
         },
         child: SizedBox(
           width: 70,

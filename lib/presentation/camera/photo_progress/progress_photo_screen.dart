@@ -24,7 +24,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
     String? token = await getToken();
     // Thay $CURRENT_USER bằng userId
     final url = Uri.parse(
-        'http://192.168.194.186:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
+        'http://192.168.64.186:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
 
     final response = await http.get(
       url,
@@ -238,7 +238,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: Image.network(
-                              'http://192.168.194.186:8055/assets/${pObj['image']}',
+                              'http://192.168.64.186:8055/assets/${pObj['image']}',
                               width: MediaQuery.of(context).size.width * 0.3,
                               height: MediaQuery.of(context).size.width * 0.3,
                               fit: BoxFit.cover,

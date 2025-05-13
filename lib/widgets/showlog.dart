@@ -22,7 +22,7 @@ class ShowLog extends StatelessWidget {
     final id = eObj["id"]; // Giả sử eObj chứa id
     String url = "";
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.194.186:8055/items/workout_schedule/$id';
+      url = 'http://192.168.64.186:8055/items/workout_schedule/$id';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -30,7 +30,7 @@ class ShowLog extends StatelessWidget {
         ),
       );
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.194.186:8055/items/meal_schedule/$id?fields=*,dish_id.*';
+      url = 'http://192.168.64.186:8055/items/meal_schedule/$id?fields=*,dish_id.*';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -49,9 +49,9 @@ class ShowLog extends StatelessWidget {
     String url = "";
     //kiểm tra phần tử là exercise hay meal
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.194.186:8055/items/workout_schedule/$id';
+      url = 'http://192.168.64.186:8055/items/workout_schedule/$id';
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.194.186:8055/items/meal_schedule/$id';
+      url = 'http://192.168.64.186:8055/items/meal_schedule/$id';
     } else {
       return;
     }

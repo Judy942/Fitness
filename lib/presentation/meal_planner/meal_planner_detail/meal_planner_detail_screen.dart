@@ -34,7 +34,7 @@ Future<List> getRecommendation(List popularDishes) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.194.186:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.64.186:8055/assets/${dish['image']}',
       //   'difficulty': dish['difficulty_id'],
       //   'nutritions': dish['nutritions']
       // });
@@ -65,7 +65,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.194.186:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.64.186:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -75,7 +75,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.194.186:8055/assets/${item['image']}',
+            'image': 'http://192.168.64.186:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();

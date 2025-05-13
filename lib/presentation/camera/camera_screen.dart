@@ -122,7 +122,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.194.186:8055/files'),
+      Uri.parse('http://192.168.64.186:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -145,7 +145,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.194.186:8055/items/process_tracker'),
+      Uri.parse('http://192.168.64.186:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'

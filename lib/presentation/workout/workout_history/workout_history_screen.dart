@@ -22,7 +22,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
   Future<void> _fetchWorkoutHistory() async {
     List<dynamic> workouts = await _userService.fetchData(
-      'http://192.168.194.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+      'http://192.168.64.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
     );
 
     setState(() {
@@ -66,7 +66,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: Image.network(
-                    'http://192.168.194.186:8055/assets/${wObj["workout_id"]["image"]}',
+                    'http://192.168.64.186:8055/assets/${wObj["workout_id"]["image"]}',
                     width: 60,
                     height: 60,
                     fit: BoxFit.fitHeight,

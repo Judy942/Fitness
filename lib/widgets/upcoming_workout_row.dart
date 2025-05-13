@@ -29,7 +29,7 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
                 // widget.wObj["image"].toString(),
-                "http://192.168.194.186:8055/assets/${widget.wObj["workout_id"]["image"].toString()}",
+                "http://192.168.64.186:8055/assets/${widget.wObj["workout_id"]["image"].toString()}",
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,

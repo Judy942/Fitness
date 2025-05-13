@@ -244,7 +244,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.194.186:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.64.186:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
