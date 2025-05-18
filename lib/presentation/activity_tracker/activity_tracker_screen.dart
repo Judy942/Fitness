@@ -66,26 +66,36 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   Future<void> _loadHealthData() async {
     setState(() => isLoadingHealth = true);
     final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(hours: 24));
+    final startOfDay = DateTime(now.year, now.month, now.day);
 
     try {
       final healthData = await _health.getHealthDataFromTypes(
         types: _dataTypes,
-        startTime: yesterday,
+        startTime: startOfDay,
         endTime: now,
       );
+
+      print('Processing health data:');
+      print('Total data points: ${healthData.length}');
+      print('Data types available: ${healthData.map((e) => e.type).toSet()}');
+
+      if (healthData.isEmpty) {
+        print('No health data available');
+        return;
+      }
 
       int steps = 0;
       double distance = 0.0;
       double activeEnergyBurned = 0.0;
-      double sleepDeep = 0.0;
-      double heartRate = 0.0;
+      double sleepDeepMinutes = 0.0;
+      List<double> heartRates = [];
 
       for (var point in healthData) {
         print(
             'point data: ${point.type}: ${(point.value as NumericHealthValue).numericValue} ${point.unit}');
         if (point.value is NumericHealthValue) {
           final value = (point.value as NumericHealthValue).numericValue;
+          if (value < 0) continue;
           switch (point.type) {
             case HealthDataType.STEPS:
               steps += value.toInt();
@@ -97,15 +107,24 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
               activeEnergyBurned += value;
               break;
             case HealthDataType.SLEEP_DEEP:
-              sleepDeep += value;
+              if (point.unit == 'hours') {
+                sleepDeepMinutes += value * 60;
+              } else {
+                sleepDeepMinutes += value;
+              }
               break;
             case HealthDataType.HEART_RATE:
-              heartRate += value;
+              heartRates.add(value.toDouble());
               break;
             default:
               break;
           }
         }
+      }
+
+      for (var type in _dataTypes) {
+        final dataForType = healthData.where((point) => point.type == type).toList();
+        print('Data for $type: ${dataForType.length} points');
       }
 
       setState(() {
@@ -116,13 +135,19 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
         totalStepsToday = steps;
         totalDistance = distance;
         totalCalories = activeEnergyBurned;
-        totalSleepDeep = sleepDeep;
-        totalHeartRate = heartRate;
+        totalSleepDeep = sleepDeepMinutes;
+        totalHeartRate = heartRates.isEmpty ? 0 : heartRates.reduce((a, b) => a + b) / heartRates.length;
       });
     } catch (e) {
       if (mounted) {
+        String errorMessage = 'Error loading health data: ';
+        if (e is HealthException) {
+          errorMessage += e.toString();
+        } else {
+          errorMessage += e.toString();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading health data: $e')),
+          SnackBar(content: Text(errorMessage)),
         );
       }
       print('Error loading health data: $e');
