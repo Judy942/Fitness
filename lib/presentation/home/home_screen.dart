@@ -6,7 +6,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
+import 'package:health/health.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../services/user_service.dart';
@@ -22,7 +24,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.64.186:8055/users/me'),
+      Uri.parse('http://192.168.1.6:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -384,8 +386,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.64.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.64.186:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;
@@ -418,3 +420,29 @@ const TextStyle sectionTitleStyle = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w600,
 );
+
+// Future<void> _requestPermissions() async {
+//   print('Requesting permissions...');
+//   try {
+//     // Kiểm tra và cài đặt Health Connect nếu cần
+//     bool isAvailable = await _health.isHealthConnectAvailable();
+//     if (!isAvailable) {
+//       bool installed = await _health.installHealthConnect();
+//       if (!installed) {
+//         throw Exception('Vui lòng cài đặt Google Health Connect để sử dụng tính năng này');
+//       }
+//     }
+
+//     // Code yêu cầu quyền hiện tại...
+//     final activityStatus = await Permission.activityRecognition.request();
+//     final sensorsStatus = await Permission.sensors.request();
+//     // ...
+//   } catch (e) {
+//     print('Error requesting permissions: $e');
+//     if (mounted) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Lỗi: $e')),
+//       );
+//     }
+//   }
+// }

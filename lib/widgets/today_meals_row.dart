@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../core/utils/app_colors.dart';
-import '../presentation/onboarding_screen/start_screen.dart';
 import '../services/user_service.dart';
 
 class TodayMealsRow extends StatefulWidget {
@@ -32,7 +31,7 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
           children: [
             ClipRRect(
               child: Image.network(
-                'http://192.168.64.186:8055/assets/${widget.wObj['dish_id']["image"]}',
+                'http://192.168.1.6:8055/assets/${widget.wObj['dish_id']["image"]}',
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -70,7 +69,7 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
                 // Cập nhật lại giá trị trên server
                 String? token = await getToken();
                 final response = await http.patch(
-                  Uri.parse('http://192.168.64.186:8055/items/meal_schedule/${widget.wObj['id']}'),
+                  Uri.parse('http://192.168.1.6:8055/items/meal_schedule/${widget.wObj['id']}'),
                   headers: {
                     'Authorization': 'Bearer $token',
                     'Content-Type': 'application/json'

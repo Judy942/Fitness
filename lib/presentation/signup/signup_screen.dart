@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/login/login_screen.dart';
 import 'package:http/http.dart' as http;
@@ -73,7 +74,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> registerUser(String email, String password) async {
-    const String url = "http://192.168.64.186:8055/users/register";
+    const String url = "http://192.168.1.6:8055/users/register";
 
     try {
       final response = await http.post(

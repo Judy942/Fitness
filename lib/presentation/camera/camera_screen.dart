@@ -2,34 +2,48 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../services/user_service.dart';
 
-
 const storage = FlutterSecureStorage();
+
+// Tạo key và iv từ mật khẩu
+Future<Map<String, String>> generateKeyAndIvFromPassword(String password) async {
+  // Tạo hash từ mật khẩu
+  final passwordBytes = utf8.encode(password);
+  final hash = sha256.convert(passwordBytes);
+  final hashBytes = hash.bytes;
+  
+  // Sử dụng 32 byte đầu tiên cho key
+  final key = encrypt.Key.fromUtf8(hashBytes.sublist(0, 32).map((e) => String.fromCharCode(e)).join());
+  
+  // Sử dụng 16 byte tiếp theo cho iv
+  final iv = encrypt.IV.fromUtf8(hashBytes.sublist(32, 48).map((e) => String.fromCharCode(e)).join());
+  
+  return {
+    'key': key.base64,
+    'iv': iv.base64
+  };
+}
 
 // Kiểm tra và tạo key/iv trong Keystore nếu chưa có
 Future<Map<String, String>> getKeyAndIv() async {
   String? key = await storage.read(key: 'encryption_key');
   String? iv = await storage.read(key: 'encryption_iv');
-  if (key == null || iv == null) {
-    final key = encrypt.Key.fromLength(32);
-    final iv = encrypt.IV.fromLength(16);
-    await storage.write(key: 'encryption_key', value: key.base64);
-    await storage.write(key: 'encryption_iv', value: iv.base64);
-    print("đã tạo key và iv");
-
-    return {'key': key.base64, 'iv': iv.base64};
+  
+  if (key == null || iv == null ) {
+    throw Exception("Key hoặc IV không tồn tại trong storage");
   }
-  print("đã có key và iv");
+  
   return {'key': key, 'iv': iv};
 }
+
 // final key = encrypt.Key.fromUtf8('my 32 length key................'); // 32 chars key for AES-256
 // final iv = encrypt.IV.fromLength(16); // AES sử dụng 16 byte IV
 
@@ -41,16 +55,7 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  List<CameraDescription> cameras = [];
-  CameraDescription? selectedCamera;
-
-  @override
-  void initState() {
-    super.initState();
-    initializeCamera();
-  }
+  final ImagePicker _picker = ImagePicker();
 
   Uint8List addPadding(Uint8List input) {
     int blockSize = 16; // Kích thước block của AES
@@ -122,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.64.186:8055/files'),
+      Uri.parse('http://192.168.1.6:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -145,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.64.186:8055/items/process_tracker'),
+      Uri.parse('http://192.168.1.6:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'
@@ -157,23 +162,6 @@ class _CameraScreenState extends State<CameraScreen> {
     );
     var response = await request;
     print(response.body);
-  }
-
-  Future<void> initializeCamera() async {
-    await Permission.camera.request();
-    try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        throw CameraException('No cameras available', 'No camera was found.');
-      }
-      selectedCamera = cameras.first; // Chọn camera đầu tiên mặc định
-
-      _controller = CameraController(cameras[0], ResolutionPreset.high);
-      _initializeControllerFuture = _controller.initialize();
-      setState(() {});
-    } catch (e) {
-      print(e);
-    }
   }
 
   Future<void> tracker_position(String imagePath) async {
@@ -189,7 +177,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 title: const Text('Front Facing'),
                 onTap: () {
                   addProcessTracker(imagePath, 1);
-                  Navigator.of(context).pop(); // Đóng hộp thoại
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Saved')),
                   );
@@ -199,7 +187,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 title: const Text('Back Facing'),
                 onTap: () {
                   addProcessTracker(imagePath, 2);
-                  Navigator.of(context).pop(); // Đóng hộp thoại
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Saved')),
                   );
@@ -209,7 +197,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 title: const Text('Left Facing'),
                 onTap: () {
                   addProcessTracker(imagePath, 3);
-                  Navigator.of(context).pop(); // Đóng hộp thoại
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Saved')),
                   );
@@ -219,7 +207,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 title: const Text('Right Facing'),
                 onTap: () {
                   addProcessTracker(imagePath, 4);
-                  Navigator.of(context).pop(); // Đóng hộp thoại
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Saved')),
                   );
@@ -232,22 +220,12 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  // Future<void> _saveImage(String imagePath, String bodyPart) async {
-  //   final result = await ImageGallerySaver.saveFile(imagePath);
-  // }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Future<void> _showCaptureDialog(String imagePath) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Capture'),
+          title: const Text('Selected Image'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -257,24 +235,22 @@ class _CameraScreenState extends State<CameraScreen> {
                 fit: BoxFit.cover,
               ),
               const SizedBox(height: 10),
-              const Text('Are you sure you want to save this image?'),
+              const Text('Do you want to use this image?'),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () async {
-                // final result = await ImageGallerySaver.saveFile(imagePath);
-                Navigator.of(context).pop(); // Đóng hộp thoại
-                Navigator.of(context).pop(); // Đóng hộp thoại
+              onPressed: () {
+                Navigator.of(context).pop();
                 tracker_position(imagePath);
               },
-              child: const Text('Save'),
+              child: const Text('Use'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Đóng hộp thoại
+                Navigator.of(context).pop();
               },
-              child: const Text('Try Again'),
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -282,31 +258,53 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        _showCaptureDialog(image.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Camera')),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      appBar: AppBar(
+        title: const Text('Select Image'),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
-            final image = await _controller.takePicture();
-            _showCaptureDialog(image.path);
-          } catch (e) {
-            print(e);
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.photo_library,
+              size: 100,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Select an image from your gallery',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.photo_library),
+              label: const Text('Choose Image'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

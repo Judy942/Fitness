@@ -18,7 +18,6 @@ import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
 import '../../meal_planner/meal_schedule/add_meal_schedule.dart';
-import '../../onboarding_screen/start_screen.dart';
 
 class AddScheduleView extends StatefulWidget {
   DateTime date;
@@ -41,7 +40,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://192.168.64.186:8055/items/workout?limit=5&page=1&meta=*'),
+      Uri.parse('http://192.168.1.6:8055/items/workout?limit=5&page=1&meta=*'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -411,7 +410,7 @@ Future<void> addWorkoutSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.64.186:8055/items/workout_schedule?fields=*,workout_id.*'),
+        'http://192.168.1.6:8055/items/workout_schedule?fields=*,workout_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../ChatMessage.dart';
 
 class ChatService {
-  final String baseUrl = 'http://192.168.64.186:8000';
+  final String baseUrl = 'http://192.168.1.6:8000';
 
   Future<String> sendMessage(String message, List<ChatMessage> history) async {
     try {
@@ -19,8 +19,8 @@ class ChatService {
         body: jsonEncode({
           'query': message,
           'chat_history': history.map((msg) => {
-            'user': msg.isUser ? msg.text : '',
-            'assistant': msg.isUser ? '' : msg.text,
+            'role': msg.isUser ? 'user' : 'assistant',
+            'content': msg.text,
           }).toList(),
         }),
       );
@@ -39,42 +39,95 @@ class ChatService {
   Stream<String> streamMessage(String message, List<ChatMessage> history) async* {
     try {
       developer.log('Preparing stream request...');
-      final request = http.Request('POST', Uri.parse('$baseUrl/query/stream'));
+      final url = Uri.parse('$baseUrl/query/stream');
+      developer.log('Request URL: $url');
+      
+      final request = http.Request('POST', url);
       request.headers['Content-Type'] = 'application/json';
       request.headers['Accept'] = 'application/json';
-      request.body = jsonEncode({
+      request.headers['Cache-Control'] = 'no-cache';
+      request.headers['Connection'] = 'keep-alive';
+      
+      final body = {
         'query': message,
         'chat_history': history.map((msg) => {
-          'user': msg.isUser ? msg.text : '',
-          'assistant': msg.isUser ? '' : msg.text,
+          'role': msg.isUser ? 'user' : 'assistant',
+          'content': msg.text,
         }).toList(),
-      });
+      };
+      request.body = jsonEncode(body);
+      
+      developer.log('Request body: ${request.body}');
 
       developer.log('Sending stream request...');
       final streamedResponse = await request.send();
+      developer.log('Response status code: ${streamedResponse.statusCode}');
       
       if (streamedResponse.statusCode == 200) {
         developer.log('Stream started successfully');
         String buffer = '';
+        bool hasData = false;
+        String currentWord = '';
+        bool isNewWord = true;
+        
         await for (var chunk in streamedResponse.stream.transform(utf8.decoder)) {
-          developer.log('Received chunk size: ${chunk.length}');
-          developer.log('Chunk content: $chunk');
+          developer.log('Raw chunk received: $chunk');
           
           if (chunk.isNotEmpty) {
-            // Thử chia nhỏ chunk thành các phần
-            final parts = chunk.split(RegExp(r'(?<=[.!?])\s+'));
-            for (var part in parts) {
-              if (part.isNotEmpty) {
-                developer.log('Yielding part: $part');
-                yield part + ' ';
+            buffer += chunk;
+            // developer.log('Current buffer: $buffer');
+            
+            // Thử parse JSON trực tiếp từ buffer
+            try {
+              final jsonData = jsonDecode(buffer);
+              if (jsonData is Map && jsonData.containsKey('answer')) {
+                hasData = true;
+                final answer = jsonData['answer'];
+                developer.log('Yielding answer from JSON: $answer');
+                yield answer;
+                buffer = ''; // Reset buffer sau khi xử lý thành công
+              }
+            } catch (e) {
+              // Xử lý từng ký tự
+              for (var char in chunk.split('')) {
+                if (char == ' ' || char == '\n' || char == '.' || char == ',' || char == ':' || char == ';') {
+                  if (currentWord.isNotEmpty) {
+                    hasData = true;
+                    yield currentWord + char;
+                    currentWord = ' ';
+                    isNewWord = true;
+                  } else if (char != ' ') {
+                    yield char;
+                  }
+                } else {
+                  if (isNewWord) {
+                    currentWord = char;
+                    isNewWord = false;
+                  } else {
+                    currentWord += char;
+                  }
+                }
               }
             }
           }
         }
+        
+        // Xử lý từ cuối cùng nếu còn
+        if (currentWord.isNotEmpty) {
+          yield currentWord;
+        }
+        
+        if (!hasData) {
+          developer.log('No data received from stream');
+          yield "Xin lỗi, tôi không nhận được phản hồi từ server.";
+        }
+        
         developer.log('Stream completed');
       } else {
+        final errorBody = await streamedResponse.stream.transform(utf8.decoder).join();
         developer.log('Stream error: ${streamedResponse.statusCode}');
-        throw Exception('Failed to stream message: ${streamedResponse.statusCode}');
+        developer.log('Error body: $errorBody');
+        throw Exception('Failed to stream message: ${streamedResponse.statusCode}\n$errorBody');
       }
     } catch (e) {
       developer.log('Stream error: $e');

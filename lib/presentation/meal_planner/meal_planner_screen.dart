@@ -34,7 +34,7 @@ Future<List> fetchDishes(String endpoint) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.64.186:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.1.6:8055/assets/${dish['image']}',
       //   // 'difficulty': dish['difficulty_id'],
       //   'difficulty': dish['difficulty_id']
       //       is Map, //&& dish['difficulty_id'].containsKey('name')) ? dish['difficulty_id']['name'] : null, // Thêm độ khó
@@ -52,7 +52,7 @@ Future<List> fetchDishes(String endpoint) async {
 
 Future<List> getListPopular() async {
   return await fetchDishes(
-      'http://192.168.64.186:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
+      'http://192.168.1.6:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
 }
 
 class MealPlannerScreen extends StatefulWidget {

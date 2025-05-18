@@ -2,14 +2,18 @@ import 'dart:convert';
 
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/camera/camera_screen.dart';
 import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
 import 'package:flutter_application_fitness/presentation/signup/signup_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../widgets/round_gradient_button.dart';
 import '../../widgets/round_textfield.dart';
+
+const storage = FlutterSecureStorage();
 
 Future<void> saveToken(String token) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,7 +52,7 @@ void fetchData() async {
     setState(() {
     isLoading = true;
   });
-  String url = "http://192.168.64.186:8055/auth/login";
+  String url = "http://192.168.1.6:8055/auth/login";
   try {
     print(url);
     final response = await http.post(
@@ -64,6 +68,12 @@ void fetchData() async {
 
       if (accessToken != null) {
         await saveToken(accessToken);
+        
+        // Tạo và lưu key/iv từ mật khẩu
+        final keyAndIv = await generateKeyAndIvFromPassword(password);
+        await storage.write(key: 'encryption_key', value: keyAndIv['key']);
+        await storage.write(key: 'encryption_iv', value: keyAndIv['iv']);
+        
         bool otpSent = await EmailOTP.sendOTP(email: email);
 
         if (otpSent) {
@@ -226,7 +236,7 @@ void fetchData() async {
                                   fontWeight: FontWeight.w400),
                               children: [
                                 TextSpan(
-                                  text: "Don’t have an account yet? ",
+                                  text: "Don't have an account yet? ",
                                 ),
                                 TextSpan(
                                     text: "Register",

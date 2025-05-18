@@ -37,7 +37,7 @@ class RecommendationContainer extends StatelessWidget {
           children: [
             SizedBox(height: 10,),
             Image.network(
-              'http://192.168.64.186:8055/assets/${wObj["image"]}',
+              'http://192.168.1.6:8055/assets/${wObj["image"]}',
               height: 60,
               width: 60,
             ),

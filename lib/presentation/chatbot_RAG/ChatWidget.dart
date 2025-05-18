@@ -1,9 +1,10 @@
-import 'dart:developer';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 
+import '../../core/utils/app_colors.dart';
 import 'ChatMessage.dart';
 import 'service/ChatService.dart';
 
@@ -20,10 +21,14 @@ class _ChatWidgetState extends State<ChatWidget> {
   final _chatService = ChatService();
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
+  Timer? _loadingTimer;
+  String _loadingDots = '';
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    debugPrint('ChatWidget initialized');
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
         // Ẩn bàn phím khi mất focus
@@ -36,12 +41,61 @@ class _ChatWidgetState extends State<ChatWidget> {
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+    _loadingTimer?.cancel();
     super.dispose();
+  }
+
+  void _startLoadingAnimation() {
+    debugPrint('Starting loading animation');
+    if (!mounted) {
+      debugPrint('Widget not mounted, skipping loading animation');
+      return;
+    }
+    
+    setState(() {
+      _isLoading = true;
+      _loadingDots = '';
+    });
+    
+    _loadingTimer?.cancel();
+    _loadingTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (!mounted) {
+        debugPrint('Widget not mounted during timer, cancelling');
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        if (_loadingDots.length >= 3) {
+          _loadingDots = '';
+        } else {
+          _loadingDots += '.';
+        }
+      });
+    });
+    debugPrint('Loading animation setup completed');
+  }
+
+  void _stopLoadingAnimation() {
+    debugPrint('Stopping loading animation');
+    if (!mounted) {
+      debugPrint('Widget not mounted, skipping stop loading animation');
+      return;
+    }
+    
+    setState(() {
+      _isLoading = false;
+    });
+    _loadingTimer?.cancel();
+    _loadingTimer = null;
+    debugPrint('Loading animation stopped');
   }
 
   void _handleSendPressed(types.PartialText message) async {
     if (message.text.trim().isEmpty) return;
 
+    debugPrint('Handling send pressed with message: ${message.text}');
+
+    // Thêm message của user
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -54,8 +108,11 @@ class _ChatWidgetState extends State<ChatWidget> {
       _textController.clear();
     });
 
+    // Bắt đầu animation loading
+    _startLoadingAnimation();
+
     try {
-      log('Starting stream request...');
+      debugPrint('Starting stream request...');
       String fullResponse = '';
       String messageId = DateTime.now().toString();
       bool isFirstChunk = true;
@@ -68,26 +125,29 @@ class _ChatWidgetState extends State<ChatWidget> {
           timestamp: DateTime.fromMillisecondsSinceEpoch(m.createdAt!),
         )).toList(),
       )) {
-        log('Processing chunk: $chunk');
+        debugPrint('Processing chunk: $chunk');
         fullResponse += chunk;
         
         if (isFirstChunk) {
-          // Tạo message mới cho chunk đầu tiên
-          final botMessage = types.TextMessage(
-            author: const types.User(id: '2'),
-            createdAt: DateTime.now().millisecondsSinceEpoch,
-            id: messageId,
-            text: fullResponse,
-          );
-          setState(() {
-            _messages.insert(0, botMessage);
-          });
+          // Dừng loading khi nhận được chunk đầu tiên
+          _stopLoadingAnimation();
           isFirstChunk = false;
-        } else {
-          // Cập nhật message hiện tại cho các chunk tiếp theo
+          
+          // Tạo message mới cho câu trả lời
           setState(() {
-            if (_messages.isNotEmpty && _messages[0].author.id == '2') {
-              _messages[0] = types.TextMessage(
+            _messages.insert(0, types.TextMessage(
+              author: const types.User(id: '2'),
+              createdAt: DateTime.now().millisecondsSinceEpoch,
+              id: messageId,
+              text: fullResponse,
+            ));
+          });
+        } else {
+          // Cập nhật message hiện có với nội dung mới
+          setState(() {
+            final index = _messages.indexWhere((m) => m.id == messageId);
+            if (index != -1) {
+              _messages[index] = types.TextMessage(
                 author: const types.User(id: '2'),
                 createdAt: DateTime.now().millisecondsSinceEpoch,
                 id: messageId,
@@ -96,12 +156,17 @@ class _ChatWidgetState extends State<ChatWidget> {
             }
           });
         }
-        // Thêm delay nhỏ để tạo hiệu ứng stream
-        await Future.delayed(const Duration(milliseconds: 50));
       }
-      log('Stream completed');
+      
+      // Đảm bảo loading được dừng khi stream hoàn thành
+      if (_isLoading) {
+        _stopLoadingAnimation();
+      }
+      
+      debugPrint('Stream completed');
     } catch (e) {
-      log('Stream error: $e');
+      debugPrint('Error occurred: $e');
+      _stopLoadingAnimation();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -134,21 +199,69 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Building ChatWidget, isLoading: $_isLoading');
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Chat(
-        messages: _messages,
-        onSendPressed: _handleSendPressed,
-        user: _user,
-        customMessageBuilder: _buildMessage,
-        theme: DefaultChatTheme(
-          primaryColor: Colors.blue,
-          secondaryColor: Colors.grey[200]!,
-          backgroundColor: Colors.white,
-          inputBackgroundColor: Colors.grey[100]!,
-          inputTextColor: Colors.black,
-          inputTextCursorColor: Colors.black,
-        ),
+      child: Stack(
+        children: [
+          Chat(
+            messages: _messages,
+            onSendPressed: _handleSendPressed,
+            user: _user,
+            customMessageBuilder: _buildMessage,
+            theme: DefaultChatTheme(
+              
+              primaryColor: AppColors.primaryColor1,
+              secondaryColor: Colors.grey[200]!,
+              backgroundColor: Colors.white,
+              inputBackgroundColor: Colors.grey[100]!,
+              inputTextColor: Colors.black,
+              inputTextCursorColor: Colors.black,
+              inputTextStyle: TextStyle(color: Colors.black),
+            ),
+          ),
+          if (_isLoading)
+            Positioned(
+              bottom: 80,
+              left: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Đang trả lời$_loadingDots',
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

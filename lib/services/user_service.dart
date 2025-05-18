@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   return prefs.getString('userToken');
 }
 class UserService {
-  static const String baseUrl = 'http://192.168.64.186:8055/users/me';
+  static const String baseUrl = 'http://192.168.1.6:8055/users/me';
 
 
 
@@ -185,7 +184,7 @@ class UserService {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.64.186:8055/items/workout_schedule_exercise?workout_schedule_id=$workoutScheduleId&exercise_id=$exerciseId'),
+          'http://192.168.1.6:8055/items/workout_schedule_exercise?workout_schedule_id=$workoutScheduleId&exercise_id=$exerciseId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'

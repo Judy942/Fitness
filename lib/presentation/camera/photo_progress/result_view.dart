@@ -1,13 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../services/user_service.dart';
-import '../../onboarding_screen/start_screen.dart';
 import '../camera_screen.dart';
 
 class ResultView extends StatefulWidget {
@@ -20,6 +21,15 @@ class ResultView extends StatefulWidget {
 }
 
 class _ResultViewState extends State<ResultView> {
+  final UserService _userService = UserService();
+  Map<int, List<dynamic>> groupedData = {};
+  Map<int, List<dynamic>> groupedData2 = {};
+  bool isLoading = true;
+  String error = '';
+  late double imageWidth;
+  late double imageHeight;
+  final double imageSpacing = 8.0;
+
   List imaArr = [];
   List statArr = [];
 
@@ -33,49 +43,93 @@ class _ResultViewState extends State<ResultView> {
   @override
   void initState() {
     super.initState();
-    fetchProcessTrackerByMounth(widget.date1.month.toString()).then((value) {
+    print('Initializing with date1: ${widget.date1}, date2: ${widget.date2}');
+    
+    fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+      print('Received data for date1: $value');
       setState(() {
-        imaArr = value;
+        groupedData = value;
+        isLoading = false;
+      });
+    }).catchError((error) {
+      print('Error fetching data for date1: $error');
+      setState(() {
+        this.error = error.toString();
+        isLoading = false;
       });
     });
-    fetchProcessTrackerByMounth(widget.date2.month.toString()).then((value) {
+
+    fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+      print('Received data for date2: $value');
       setState(() {
-        statArr = value;
+        groupedData2 = value;
+        isLoading = false;
+      });
+    }).catchError((error) {
+      print('Error fetching data for date2: $error');
+      setState(() {
+        this.error = error.toString();
+        isLoading = false;
       });
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Tính toán kích thước ảnh dựa trên màn hình
+    final screenWidth = MediaQuery.of(context).size.width;
+    final availableWidth = screenWidth - 40 - 16; // Trừ padding và spacing
+    imageWidth = availableWidth * 0.4; // 40% chiều rộng màn hình
+    imageHeight = imageWidth * 1.5; // Tỷ lệ 2:3
+  }
+
   // Phần code tải ảnh, giải mã và lưu lại
 
-  Future<List<dynamic>> fetchProcessTrackerByMounth(String m) async {
+  Future<Map<int, List<dynamic>>> fetchProcessTrackerByMounth(String month, int year) async {
     String? token = await getToken();
     final url = Uri.parse(
-        'http://192.168.64.186:8055/items/process_tracker?limit=25&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$m&filter[year(date_upload)][_eq]=${widget.date1.year}');
+        'http://192.168.1.6:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
 
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json'
-        },
-      );
+    print('Fetching data for month: $month, year: $year');
+    print('URL: $url');
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201 ||
-          response.statusCode == 204) {
-        final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['data'] != null && jsonResponse['data'].isNotEmpty) {
-          return jsonResponse['data'];
-        } else {
-          return []; // Trả về danh sách rỗng nếu không có dữ liệu
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+    );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final List<dynamic> data = jsonResponse['data'];
+      print('Data received: $data');
+      
+      // Lọc dữ liệu theo ngày chính xác
+      final filteredData = data.where((item) {
+        final dateUpload = DateTime.parse(item['date_upload']);
+        return dateUpload.month == int.parse(month) && dateUpload.year == year;
+      }).toList();
+      
+      // Nhóm dữ liệu theo tracker_position_id
+      Map<int, List<dynamic>> groupedData = {};
+      for (var item in filteredData) {
+        int positionId = item['tracker_position_id'];
+        if (!groupedData.containsKey(positionId)) {
+          groupedData[positionId] = [];
         }
-      } else {
-        return []; // Trả về danh sách rỗng nếu không có dữ liệu
+        groupedData[positionId]!.add(item);
       }
-    } catch (e) {
-      print("Error fetching data: $e");
-      return []; // Trả về danh sách rỗng trong trường hợp lỗi
+      
+      print('Grouped data: $groupedData');
+      return groupedData;
+    } else {
+      throw Exception('Failed to load process tracker data');
     }
   }
 
@@ -152,7 +206,7 @@ class _ResultViewState extends State<ResultView> {
 
   Future<Uint8List> decryptAndSaveImageFromTextFile(
       String filePath, String fileName) async {
-    final fileUrl = 'http://192.168.64.186:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.1.6:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       // Kiểm tra xem file có tồn tại không
@@ -175,25 +229,561 @@ class _ResultViewState extends State<ResultView> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    var groupedData = <int, List<dynamic>>{};
-    for (var item in statArr) {
-      int positionId = item['tracker_position_id'];
-      if (!groupedData.containsKey(positionId)) {
-        groupedData[positionId] = [];
+  Future<void> _deleteImage(String imageId) async {
+    try {
+      // Hiển thị loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      String? token = await getToken();
+      
+      // Lấy thông tin ảnh trước khi xóa
+      final getResponse = await http.get(
+        Uri.parse('http://192.168.1.6:8055/items/process_tracker/$imageId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
+      );
+
+      if (getResponse.statusCode == 200) {
+        final imageData = jsonDecode(getResponse.body)['data'];
+        final fileId = imageData['image'];
+
+        // Xóa file trong storage
+        final deleteFileResponse = await http.delete(
+          Uri.parse('http://192.168.1.6:8055/files/$fileId'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (deleteFileResponse.statusCode != 200 && deleteFileResponse.statusCode != 204) {
+          throw Exception('Xóa file thất bại');
+        }
+
+        // Xóa record trong database
+        final deleteResponse = await http.delete(
+          Uri.parse('http://192.168.1.6:8055/items/process_tracker/$imageId'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+        );
+
+        // Đóng loading
+        Navigator.pop(context);
+
+        if (deleteResponse.statusCode == 200 || deleteResponse.statusCode == 204) {
+          // Cập nhật lại dữ liệu sau khi xóa
+          setState(() {
+            isLoading = true;
+          });
+          await fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+            setState(() {
+              groupedData = value;
+              isLoading = false;
+            });
+          });
+          await fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+            setState(() {
+              groupedData2 = value;
+              isLoading = false;
+            });
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Xóa ảnh thành công')),
+          );
+        } else {
+          throw Exception('Xóa ảnh thất bại');
+        }
+      } else {
+        throw Exception('Không thể lấy thông tin ảnh');
       }
-      groupedData[positionId]!.add(item);
+    } catch (e) {
+      // Đóng loading nếu có lỗi
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi xóa ảnh: $e')),
+      );
+    }
+  }
+
+  Future<void> _editImage(String imageId, int positionId, DateTime date) async {
+    try {
+      // Hiển thị dialog để chọn vị trí và ngày
+      final result = await showDialog<Map<String, dynamic>>(
+        context: context,
+        builder: (context) {
+          int selectedPosition = positionId;
+          DateTime selectedDate = date;
+          
+          return AlertDialog(
+            title: const Text('Chỉnh sửa thông tin ảnh'),
+            content: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<int>(
+                      value: selectedPosition,
+                      decoration: const InputDecoration(
+                        labelText: 'Vị trí',
+                      ),
+                      items: List.generate(4, (index) {
+                        return DropdownMenuItem(
+                          value: index + 1,
+                          child: Text(tracker_position[index]),
+                        );
+                      }),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedPosition = value;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Ngày chụp',
+                        ),
+                        child: Text(
+                          '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context, {
+                          'position': selectedPosition,
+                          'date': selectedDate,
+                          'changeImage': true,
+                        });
+                      },
+                      child: const Text('Thay đổi ảnh'),
+                    ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, {
+                    'position': selectedPosition,
+                    'date': selectedDate,
+                    'changeImage': false,
+                  });
+                },
+                child: const Text('Lưu thông tin'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (result == null) return;
+
+      // Hiển thị loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      String? token = await getToken();
+      
+      // Lấy thông tin ảnh cũ
+      final getResponse = await http.get(
+        Uri.parse('http://192.168.1.6:8055/items/process_tracker/$imageId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
+      );
+
+      if (getResponse.statusCode == 200) {
+        final oldImageData = jsonDecode(getResponse.body)['data'];
+        final oldFileId = oldImageData['image'];
+
+        String newFileId = oldFileId;
+
+        // Chỉ thay đổi ảnh nếu người dùng chọn
+        if (result['changeImage'] == true) {
+          final ImagePicker picker = ImagePicker();
+          final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+          
+          if (image != null) {
+            // Mã hóa ảnh mới
+            final encryptedFilePath = await encryptImage(image.path);
+            
+            // Tải lên ảnh đã mã hóa
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('http://192.168.1.6:8055/files'),
+            );
+
+            request.headers['Authorization'] = 'Bearer $token';
+            request.files.add(await http.MultipartFile.fromPath('file', encryptedFilePath));
+
+            var response = await request.send();
+            if (response.statusCode == 200) {
+              final responseData = await response.stream.bytesToString();
+              newFileId = jsonDecode(responseData)['data']['id'];
+
+              // Xóa file ảnh cũ
+              await http.delete(
+                Uri.parse('http://192.168.1.6:8055/files/$oldFileId'),
+                headers: {
+                  'Authorization': 'Bearer $token',
+                },
+              );
+            } else {
+              throw Exception('Tải lên ảnh thất bại');
+            }
+          } else {
+            // Đóng loading nếu người dùng hủy chọn ảnh
+            Navigator.pop(context);
+            return;
+          }
+        }
+
+        // Cập nhật thông tin ảnh trong database
+        final updateResponse = await http.patch(
+          Uri.parse('http://192.168.1.6:8055/items/process_tracker/$imageId'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({
+            'image': newFileId,
+            'tracker_position_id': result['position'],
+            'date_upload': result['date'].toIso8601String(),
+          }),
+        );
+
+        // Đóng loading
+        Navigator.pop(context);
+
+        if (updateResponse.statusCode == 200 || updateResponse.statusCode == 204) {
+          // Cập nhật lại dữ liệu sau khi sửa
+          setState(() {
+            isLoading = true;
+          });
+          await fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+            setState(() {
+              groupedData = value;
+              isLoading = false;
+            });
+          });
+          await fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+            setState(() {
+              groupedData2 = value;
+              isLoading = false;
+            });
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Cập nhật thông tin thành công')),
+          );
+        } else {
+          throw Exception('Cập nhật thông tin thất bại');
+        }
+      } else {
+        throw Exception('Không thể lấy thông tin ảnh cũ');
+      }
+    } catch (e) {
+      // Đóng loading nếu có lỗi
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi cập nhật thông tin: $e')),
+      );
+    }
+  }
+
+  void _showImageOptions(BuildContext context, String imageId, int positionId, DateTime date) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Sửa ảnh'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editImage(imageId, positionId, date);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Xóa ảnh', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context, imageId);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, String imageId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Xác nhận xóa'),
+          content: const Text('Bạn có chắc chắn muốn xóa ảnh này?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteImage(imageId);
+              },
+              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: Stack(
+            children: [
+              InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Image.memory(
+                    imageData,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 40,
+                right: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildImage(Uint8List imageData, String imageId, int positionId, DateTime date) {
+    return GestureDetector(
+      onTap: () => _showFullScreenImage(context, imageData),
+      onLongPress: () => _showImageOptions(context, imageId, positionId, date),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.memory(
+          imageData,
+          fit: BoxFit.cover,
+          width: imageWidth,
+          height: imageHeight,
+        ),
+      ),
+    );
+  }
+
+  Future<String> encryptImage(String imagePath) async {
+    // Đọc hình ảnh dưới dạng byte
+    File imageFile = File(imagePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+
+    // Thêm padding vào dữ liệu hình ảnh
+    Uint8List paddedImageBytes = addPadding(imageBytes);
+
+    final keyAndIv = await getKeyAndIv();
+
+    String? encryptionKey = keyAndIv['key'];
+    String? encryptionIv = keyAndIv['iv'];
+
+    if (encryptionKey == null || encryptionIv == null) {
+      throw Exception("Key hoặc IV không tồn tại trong storage");
     }
 
-    var groupedData2 = <int, List<dynamic>>{};
-    for (var item in imaArr) {
-      int positionId = item['tracker_position_id'];
-      if (!groupedData2.containsKey(positionId)) {
-        groupedData2[positionId] = [];
-      }
-      groupedData2[positionId]!.add(item);
+    final key = encrypt.Key.fromBase64(encryptionKey);
+    final iv = encrypt.IV.fromBase64(encryptionIv);
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+
+    // Mã hóa dữ liệu hình ảnh đã được padding
+    final encrypted = encrypter.encryptBytes(paddedImageBytes, iv: iv);
+    // Chuyển đổi dữ liệu đã mã hóa thành Base64
+    String base64Encrypted = base64.encode(encrypted.bytes);
+
+    // Lưu vào file văn bản
+    String encryptedFilePath = '${imagePath}_encrypted.txt';
+    File encryptedFile = File(encryptedFilePath);
+    await encryptedFile.writeAsString(base64Encrypted);
+
+    return encryptedFilePath;
+  }
+
+  Uint8List addPadding(Uint8List input) {
+    int blockSize = 16; // Kích thước block của AES
+    int paddingLength = blockSize - (input.length % blockSize);
+    if (paddingLength == 0) {
+      return input; // Không cần padding nếu đã là bội số của blockSize
     }
+
+    Uint8List paddedInput = Uint8List(input.length + paddingLength);
+    paddedInput.setAll(0, input);
+
+    // Padding theo chuẩn PKCS7: điền paddingLength vào cuối dữ liệu
+    for (int i = 0; i < paddingLength; i++) {
+      paddedInput[input.length + i] = paddingLength;
+    }
+    return paddedInput;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (error.isNotEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Lỗi: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isLoading = true;
+                    error = '';
+                  });
+                  initState();
+                },
+                child: const Text('Thử lại'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    String formatDate(DateTime date) {
+      return '${date.month}/${date.year}';
+    }
+
+    if (groupedData.isEmpty && groupedData2.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.whiteColor,
+          centerTitle: true,
+          elevation: 0,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              height: 40,
+              width: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  color: AppColors.lightGrayColor,
+                  borderRadius: BorderRadius.circular(10)),
+              child: Image.asset(
+                "assets/icons/back_icon.png",
+                width: 25,
+                height: 25,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          title: const Text(
+            "Result",
+            style: TextStyle(
+                color: AppColors.blackColor,
+                fontSize: 22,
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        body: const Center(
+          child: Text('Không có dữ liệu để hiển thị'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -260,91 +850,115 @@ class _ResultViewState extends State<ResultView> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Column(
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Before",
-                            style: TextStyle(
-                                color: AppColors.blackColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 8),
-                          GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
+                          // Cột bên trái - Thời gian 1
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    formatDate(widget.date1),
+                                    style: const TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 1,
+                                    mainAxisSpacing: imageSpacing,
+                                    childAspectRatio: imageWidth / imageHeight,
+                                  ),
+                                  itemCount: items2.length,
+                                  itemBuilder: (context, i) {
+                                    return FutureBuilder<Uint8List>(
+                                      future: decryptAndSaveImageFromTextFile(
+                                        items2[i]['image'],
+                                        'image_$i.png',
+                                      ),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.hasData) {
+                                            return _buildImage(
+                                              snapshot.data!,
+                                              items2[i]['id'],
+                                              items2[i]['tracker_position_id'],
+                                              DateTime.parse(items2[i]['date_upload']),
+                                            );
+                                          } else {
+                                            return const Icon(Icons.error_outline);
+                                          }
+                                        } else {
+                                          return const Center(child: CircularProgressIndicator());
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                            itemCount: items2.length,
-                            itemBuilder: (context, i) {
-                              return FutureBuilder<Uint8List>(
-                          future: decryptAndSaveImageFromTextFile(
-                            items2[i]['image'],
-                            'image_$i.png',
                           ),
-                          builder: (context, snapshot) {
-                            // Image.file(File(snapshot.data!.path));
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.hasData) {
-                                // return Image.file(snapshot.data!);
-                                return Image.memory(snapshot.data!);
-                              } else {
-                                return const Icon(Icons.error_outline);
-                              }
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                          },
-                                
-                              );
-                            },
-                          ),
-                          const Text(
-                            "After",
-                            style: TextStyle(
-                                color: AppColors.blackColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 8),
-                          GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
+                          const SizedBox(width: 16),
+                          // Cột bên phải - Thời gian 2
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    formatDate(widget.date2),
+                                    style: const TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 1,
+                                    mainAxisSpacing: imageSpacing,
+                                    childAspectRatio: imageWidth / imageHeight,
+                                  ),
+                                  itemCount: items.length,
+                                  itemBuilder: (context, i) {
+                                    return FutureBuilder<Uint8List>(
+                                      future: decryptAndSaveImageFromTextFile(
+                                        items[i]['image'],
+                                        'image_$i.png',
+                                      ),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.hasData) {
+                                            return _buildImage(
+                                              snapshot.data!,
+                                              items[i]['id'],
+                                              items[i]['tracker_position_id'],
+                                              DateTime.parse(items[i]['date_upload']),
+                                            );
+                                          } else {
+                                            return const Icon(Icons.error_outline);
+                                          }
+                                        } else {
+                                          return const Center(child: CircularProgressIndicator());
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                            itemCount: items.length,
-                            itemBuilder: (context, i) {
-                              return FutureBuilder<Uint8List>(
-                          future: decryptAndSaveImageFromTextFile(
-                            items2[i]['image'],
-                            'image_$i.png',
-                          ),
-                          builder: (context, snapshot) {
-                            // Image.file(File(snapshot.data!.path));
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.hasData) {
-                                // return Image.file(snapshot.data!);
-                                return Image.memory(snapshot.data!);
-                              } else {
-                                return const Icon(Icons.error_outline);
-                              }
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                          },
-                              );
-                            },
                           ),
                         ],
                       ),
@@ -360,84 +974,3 @@ class _ResultViewState extends State<ResultView> {
     );
   }
 }
-
-                // return Column(
-//                   children: [
-//                     Center(child: Text(tracker_position[positionId - 1])),
-//                     // Hiển thị ảnh giải mã từ base64
-//                     GridView.builder(
-//                       shrinkWrap: true,
-//                       itemCount: items2.length,
-//                       itemBuilder: (context, i) {
-//                         return FutureBuilder<Uint8List>(
-//                           future: decryptAndSaveImageFromTextFile(
-//                             items2[i]['image'],
-//                             'image_$i.png',
-//                           ),
-//                           builder: (context, snapshot) {
-//                             // Image.file(File(snapshot.data!.path));
-//                             if (snapshot.connectionState ==
-//                                 ConnectionState.done) {
-//                               if (snapshot.hasData) {
-//                                 // return Image.file(snapshot.data!);
-//                                 return Image.memory(snapshot.data!);
-//                               } else {
-//                                 return const Icon(Icons.error_outline);
-//                               }
-//                             } else {
-//                               return const Center(
-//                                   child: CircularProgressIndicator());
-//                             }
-//                           },
-//                         );
-//                       },
-//                       gridDelegate:
-//                           const SliverGridDelegateWithFixedCrossAxisCount(
-//                         crossAxisCount: 3,
-//                         crossAxisSpacing: 10,
-//                         mainAxisSpacing: 10,
-//                       ),
-//                     ),
-//                     // Tương tự cho các ảnh "After"
-//                     GridView.builder(
-//                       shrinkWrap: true,
-//                       itemCount: items.length,
-//                       itemBuilder: (context, i) {
-//                         return FutureBuilder<Uint8List>(
-//                           future: decryptAndSaveImageFromTextFile(
-//                             items[i]['image'],
-//                             'image_after_$i.jpg',
-//                           ),
-//                           builder: (context, snapshot) {
-//                             if (snapshot.connectionState ==
-//                                 ConnectionState.done) {
-//                               if (snapshot.hasData) {
-//                                 // return Image.file(snapshot.data!);
-//                                 return Image.memory(snapshot.data!);
-//                               } else {
-//                                 return const Icon(Icons.error_outline);
-//                               }
-//                             } else {
-//                               return const Center(
-//                                   child: CircularProgressIndicator());
-//                             }
-//                           },
-//                         );
-//                       },
-//                       gridDelegate:
-//                           const SliverGridDelegateWithFixedCrossAxisCount(
-//                         crossAxisCount: 3,
-//                         crossAxisSpacing: 10,
-//                         mainAxisSpacing: 10,
-//                       ),
-//                     ),
-//                   ],
-//                 );
-//               },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

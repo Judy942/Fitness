@@ -1,20 +1,16 @@
 buildscript {
     ext.kotlin_version = '1.9.10'
+    ext.java_version = JavaVersion.VERSION_17
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        // START: FlutterFire Configuration
-        classpath 'com.google.gms:google-services:4.3.15'
-        // END: FlutterFire Configuration
-        // classpath 'com.android.tools.build:gradle:7.6.2'
-        classpath "com.android.tools.build:gradle:8.9.1"
+        classpath 'com.android.tools.build:gradle:8.9.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-
 
 allprojects {
     repositories {
@@ -22,30 +18,37 @@ allprojects {
         mavenCentral()
     }
 
-  //   configurations.all {
-  //   resolutionStrategy {
-  //     // Ép tất cả các module (kể cả flutter_health_connect) dùng version 1.1.0-rc01
-  //     force "androidx.health.connect:connect-client:1.1.0-rc01"
-  //   }
-  // }
-
-
-
     subprojects {
-    afterEvaluate { proj ->
-    if (proj.plugins.hasPlugin("com.android.library")) {
-      proj.android {
-        if (namespace == null || namespace.isEmpty()) {
-          namespace = proj.group?.toString() ?: "com.example.${proj.name}"
+        afterEvaluate { proj ->
+            if (proj.plugins.hasPlugin("com.android.library")) {
+                proj.android {
+                    if (namespace == null || namespace.isEmpty()) {
+                        namespace = proj.group?.toString() ?: "com.example.${proj.name}"
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
 
-    // configurations.all {
-    //     exclude group: 'com.google.errorprone', module: 'error_prone_annotations'
-    // }
+subprojects {
+    afterEvaluate { proj ->
+        if (proj.plugins.hasPlugin("com.android.library") || proj.plugins.hasPlugin("com.android.application")) {
+            proj.android {
+                compileOptions {
+                    sourceCompatibility java_version
+                    targetCompatibility java_version
+                }
+            }
+        }
+        if (proj.plugins.hasPlugin("kotlin-android")) {
+            proj.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                kotlinOptions {
+                    jvmTarget = java_version.toString()
+                }
+            }
+        }
+    }
 }
 
 rootProject.buildDir = '../build'
