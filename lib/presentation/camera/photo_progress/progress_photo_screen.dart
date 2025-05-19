@@ -292,7 +292,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
               ]),
           alignment: Alignment.center,
           child: const Icon(
-            Icons.photo_camera,
+            Icons.photo_library_outlined,
             size: 20,
             color: AppColors.whiteColor,
           ),
