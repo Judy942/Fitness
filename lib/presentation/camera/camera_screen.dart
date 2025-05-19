@@ -21,10 +21,10 @@ Future<Map<String, String>> generateKeyAndIvFromPassword(String password) async 
   final hashBytes = hash.bytes;
   
   // Sử dụng 32 byte đầu tiên cho key
-  final key = encrypt.Key.fromUtf8(hashBytes.sublist(0, 32).map((e) => String.fromCharCode(e)).join());
+  final key = encrypt.Key(Uint8List.fromList(hashBytes.sublist(0, 32)));
   
   // Sử dụng 16 byte tiếp theo cho iv
-  final iv = encrypt.IV.fromUtf8(hashBytes.sublist(32, 48).map((e) => String.fromCharCode(e)).join());
+  final iv = encrypt.IV(Uint8List.fromList(hashBytes.sublist(0, 16)));
   
   return {
     'key': key.base64,
@@ -40,6 +40,11 @@ Future<Map<String, String>> getKeyAndIv() async {
   if (key == null || iv == null ) {
     throw Exception("Key hoặc IV không tồn tại trong storage");
   }
+  
+  final decodedIv = base64.decode(iv);
+  final decodedKey = base64.decode(key);
+  print('IV length: ${decodedIv.length}'); // Phải là 16
+  print('Key length: ${decodedKey.length}'); // Phải là 32
   
   return {'key': key, 'iv': iv};
 }
@@ -58,63 +63,63 @@ class _CameraScreenState extends State<CameraScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Uint8List addPadding(Uint8List input) {
-    int blockSize = 16; // Kích thước block của AES
-    int paddingLength = blockSize - (input.length % blockSize);
-    if (paddingLength == 0) {
-      return input; // Không cần padding nếu đã là bội số của blockSize
-    }
+    try {
+      int blockSize = 16;
+      int paddingLength = blockSize - (input.length % blockSize);
+      if (paddingLength == 0) {
+        return input;
+      }
 
-    Uint8List paddedInput = Uint8List(input.length + paddingLength);
-    paddedInput.setAll(0, input);
-
-    // Padding theo chuẩn PKCS7: điền paddingLength vào cuối dữ liệu
-    for (int i = 0; i < paddingLength; i++) {
-      paddedInput[input.length + i] = paddingLength;
+      Uint8List paddedInput = Uint8List(input.length + paddingLength);
+      paddedInput.setAll(0, input);
+      
+      for (int i = 0; i < paddingLength; i++) {
+        paddedInput[input.length + i] = paddingLength;
+      }
+      
+      return paddedInput;
+    } catch (e) {
+      print('Lỗi khi thêm padding: $e');
+      rethrow;
     }
-    print(paddingLength);
-    return paddedInput;
   }
 
   Future<String> encryptImage(String imagePath) async {
-    // Đọc hình ảnh dưới dạng byte
-    File imageFile = File(imagePath);
-    Uint8List imageBytes = await imageFile.readAsBytes();
-
-    // Thêm padding vào dữ liệu hình ảnh
-    print("độ dài sau khi thêm padding: ${imageBytes.length}");
-
-    Uint8List paddedImageBytes = addPadding(imageBytes);
-
-    final keyAndIv = await getKeyAndIv();
-
-// Ensure that both key and iv are not null before using them
-    String? encryptionKey = keyAndIv['key'];
-    String? encryptionIv = keyAndIv['iv'];
-
-    if (encryptionKey == null || encryptionIv == null) {
-      // Handle the case where the key or iv is missing
-      throw Exception("Key or IV is missing in storage");
+    try {
+      File imageFile = File(imagePath);
+      Uint8List imageBytes = await imageFile.readAsBytes();
+      
+      Uint8List paddedImageBytes = addPadding(imageBytes);
+      final keyAndIv = await getKeyAndIv();
+      
+      String? encryptionKey = keyAndIv['key'];
+      String? encryptionIv = keyAndIv['iv'];
+      
+      if (encryptionKey == null || encryptionIv == null) {
+        throw Exception("Key hoặc IV không tồn tại trong storage");
+      }
+      
+      final key = encrypt.Key.fromBase64(encryptionKey);
+      final iv = encrypt.IV.fromBase64(encryptionIv);
+      
+      // Kiểm tra độ dài IV
+      if (iv.bytes.length != 16) {
+        throw Exception("IV không đúng độ dài (phải là 16 bytes)");
+      }
+      
+      final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+      final encrypted = encrypter.encryptBytes(paddedImageBytes, iv: iv);
+      
+      String base64Encrypted = base64.encode(encrypted.bytes);
+      String encryptedFilePath = '${imagePath}_encrypted.txt';
+      File encryptedFile = File(encryptedFilePath);
+      await encryptedFile.writeAsString(base64Encrypted);
+      
+      return encryptedFilePath;
+    } catch (e) {
+      print('Lỗi khi mã hóa: $e');
+      rethrow;
     }
-
-    final key = encrypt.Key.fromBase64(encryptionKey);
-    final iv = encrypt.IV.fromBase64(encryptionIv);
-
-    final encrypter =
-        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
-
-    // Mã hóa dữ liệu hình ảnh đã được padding
-    final encrypted = encrypter.encryptBytes(paddedImageBytes, iv: iv);
-    // Chuyển đổi dữ liệu đã mã hóa thành Base64
-    String base64Encrypted = base64.encode(encrypted.bytes);
-    print("độ dài sau khi mã hóa: ${encrypted.bytes.length}");
-    print("Độ dài Base64 sau khi mã hóa: ${base64Encrypted.length}");
-
-    // Lưu vào file văn bản
-    String encryptedFilePath = '${imagePath}_encrypted.txt';
-    File encryptedFile = File(encryptedFilePath);
-    await encryptedFile.writeAsString(base64Encrypted);
-
-    return encryptedFilePath;
   }
 
 
