@@ -67,7 +67,7 @@ class FinishWorkoutScreen extends StatelessWidget {
 
               const Spacer(),
               RoundGradientButton(
-                  title: "Back To Home",
+                  title: "Back To History",
                   onPressed: () {
                     Navigator.pop(context);
                   }),

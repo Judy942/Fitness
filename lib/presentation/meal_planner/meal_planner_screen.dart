@@ -34,7 +34,7 @@ Future<List> fetchDishes(String endpoint) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.1.6:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.133.103:8055/assets/${dish['image']}',
       //   // 'difficulty': dish['difficulty_id'],
       //   'difficulty': dish['difficulty_id']
       //       is Map, //&& dish['difficulty_id'].containsKey('name')) ? dish['difficulty_id']['name'] : null, // Thêm độ khó
@@ -52,7 +52,7 @@ Future<List> fetchDishes(String endpoint) async {
 
 Future<List> getListPopular() async {
   return await fetchDishes(
-      'http://192.168.1.6:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
+      'http://192.168.133.103:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
 }
 
 class MealPlannerScreen extends StatefulWidget {
@@ -67,268 +67,290 @@ class _HomeScreenState extends State<MealPlannerScreen> {
   List todayMeals = [];
   List popularArr = [];
 
+  Future<void> refreshData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final value = await getMealSchedule(DateTime.now().toString().substring(0, 10));
+      final popularValue = await getListPopular();
+      
+      if (!mounted) return;
+      
+      setState(() {
+        todayMeals = value;
+        popularArr = popularValue;
+        isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
-      if (!mounted) return;
-      setState(() {
-        todayMeals = value;
-      });
-    });
-
-    getListPopular().then((value) {
-      if (!mounted) return;
-      setState(() {
-        popularArr = value;
-      });
-    });
+    refreshData();
   }
 
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
-    return isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Scaffold(
-            backgroundColor: AppColors.whiteColor,
-            appBar: AppBar(
-              backgroundColor: AppColors.whiteColor,
-              centerTitle: true,
-              elevation: 0,
-              leading: InkWell(
-                onTap: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ActivityTrackerScreen()));
-                },
-                child: Container(
-                  margin: const EdgeInsets.all(8),
-                  height: 40,
-                  width: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: AppColors.lightGrayColor,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Image.asset(
-                    "assets/icons/back_icon.png",
-                    width: 15,
-                    height: 15,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              title: const Text(
-                "Meal Planner",
-                style: TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
-              ),
-              actions: [
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: AppColors.lightGrayColor,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset(
-                      "assets/icons/more_icon.png",
-                      width: 12,
-                      height: 12,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                )
-              ],
+    return Scaffold(
+      backgroundColor: AppColors.whiteColor,
+      appBar: AppBar(
+        backgroundColor: AppColors.whiteColor,
+        centerTitle: true,
+        elevation: 0,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ActivityTrackerScreen()));
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            height: 40,
+            width: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: AppColors.lightGrayColor,
+                borderRadius: BorderRadius.circular(10)),
+            child: Image.asset(
+              "assets/icons/back_icon.png",
+              width: 15,
+              height: 15,
+              fit: BoxFit.contain,
             ),
-            body: SafeArea(
+          ),
+        ),
+        title: const Text(
+          "Meal Planner",
+          style: TextStyle(
+              color: AppColors.blackColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w700),
+        ),
+        actions: [
+          InkWell(
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              height: 40,
+              width: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  color: AppColors.lightGrayColor,
+                  borderRadius: BorderRadius.circular(10)),
+              child: Image.asset(
+                "assets/icons/more_icon.png",
+                width: 12,
+                height: 12,
+                fit: BoxFit.contain,
+              ),
+            ),
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: refreshData,
               child: Container(
                 height: media.height * 0.9,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Today Meals",
-                        style: TextStyle(
-                          color: AppColors.blackColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                  child: Opacity(
+                    opacity: isLoading ? 0.5 : 1.0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Today Meals",
+                          style: TextStyle(
+                            color: AppColors.blackColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      todayMeals.isEmpty ||
-                              todayMeals.every((meal) => meal['meals'].isEmpty)
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    "No meal found",
-                                    style: TextStyle(
-                                        color: AppColors.blackColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Lottie.asset(
-                                    'assets/food.json',
-                                    height: 100,
-                                    width: 100,
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: EdgeInsets.zero,
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: todayMeals.length,
-                              itemBuilder: (context, index) {
-                                if (todayMeals[index].isNotEmpty) {
-                                  return ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        todayMeals[index]['meals'].length,
-                                    itemBuilder: (context, mealIndex) {
-                                      var wObj = todayMeals[index]['meals']
-                                              [mealIndex] as Map? ??
-                                          {};
-                                      return TodayMealsRow(wObj: wObj);
-                                    },
-                                  );
-                                }
-                                return Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        "Không có lịch nào",
-                                        style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Lottie.asset(
-                                        'assets/food.json',
-                                        height: 100,
-                                        width: 100,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                      SizedBox(
-                        height: media.width * 0.05,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor2.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Daily Meal Schedule",
-                              style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(
-                              width: 80,
-                              height: 30,
-                              child: RoundButton(
-                                type: RoundButtonType.primaryBG,
-                                title: "Check",
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const MealSchedule(),
+                        todayMeals.isEmpty ||
+                                todayMeals.every((meal) => meal['meals'].isEmpty)
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "No meal found",
+                                      style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Lottie.asset(
+                                      'assets/food.json',
+                                      height: 100,
+                                      width: 100,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: EdgeInsets.zero,
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: todayMeals.length,
+                                itemBuilder: (context, index) {
+                                  if (todayMeals[index].isNotEmpty) {
+                                    return ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          todayMeals[index]['meals'].length,
+                                      itemBuilder: (context, mealIndex) {
+                                        var wObj = todayMeals[index]['meals']
+                                                [mealIndex] as Map? ??
+                                            {};
+                                        return TodayMealsRow(wObj: wObj);
+                                      },
+                                    );
+                                  }
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          "Không có lịch nào",
+                                          style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Lottie.asset(
+                                          'assets/food.json',
+                                          height: 100,
+                                          width: 100,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
                               ),
-                            )
+                        SizedBox(
+                          height: media.width * 0.05,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor2.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Daily Meal Schedule",
+                                style: TextStyle(
+                                    color: AppColors.blackColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                              SizedBox(
+                                width: 80,
+                                height: 30,
+                                child: RoundButton(
+                                  type: RoundButtonType.primaryBG,
+                                  title: "Check",
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MealSchedule(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: media.width * 0.05),
+                        Row(
+                          children: [
+                            const Text(
+                              "Find Something To Eat",
+                              style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              MealPlannerDetailScreen(
+                                                popularDishes: popularArr,
+                                              )));
+                                },
+                                child: const Text("View All"))
                           ],
                         ),
-                      ),
-                      SizedBox(height: media.width * 0.05),
-                      Row(
-                        children: [
-                          const Text(
-                            "Find Something To Eat",
-                            style: TextStyle(
-                                color: AppColors.blackColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            MealPlannerDetailScreen(
-                                              popularDishes: popularArr,
-                                            )));
-                              },
-                              child: const Text("View All"))
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.width *
-                            0.25 *
-                            popularArr.length,
-                        width: MediaQuery.of(context).size.width * 0.98,
-                        child: ListView.builder(
-                          itemBuilder: (context, position) {
-                            var wObj = popularArr[position] as Map? ?? {};
-                            return Container(
-                                margin: const EdgeInsets.only(bottom: 15, left: 10,right: 10),
-                                child: PopularContainer(wObj: wObj));
-                          },
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-
-                          // scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: popularArr.length,
+                        const SizedBox(
+                          height: 15,
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: MediaQuery.of(context).size.width *
+                              0.25 *
+                              popularArr.length,
+                          width: MediaQuery.of(context).size.width * 0.98,
+                          child: ListView.builder(
+                            itemBuilder: (context, position) {
+                              var wObj = popularArr[position] as Map? ?? {};
+                              return Container(
+                                  margin: const EdgeInsets.only(bottom: 15, left: 10,right: 10),
+                                  child: PopularContainer(wObj: wObj));
+                            },
+                            padding: EdgeInsets.zero,
+                            physics: const NeverScrollableScrollPhysics(),
+
+                            // scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: popularArr.length,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          );
+            if (isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

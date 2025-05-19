@@ -19,7 +19,7 @@ class ExercisesSetSection extends StatelessWidget {
       children: [
         Text(
           // sObj["name"].toString(),
-          'Set ${sObj.setNumber}',
+          'Day ${sObj.setNumber}',
           style: const TextStyle(
               color: AppColors.blackColor, fontSize: 12, fontWeight: FontWeight.w500),
         ),

@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/workout/finish_workout/finish_workout_screen.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../services/user_service.dart';
@@ -13,6 +16,7 @@ class WorkoutHistoryScreen extends StatefulWidget {
 class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
   final UserService _userService = UserService();
   List workoutHistoryArr = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -22,13 +26,14 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
   Future<void> _fetchWorkoutHistory() async {
     List<dynamic> workouts = await _userService.fetchData(
-      'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+      'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
     );
 
     setState(() {
       workoutHistoryArr = workouts.where((wObj) {
         return wObj["completed_exercise"]?.length == wObj["workout_id"]["exercises"]?.length;
       }).toList();
+      isLoading = false;
     });
   }
 
@@ -48,58 +53,90 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(15),
-        itemCount: workoutHistoryArr.length,
-        itemBuilder: (context, index) {
-          var wObj = workoutHistoryArr[index] as Map? ?? {};
-          return Container(
-            margin: const EdgeInsets.only(bottom: 15),
+      body: Stack(
+        children: [
+          ListView.builder(
             padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: AppColors.whiteColor,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
-            ),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: Image.network(
-                    'http://192.168.1.6:8055/assets/${wObj["workout_id"]["image"]}',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.fitHeight,
+            itemCount: workoutHistoryArr.length,
+            itemBuilder: (context, index) {
+              var wObj = workoutHistoryArr[index] as Map? ?? {};
+              List completedExercise = (wObj["completed_exercise"] ?? []).map((exercise) {
+                return {
+                  "id": exercise["id"],
+                  "workout_schedule_id": wObj["id"],
+                  "exercise_id": exercise["exercise_id"]["id"],
+                  "set_completed_in": exercise["set_completed_in"]
+                };
+              }).toList();
+              return GestureDetector(
+                onTap: () {
+                  log(completedExercise.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // builder: (context) => CompleteWorkoutScreen(
+                      //   workoutSchedule: wObj,
+                      //   completedExercise: completedExercise,
+                      //   onComplete: () {},
+                      // ),
+                      builder: (context) => FinishWorkoutScreen()
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 15),
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: AppColors.whiteColor,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
                   ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        wObj["workout_id"]["name"] ?? "",
-                        style: const TextStyle(
-                          color: AppColors.blackColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.network(
+                          'http://192.168.133.103:8055/assets/${wObj["workout_id"]["image"]}',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.fitHeight,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Ngày bắt đầu: ${DateTime.parse(wObj["scheduled_execution_time"]).toString().split(' ')[0]}",
-                        style: const TextStyle(
-                          color: AppColors.grayColor,
-                          fontSize: 14,
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              wObj["workout_id"]["name"] ?? "",
+                              style: const TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Ngày bắt đầu: ${DateTime.parse(wObj["scheduled_execution_time"]).toString().split(' ')[0]}",
+                              style: const TextStyle(
+                                color: AppColors.grayColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              );
+            },
+          ),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
             ),
-          );
-        },
+        ],
       ),
     );
   }

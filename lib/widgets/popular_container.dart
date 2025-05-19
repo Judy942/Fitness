@@ -43,18 +43,26 @@ class PopularContainer extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
                 child: Image.network(
-                  'http://192.168.1.6:8055/assets/${wObj["image"]}',
+                  'http://192.168.133.103:8055/assets/${wObj["image"]}',
                   height: 55,
                   width: 55,
                   fit: BoxFit.fill,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.error,
+                      size: 55,
+                      // color: Colors.red,
+                    );
+                  },
                 ),
               ),
             ),
             Text(
-              wObj["name"].toString(),
+              wObj["name"].toString().length > 25
+                  ? '${wObj["name"].toString().substring(0, 25)}...'
+                  : wObj["name"].toString(),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
-              
               style: const TextStyle(
                   color: AppColors.blackColor,
                   fontSize: 14,

@@ -30,7 +30,7 @@ class _FinishWorkoutScreenState extends State<CompleteWorkoutScreen> {
 
   Future<void> _fetchExerciseData() async {
     Map<String, dynamic> exercises = await _userService.fetchDataMap(
-      'http://192.168.1.6:8055/api/workouts/${widget.workoutSchedule["workout_id"]["id"]}',
+      'http://192.168.133.103:8055/api/workouts/${widget.workoutSchedule["workout_id"]["id"]}',
     );
     setState(() {
       _groupExercisesBySet(exercises['exercises']);
@@ -87,7 +87,7 @@ class _FinishWorkoutScreenState extends State<CompleteWorkoutScreen> {
                       completedExercise: widget.completedExercise,
                       onDelete: (exerciseId) {
                         _userService.deleteData(
-                          'http://192.168.1.6:8055/items/workout_schedule_exercise/$exerciseId',
+                          'http://192.168.133.103:8055/items/workout_schedule_exercise/$exerciseId',
                         );
                       },
                     );
@@ -171,7 +171,7 @@ class _CompletedExerciseRowState extends State<CompletedExerciseRow> {
                                 "set_completed_in": widget.wObj['set_number'],
                               });
                               userService.postData(
-                                'http://192.168.1.6:8055/items/workout_schedule_exercise',
+                                'http://192.168.133.103:8055/items/workout_schedule_exercise',
                                 {
                                   "workout_schedule_id":
                                       widget.workoutSchedule["id"],
@@ -231,7 +231,7 @@ class _CompletedExerciseRowState extends State<CompletedExerciseRow> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.network(
-                        'http://192.168.1.6:8055/assets/${widget.wObj["exercise_id"]["image"]}',
+                        'http://192.168.133.103:8055/assets/${widget.wObj["exercise_id"]["image"]}',
                         width: 90,
                         height: 90,
                         fit: BoxFit.fill),

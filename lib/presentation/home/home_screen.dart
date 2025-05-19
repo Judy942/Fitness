@@ -21,7 +21,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.1.6:8055/users/me'),
+      Uri.parse('http://192.168.133.103:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -399,8 +399,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;

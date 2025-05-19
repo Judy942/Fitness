@@ -40,12 +40,7 @@ Future<Map<String, String>> getKeyAndIv() async {
   if (key == null || iv == null ) {
     throw Exception("Key hoặc IV không tồn tại trong storage");
   }
-  
-  final decodedIv = base64.decode(iv);
-  final decodedKey = base64.decode(key);
-  print('IV length: ${decodedIv.length}'); // Phải là 16
-  print('Key length: ${decodedKey.length}'); // Phải là 32
-  
+
   return {'key': key, 'iv': iv};
 }
 
@@ -132,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.6:8055/files'),
+      Uri.parse('http://192.168.133.103:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -155,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.1.6:8055/items/process_tracker'),
+      Uri.parse('http://192.168.133.103:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'

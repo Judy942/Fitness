@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../services/user_service.dart';
+import '../../../widgets/today_meals_row.dart';
 
 class MealHistoryScreen extends StatefulWidget {
   const MealHistoryScreen({Key? key}) : super(key: key);
@@ -21,13 +22,12 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
   }
 
   Future<void> _fetchMealHistory() async {
-    // Thay đổi URL API để lấy lịch sử bữa ăn
-    List<dynamic> meals = await _userService.fetchData(
-      'http://192.168.1.6:8055/items/meal?fields=*&sort=-date'
+    List<dynamic> response = await _userService.fetchData(
+      'http://192.168.133.103:8055/items/meal_schedule?fields=*,dish_id.*&filter[_and][1][status][_neq]=archived&sort=-meal_time'
     );
 
     setState(() {
-      mealHistoryArr = meals;
+      mealHistoryArr = response;
     });
   }
 
@@ -56,43 +56,13 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
         itemCount: mealHistoryArr.length,
         itemBuilder: (context, index) {
           var meal = mealHistoryArr[index] as Map? ?? {};
-          return Container(
-            margin: const EdgeInsets.only(bottom: 15),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: AppColors.whiteColor,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  meal["name"] ?? "Bữa ăn không tên",
-                  style: const TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Ngày: ${meal["date"] ?? "Không có thông tin"}",
-                  style: const TextStyle(
-                    color: AppColors.grayColor,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Calo: ${meal["calories"] ?? "0"} kcal",
-                  style: const TextStyle(
-                    color: AppColors.grayColor,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 1,
+            itemBuilder: (context, mealIndex) {
+              return TodayMealsRow(wObj: meal); // Sử dụng TodayMealsRow để hiển thị món ăn
+            },
           );
         },
       ),

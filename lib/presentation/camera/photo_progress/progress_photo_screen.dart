@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/camera/photo_progress/comparison_view.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/utils/app_colors.dart';
+import '../../../services/image_service.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/round_button.dart';
 import '../camera_screen.dart';
@@ -23,7 +25,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
     String? token = await getToken();
     // Thay $CURRENT_USER bằng userId
     final url = Uri.parse(
-        'http://192.168.1.6:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
+        'http://192.168.133.103:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
 
     final response = await http.get(
       url,
@@ -234,14 +236,30 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             color: AppColors.lightGrayColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              'http://192.168.1.6:8055/assets/${pObj['image']}',
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              height: MediaQuery.of(context).size.width * 0.3,
-                              fit: BoxFit.cover,
+                          child: FutureBuilder<Uint8List>(
+                            future: ImageService.decryptAndSaveImageFromTextFile(
+                              pObj['image'],
+                              'image_$index.png',
                             ),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.done) {
+                                if (snapshot.hasData) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.memory(
+                                      snapshot.data!,
+                                      width: MediaQuery.of(context).size.width * 0.3,
+                                      height: MediaQuery.of(context).size.width * 0.3,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                } else {
+                                  return const Icon(Icons.error_outline);
+                                }
+                              } else {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+                            },
                           ),
                         );
                       }),

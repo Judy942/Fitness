@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -40,14 +38,6 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
   @override
   void initState() {
     super.initState();
-    // mealSelected = (widget.obj?['dish_id']['id'] ?? 1) - 1;
-    // getListPopular().then((value) {
-    //   setState(() {
-    //     recommendationArr = value;
-    //     isLoading = false;
-    //     print("recommendationArr: $recommendationArr");
-    //   });
-    // });
     getListPopular().then((value) {
       recommendationArr = value;
       if (widget.obj != null) {
@@ -176,20 +166,6 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                           ? recommendationArr[mealSelected]['name']
                           : '',
                       color: AppColors.lightGrayColor,
-                      // onPressed: () async {
-                      //   print("Meal selected index: $mealSelected");
-                      //   print(
-                      //       "Meal name: ${recommendationArr[mealSelected]['name']}");
-                      //   int? result = await showWorkoutDialog(
-                      //       context, recommendationArr);
-                      //   if (result != null && result > 0) {
-                      //     setState(() {
-                      //       print("Selected meal index: $result");
-                      //       mealSelected = result - 1;
-                      //     });
-                      //   }
-                      // }
-
                       onPressed: () async {
                         int? resultId =
                             await showWorkoutDialog(context, recommendationArr);
@@ -210,7 +186,10 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                     const Spacer(),
                     RoundGradientButton(
                         title: "Save",
-                        onPressed: () {
+                        onPressed: () async {
+                          setState(() {
+                            isLoading = true;
+                          });
                           print(widget.date);
                           DateTime utcDateTime = widget.date.toUtc();
                           String formattedTime = utcDateTime
@@ -223,11 +202,14 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
 
                           print(data);
                           if (widget.isEdit == true) {
-                            editSchedule(context, data, widget.url!);
+                            await editSchedule(context, data, widget.url!);
                             print("Edit");
                           } else {
-                            addMealSchedule(data, context);
+                            await addMealSchedule(data, context);
                           }
+                          setState(() {
+                            isLoading = false;
+                          });
                         }),
                     const SizedBox(
                       height: 20,
@@ -244,7 +226,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.1.6:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.133.103:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

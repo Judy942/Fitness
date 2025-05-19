@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/models/workout.dart';
-import 'package:lottie/lottie.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../core/utils/app_colors.dart';
@@ -83,19 +82,22 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     height: media.width * 0.43,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20)),
-                    // child: Image.network(
-                    //   widget.eObj.image,
+                    child: Image.network(
+                      'http://192.168.133.103:8055/assets/${widget.exerciseDetail["animation"]}',
+                      width: media.width,
+                      height: media.width * 0.43,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error, size: 40, color: AppColors.grayColor);
+                      },
+                    ),
+                    // child: Lottie.network('http://192.168.133.103:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    // child: Lottie.asset(
+                    //   'assets/Animation - 1725696475335.json',
                     //   width: media.width,
                     //   height: media.width * 0.43,
                     //   fit: BoxFit.contain,
                     // ),
-                    // child: Lottie.network('http://192.168.1.6:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
-                    child: Lottie.asset(
-                      'assets/Animation - 1725696475335.json',
-                      width: media.width,
-                      height: media.width * 0.43,
-                      fit: BoxFit.contain,
-                    ),
                   ),
                   Container(
                     width: media.width,

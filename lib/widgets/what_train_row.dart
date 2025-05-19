@@ -101,7 +101,7 @@ class WhatTrainRow extends StatelessWidget {
                     // fit: BoxFit.contain,
                     // ),
                     child: Image.network(
-                        'http://192.168.1.6:8055/assets/${wObj["image"]}',
+                        'http://192.168.133.103:8055/assets/${wObj["image"]}',
                         width: 90,
                         height: 90,
                         fit: BoxFit.contain),

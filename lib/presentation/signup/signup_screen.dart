@@ -74,7 +74,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> registerUser(String email, String password) async {
-    const String url = "http://192.168.1.6:8055/users/register";
+    const String url = "http://192.168.133.103:8055/users/register";
 
     try {
       final response = await http.post(

@@ -40,7 +40,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://192.168.1.6:8055/items/workout?limit=5&page=1&meta=*'),
+      Uri.parse('http://192.168.133.103:8055/items/workout?limit=5&page=1&meta=*'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -410,7 +410,7 @@ Future<void> addWorkoutSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.1.6:8055/items/workout_schedule?fields=*,workout_id.*'),
+        'http://192.168.133.103:8055/items/workout_schedule?fields=*,workout_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

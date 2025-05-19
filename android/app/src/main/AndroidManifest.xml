@@ -84,18 +84,21 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+
+    <!-- Health Connect Permissions -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <!-- Thêm các quyền khác tùy dữ liệu bạn cần -->
-    <uses-permission android:name="android.permission.health.READ_SLEEP" />
     <uses-permission android:name="android.permission.health.READ_DISTANCE" />
-    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" />
     <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
     <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
-    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED"/>
-    <uses-permission android:name="android.permission.health.READ_EXERCISE_TIME"/>
-    <uses-permission android:name="android.permission.health.READ_SLEEP_DEEP"/>
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY_SDNN"/>
+    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP_ASLEEP" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP_DEEP" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP_LIGHT" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP_REM" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP_AWAKE" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
 
 </manifest>

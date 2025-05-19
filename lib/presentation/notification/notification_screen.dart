@@ -23,6 +23,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   List todayMeals = [];
+  List lastWorkoutNotificationArr = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -91,11 +92,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
 
   final UserService _userService = UserService(); // Create an instance
-  List lastWorkoutNotificationArr = [];
 
   Future<void> _fetchWorkoutNotification() async {
     List<dynamic> workouts = await _userService.fetchData(
-        'http://192.168.1.6:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     // Duyệt qua từng thông báo và tính toán thời gian nếu có trường scheduled_execution_time
     for (var nObj in workouts) {
@@ -173,29 +173,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
- 
+  Future<void> refreshData() async {
+    await _fetchWorkoutNotification();
+    final value = await getMealSchedule(DateTime.now().toString().substring(0, 10));
+    if (!mounted) return;
+    setState(() {
+      todayMeals = value;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    // configureLocalNotification();
-    // scheduleMotivationalNotification();
-    // checkExactAlarmPermission();
-    _fetchWorkoutNotification();
-    getMealSchedule(DateTime.now().toString().substring(0, 10)).then((value) {
-      if (!mounted) return;
-      setState(() {
-        // for (var meal in value) {
-        //   if (meal["scheduled_time"] != null) {
-        //     DateTime mealTime =
-        //         DateTime.parse(meal["scheduled_time"]).toLocal();
-        //     scheduleMealNotification(mealTime, meal["name"] ?? "bữa ăn");
-        //   }
-        // }
-
-        print(value);
-        todayMeals = value;
-      });
-    });
+    refreshData();
   }
 
   @override
@@ -221,42 +211,46 @@ class _NotificationScreenState extends State<NotificationScreen> {
               fontWeight: FontWeight.w700),
         ),
       ),
-      body: lastWorkoutNotificationArr.isEmpty && todayMeals.isEmpty
-          ? const Center(
-              child: Text(
-                "Không có thông báo nào",
-                style: TextStyle(
-                  color: AppColors.grayColor,
-                  fontSize: 16,
+      body: RefreshIndicator(
+        onRefresh: refreshData,
+        child: lastWorkoutNotificationArr.isEmpty && todayMeals.isEmpty
+            ? const Center(
+                child: Text(
+                  "Không có thông báo nào",
+                  style: TextStyle(
+                    color: AppColors.grayColor,
+                    fontSize: 16,
+                  ),
                 ),
+              )
+            : ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+                itemCount: lastWorkoutNotificationArr.length + todayMeals.length,
+                itemBuilder: (context, index) {
+                  if (index < lastWorkoutNotificationArr.length) {
+                    var nObj = lastWorkoutNotificationArr[index]
+                            as Map<String, dynamic>? ??
+                        {};
+
+                    return NotificationRow(nObj: nObj);
+                  } else {
+                    // Hiển thị thông báo từ lịch ăn uống
+                    var mealObj =
+                        todayMeals[index - lastWorkoutNotificationArr.length]
+                                as Map<String, dynamic>? ??
+                            {};
+                    mealObj["time_difference_str"] = "Lịch ăn hôm nay";
+
+                    return NotificationRow(nObj: mealObj);
+                  }
+                },
+                separatorBuilder: (context, index) {
+                  return Divider(
+                      color: AppColors.grayColor.withOpacity(0.5), height: 1);
+                },
               ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-              itemCount: lastWorkoutNotificationArr.length + todayMeals.length,
-              itemBuilder: (context, index) {
-                if (index < lastWorkoutNotificationArr.length) {
-                  var nObj = lastWorkoutNotificationArr[index]
-                          as Map<String, dynamic>? ??
-                      {};
-
-                  return NotificationRow(nObj: nObj);
-                } else {
-                  // Hiển thị thông báo từ lịch ăn uống
-                  var mealObj =
-                      todayMeals[index - lastWorkoutNotificationArr.length]
-                              as Map<String, dynamic>? ??
-                          {};
-                  mealObj["time_difference_str"] = "Lịch ăn hôm nay";
-
-                  return NotificationRow(nObj: mealObj);
-                }
-              },
-              separatorBuilder: (context, index) {
-                return Divider(
-                    color: AppColors.grayColor.withOpacity(0.5), height: 1);
-              },
-            ),
+      ),
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../ChatMessage.dart';
 
 class ChatService {
-  final String baseUrl = 'http://192.168.1.6:8000';
+  final String baseUrl = 'http://192.168.133.103:8000';
 
   Future<String> sendMessage(String message, List<ChatMessage> history) async {
     try {
