@@ -177,16 +177,34 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 gridData: FlGridData(show: true, drawVerticalLine: true),
                                 titlesData: FlTitlesData(
                                   leftTitles: AxisTitles(
-                                    sideTitles: SideTitles(showTitles: true),
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 30,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
+                                      },
+                                    ),
                                   ),
                                   bottomTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: true,
                                       reservedSize: 30,
                                       getTitlesWidget: (value, meta) {
-                                        return Text(value.toInt().toString());
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
                                       },
                                     ),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
                                   ),
                                 ),
                                 borderData: FlBorderData(
@@ -230,9 +248,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                   leftTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: true,
-                                      reservedSize: 40,
+                                      reservedSize: 30,
                                       getTitlesWidget: (value, meta) {
-                                        return Text(value.toStringAsFixed(0));
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
                                       },
                                     ),
                                   ),
@@ -241,14 +262,23 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                       showTitles: true,
                                       reservedSize: 30,
                                       getTitlesWidget: (value, meta) {
-                                        return Text(value.toInt().toString());
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
                                       },
                                     ),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
                                   ),
                                 ),
                                 borderData: FlBorderData(
                                   show: true,
-                                  border: Border.all(color: AppColors.primaryColor1, width: 1),
+                                  border: Border.all(color: Colors.black, width: 1),
                                 ),
                                 barGroups: allData['distance']!.map((data) {
                                   final day = data['day'] as int;
@@ -258,13 +288,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                     barRods: [
                                       BarChartRodData(
                                         toY: value,
-                                        color: AppColors.primaryColor1,
-                                        width: 16,
+                                        color: AppColors.primaryColor2,
+                                        width: 12, // Giảm kích thước thanh
                                         backDrawRodData: BackgroundBarChartRodData(
                                           show: true,
                                           toY: 0,
-                                          color: AppColors.primaryColor1.withOpacity(0.1),
+                                          color: AppColors.primaryColor2.withOpacity(0.1),
                                         ),
+                                        borderSide: const BorderSide(color: Colors.black, width: 1), // Thêm viền màu đen
                                       ),
                                     ],
                                   );
@@ -303,16 +334,34 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 gridData: FlGridData(show: true, drawVerticalLine: true),
                                 titlesData: FlTitlesData(
                                   leftTitles: AxisTitles(
-                                    sideTitles: SideTitles(showTitles: true),
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 30,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
+                                      },
+                                    ),
                                   ),
                                   bottomTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: true,
                                       reservedSize: 30,
                                       getTitlesWidget: (value, meta) {
-                                        return Text(value.toInt().toString());
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(fontSize: 10),
+                                        );
                                       },
                                     ),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
                                   ),
                                 ),
                                 borderData: FlBorderData(

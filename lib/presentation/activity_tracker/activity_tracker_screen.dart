@@ -10,6 +10,8 @@ import 'package:timezone/data/latest.dart' as tz;
 import '../../core/utils/app_colors.dart';
 import '../../services/user_service.dart';
 import '../../widgets/latest_activity_row.dart';
+import '../../widgets/round_button.dart';
+import '../meal_planner/meal_planner_screen.dart';
 import 'statistics_screen.dart';
 
 class ActivityTrackerScreen extends StatefulWidget {
@@ -180,8 +182,11 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
               await _loadLatestActivity();
             },
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Column(
+
                 children: [
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -199,6 +204,37 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                       _buildInfoCard(null, 'Total Burn Cal', // Đổi tên
                           totalBurnCal.toStringAsFixed(0), Colors.grey[300]), // Đổi tên biến
                     ],
+                  ),
+                  const SizedBox(height: 10),
+                   Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 10),
+                    // margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor2.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Daily Workout Schedule',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w700)),
+                        SizedBox(
+                          width: 80,
+                          height: 30,
+                          child: RoundButton(
+                            type: RoundButtonType.primaryBG,
+                            title: 'Check',
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const MealPlannerScreen()),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const Text('Latest Activity',
