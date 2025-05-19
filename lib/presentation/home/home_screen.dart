@@ -6,16 +6,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
 import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
-import 'package:health/health.dart';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../services/user_service.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/workout_row.dart';
 import '../onboarding_screen/start_screen.dart';
-
 
 Future<Map<String, dynamic>> getUserData() async {
   String? token = await getToken();
@@ -50,19 +47,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic> userData = {};
   String bmi = '0';
+
+  Future<void> refreshData() async {
+    final data = await getUserData();
+    final bmiValue = await getBmi();
+    setState(() {
+      userData = data;
+      bmi = bmiValue == "null" ? '0' : bmiValue;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    getUserData().then((data) {
-      setState(() {
-        userData = data;
-      });
-    });
-    getBmi().then((value) {
-      setState(() {
-        bmi = value == "null" ? '0' : value;
-      });
-    });
+    refreshData();
   }
 
   @override
@@ -72,21 +70,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TopBar(userData['last_name'] ?? ""),
-                SizedBox(height: media.width * 0.05),
-                ContainerBmi(bmi: bmi),
-                SizedBox(height: media.width * 0.05),
-                const TodayTargetSection(),
-                SizedBox(height: media.width * 0.05),
-                const LatestWorkoutSection(),
-                SizedBox(height: media.width * 0.1),
-              ],
+        child: RefreshIndicator(
+          onRefresh: refreshData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TopBar(userData['last_name'] ?? ""),
+                  SizedBox(height: media.width * 0.05),
+                  ContainerBmi(bmi: bmi),
+                  SizedBox(height: media.width * 0.05),
+                  const TodayTargetSection(),
+                  SizedBox(height: media.width * 0.05),
+                  const LatestWorkoutSection(),
+                  SizedBox(height: media.width * 0.1),
+                ],
+              ),
             ),
           ),
         ),
@@ -126,18 +128,29 @@ class TopBar extends StatelessWidget {
           ],
         ),
         IconButton(
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const NotificationScreen();
-            }));
-          },
-          icon: Image.asset(
-            "assets/icons/notification_icon.png",
-            width: 25,
-            height: 25,
-            fit: BoxFit.fitHeight,
-          ),
-        ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const NotificationScreen();
+              }));
+            },
+            icon: Image.asset(
+              "assets/icons/notification_icon.png",
+              width: 25,
+              height: 25,
+              fit: BoxFit.fitHeight,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.notifications);
+              },
+            )
+            // Image.asset(
+            //   "assets/icons/notification_icon.png",
+            //   width: 25,
+            //   height: 25,
+            //   fit: BoxFit.fitHeight,
+            // ),
+            // icon: Icon(Icons.notifications),
+
+            ),
       ],
     );
   }

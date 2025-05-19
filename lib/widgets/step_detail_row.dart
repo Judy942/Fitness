@@ -68,10 +68,11 @@ class StepDetailRow extends StatelessWidget {
                   fontSize: 18,
                 ),
               ),
-              // Text(
-              //   sObj["description"].toString(),
-              //   style: const TextStyle(color: AppColors.grayColor, fontSize: 16),
-              // ),
+              if (sObj["description"] != null)
+                Text(
+                  sObj["description"].toString(),
+                  style: const TextStyle(color: AppColors.grayColor, fontSize: 16),
+                ),
             ],
           ),
         )

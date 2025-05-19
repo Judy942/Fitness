@@ -51,30 +51,27 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
   List whatArr = [];
   List workoutSuggestion = [];
 
+  Future<void> refreshData() async {
+    final value = await getListWorkout();
+    String? bmi = await getBmi();
+    double bmiValue = double.tryParse(bmi) ?? 0.0;
+    
+    setState(() {
+      whatArr = value;
+      if (bmiValue < 18.5) {
+        workoutSuggestion = whatArr.where((item) => item['type'] == 1).toList();
+      } else if (bmiValue >= 18.5 && bmiValue < 23) {
+        workoutSuggestion = whatArr.where((item) => item['type'] == 0).toList();
+      } else {
+        workoutSuggestion = whatArr.where((item) => item['type'] == 2).toList();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    getListWorkout().then((value) async {
-      whatArr = value;
-      String? bmi = await getBmi(); // Lấy giá trị BMI
-      double bmiValue = double.tryParse(bmi) ?? 0.0;
-      if (bmiValue < 18.5) {
-        workoutSuggestion = whatArr
-            .where((item) => item['type'] == 1)
-            .toList(); // Người thiếu cân
-      } else if (bmiValue >= 18.5 && bmiValue < 23) {
-        workoutSuggestion = whatArr
-            .where((item) => item['type'] == 0)
-            .toList(); // Người cân đối
-      } else {
-        workoutSuggestion = whatArr
-            .where((item) => item['type'] == 2)
-            .toList(); // Người thừa cân
-      }
-
-      print("list workouts màn workout tracker: $workoutSuggestion"); // Cập nhật để in ra danh sách gợi ý
-      setState(() {}); // Cập nhật trạng thái sau khi hoàn thành công việc bất đồng bộ
-    });
+    refreshData();
   }
 
   @override
@@ -122,113 +119,117 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                     topRight: Radius.circular(25))),
             child: Scaffold(
               backgroundColor: Colors.transparent,
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      width: 50,
-                      height: 4,
-                      decoration: BoxDecoration(
-                          color: AppColors.grayColor.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(3)),
-                    ),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 15),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor2.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(15),
+              body: RefreshIndicator(
+                onRefresh: refreshData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
                       ),
-                      child: Row(
+                      Container(
+                        width: 50,
+                        height: 4,
+                        decoration: BoxDecoration(
+                            color: AppColors.grayColor.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(3)),
+                      ),
+                      SizedBox(
+                        height: media.width * 0.05,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 15),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor2.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Daily Workout Schedule",
+                              style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              height: 30,
+                              child: RoundButton(
+                                type: RoundButtonType.primaryBG,
+                                title: "Check",
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const WorkoutScheduleView()));
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: media.width * 0.05,
+                      ),
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Daily Workout Schedule",
+                          Text(
+                            "Workouts for you",
                             style: TextStyle(
                                 color: AppColors.blackColor,
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
-                          SizedBox(
-                            width: 80,
-                            height: 30,
-                            child: RoundButton(
-                              type: RoundButtonType.primaryBG,
-                              title: "Check",
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const WorkoutScheduleView()));
-                              },
-                            ),
-                          )
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Workouts for you",
-                          style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                    ListView.builder(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: workoutSuggestion.length,
-                        itemBuilder: (context, index) {
-                          var wObj = workoutSuggestion[index] as Map? ?? {};
-                          return WhatTrainRow(
-                            wObj: wObj,
-                          );
-                        }),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "All workouts",
-                          style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                    ListView.builder(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: whatArr.length,
-                        itemBuilder: (context, index) {
-                          var wObj = whatArr[index] as Map? ?? {};
-                          return WhatTrainRow(
-                            wObj: wObj,
-                          );
-                        }),
-                    SizedBox(
-                      height: media.width * 0.1,
-                    ),
-                  ],
+                      ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: workoutSuggestion.length,
+                          itemBuilder: (context, index) {
+                            var wObj = workoutSuggestion[index] as Map? ?? {};
+                            return WhatTrainRow(
+                              wObj: wObj,
+                            );
+                          }),
+                      SizedBox(
+                        height: media.width * 0.05,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "All workouts",
+                            style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                      ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: whatArr.length,
+                          itemBuilder: (context, index) {
+                            var wObj = whatArr[index] as Map? ?? {};
+                            return WhatTrainRow(
+                              wObj: wObj,
+                            );
+                          }),
+                      SizedBox(
+                        height: media.width * 0.1,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )),

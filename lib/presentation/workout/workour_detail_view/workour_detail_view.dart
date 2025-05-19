@@ -9,7 +9,6 @@ import '../../../models/workout.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/exercises_set_section.dart';
 import '../../../widgets/icon_title_next_row.dart';
-import '../../../widgets/round_gradient_button.dart';
 import 'exercises_step_details.dart';
 
 Future<Map<String, dynamic>> getExerciseDetail(int id) async {
@@ -171,16 +170,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         ],
                       ),
                       SizedBox(
-                        height: media.width * 0.05,
+                        height: 12,
                       ),
                       IconTitleNextRow(
                           icon: "assets/icons/time_icon.png",
                           title: "Schedule Workout",
-                          time: "5/27, 09:00 AM",
+                          // time: "5/27, 09:00 AM",
                           color: AppColors.primaryColor2.withOpacity(0.3),
                           onPressed: () {
-                            // Navigator.pushNamed(
-                            //     context, '/workoutScheduleView');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -189,17 +186,17 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                             );
                           }),
                       SizedBox(
-                        height: media.width * 0.02,
+                        height: 10,
                       ),
-                      IconTitleNextRow(
-                          icon: "assets/icons/difficulity_icon.png",
-                          title: "Difficulity",
-                          time: "Beginner",
-                          color: AppColors.secondaryColor2.withOpacity(0.3),
-                          onPressed: () {}),
-                      SizedBox(
-                        height: media.width * 0.05,
-                      ),
+                      // IconTitleNextRow(
+                      //     icon: "assets/icons/difficulity_icon.png",
+                      //     title: "Difficulity",
+                      //     // time: "Beginner",
+                      //     color: AppColors.secondaryColor2.withOpacity(0.3),
+                      //     onPressed: () {}),
+                      // SizedBox(
+                      //   height: media.width * 0.05,
+                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -316,24 +313,24 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     ],
                   ),
                 ),
-                SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      RoundGradientButton(
-                          title: "Start Workout",
-                          onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => const AiHome(),
-                            //   ),
-                            // );
-                          })
-                    ],
-                  ),
-                )
+                // SafeArea(
+                //   child: Column(
+                //     mainAxisSize: MainAxisSize.max,
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: [
+                //       RoundGradientButton(
+                //           title: "Start Workout",
+                //           onPressed: () {
+                //             // Navigator.push(
+                //             //   context,
+                //             //   MaterialPageRoute(
+                //             //     builder: (context) => const AiHome(),
+                //             //   ),
+                //             // );
+                //           })
+                //     ],
+                //   ),
+                // )
               ],
             ),
           ),

@@ -5,10 +5,10 @@ import '../core/utils/app_colors.dart';
 class IconTitleNextRow extends StatelessWidget {
   final String icon;
   final String title;
-  final String time;
+  final String? time;
   final VoidCallback onPressed;
   final Color color;
-  const IconTitleNextRow({Key? key, required this.icon, required this.title, required this.time, required this.onPressed, required this.color}) : super(key: key);
+  const IconTitleNextRow({Key? key, required this.icon, required this.title, this.time, required this.onPressed, required this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class IconTitleNextRow extends StatelessWidget {
             SizedBox(
               width: 120,
               child: Text(
-                time  ,
+                time ?? '',
                 textAlign: TextAlign.right,
                 style: const TextStyle(color: AppColors.grayColor, fontSize: 12),
               ),

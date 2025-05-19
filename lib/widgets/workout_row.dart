@@ -20,7 +20,7 @@ class _WorkoutRowState extends State<WorkoutRow> {
   void initState() {
     super.initState();
     for (var item in widget.wObj["completed_exercise"]) {
-        completedExercise.add(item);
+      completedExercise.add(item);
     }
   }
 
@@ -61,6 +61,9 @@ class _WorkoutRowState extends State<WorkoutRow> {
                 width: 60,
                 height: 60,
                 fit: BoxFit.fitHeight,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error_outline);
+                },
               ),
             ),
             const SizedBox(
@@ -102,7 +105,6 @@ class _WorkoutRowState extends State<WorkoutRow> {
                   style: const TextStyle(
                       color: AppColors.blackColor, fontSize: 12),
                 ),
-
               ],
             )),
             IconButton(

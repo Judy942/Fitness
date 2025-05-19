@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/models/workout.dart';
 import 'package:lottie/lottie.dart';
@@ -190,12 +189,6 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 shrinkWrap: true,
                 itemCount: widget.exerciseDetail["process_steps"].length,
                 itemBuilder: ((context, index) {
-                  // var sObj = exerciseDetail["process_steps"][index] as Map? ?? {};
-
-                  // return StepDetailRow(
-                  //   sObj: sObj,
-                  //   isLast: exerciseDetail["process_steps"].last == sObj,
-                  // );
                   if (widget.exerciseDetail["process_steps"].isNotEmpty) {
                     // An toàn để truy cập các phần tử
                     return StepDetailRow(
@@ -209,66 +202,66 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   }
                 }),
               ),
-              const Text(
-                "Custom Repetitions",
-                style: TextStyle(
-                    color: AppColors.blackColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
-              ),
-              SizedBox(
-                height: 150,
-                child: CupertinoPicker.builder(
-                  itemExtent: 42,
-                  selectionOverlay: Container(
-                    width: double.maxFinite,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                            color: AppColors.grayColor.withOpacity(0.2),
-                            width: 1),
-                        bottom: BorderSide(
-                            color: AppColors.grayColor.withOpacity(0.2),
-                            width: 1),
-                      ),
-                    ),
-                  ),
-                  onSelectedItemChanged: (index) {
-                  },
-                  childCount: 100,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/icons/burn_icon.png",
-                          width: 15,
-                          height: 15,
-                          fit: BoxFit.contain,
-                        ),
-                        Text(
-                          " ${(index + 1) * 15} Calories Burn",
-                          style: const TextStyle(
-                              color: AppColors.grayColor, fontSize: 10),
-                        ),
-                        Text(
-                          " ${index + 1} ",
-                          style: const TextStyle(
-                              color: AppColors.grayColor,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        const Text(
-                          " times",
-                          style: TextStyle(
-                              color: AppColors.grayColor, fontSize: 16),
-                        )
-                      ],
-                    );
-                  },
-                ),
-              ),
+              // const Text(
+              //   "Custom Repetitions",
+              //   style: TextStyle(
+              //       color: AppColors.blackColor,
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.w700),
+              // ),
+              // SizedBox(
+              //   height: 150,
+              //   child: CupertinoPicker.builder(
+              //     itemExtent: 42,
+              //     selectionOverlay: Container(
+              //       width: double.maxFinite,
+              //       height: 40,
+              //       decoration: BoxDecoration(
+              //         border: Border(
+              //           top: BorderSide(
+              //               color: AppColors.grayColor.withOpacity(0.2),
+              //               width: 1),
+              //           bottom: BorderSide(
+              //               color: AppColors.grayColor.withOpacity(0.2),
+              //               width: 1),
+              //         ),
+              //       ),
+              //     ),
+              //     onSelectedItemChanged: (index) {
+              //     },
+              //     childCount: 100,
+              //     itemBuilder: (context, index) {
+              //       return Row(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         children: [
+              //           Image.asset(
+              //             "assets/icons/burn_icon.png",
+              //             width: 15,
+              //             height: 15,
+              //             fit: BoxFit.contain,
+              //           ),
+              //           Text(
+              //             " ${(index + 1) * 15} Calories Burn",
+              //             style: const TextStyle(
+              //                 color: AppColors.grayColor, fontSize: 10),
+              //           ),
+              //           Text(
+              //             " ${index + 1} ",
+              //             style: const TextStyle(
+              //                 color: AppColors.grayColor,
+              //                 fontSize: 24,
+              //                 fontWeight: FontWeight.w500),
+              //           ),
+              //           const Text(
+              //             " times",
+              //             style: TextStyle(
+              //                 color: AppColors.grayColor, fontSize: 16),
+              //           )
+              //         ],
+              //       );
+              //     },
+              //   ),
+              // ),
               // RoundGradientButton(
               //     title: "Save",
               //     onPressed: () async {
