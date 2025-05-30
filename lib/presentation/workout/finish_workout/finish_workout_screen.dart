@@ -30,7 +30,7 @@ class FinishWorkoutScreen extends StatelessWidget {
               ),
 
               const Text(
-                "Congratulations, You Have Finished Your Workout",
+                "Chúc mừng, bạn đã hoàn thành bài tập",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.blackColor,
@@ -44,7 +44,7 @@ class FinishWorkoutScreen extends StatelessWidget {
               ),
 
               const Text(
-                "Exercises is king and nutrition is queen. Combine the two and you will have a kingdom",
+                "Tập luyện là vua và dinh dưỡng là hoàng hậu. Kết hợp cả hai và bạn sẽ có một vương quốc",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.grayColor,
@@ -67,7 +67,7 @@ class FinishWorkoutScreen extends StatelessWidget {
 
               const Spacer(),
               RoundGradientButton(
-                  title: "Back To History",
+                  title: "Quay lại lịch sử",
                   onPressed: () {
                     Navigator.pop(context);
                   }),

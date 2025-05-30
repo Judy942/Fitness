@@ -34,7 +34,7 @@ Future<List> fetchDishes(String endpoint) async {
       //   'name': dish['name'],
       //   'description': dish['description'],
       //   'cooking_time': dish['cooking_time'],
-      //   'image': 'http://192.168.133.103:8055/assets/${dish['image']}',
+      //   'image': 'http://192.168.133.101:8055/assets/${dish['image']}',
       //   // 'difficulty': dish['difficulty_id'],
       //   'difficulty': dish['difficulty_id']
       //       is Map, //&& dish['difficulty_id'].containsKey('name')) ? dish['difficulty_id']['name'] : null, // Thêm độ khó
@@ -52,7 +52,7 @@ Future<List> fetchDishes(String endpoint) async {
 
 Future<List> getListPopular() async {
   return await fetchDishes(
-      'http://192.168.133.103:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
+      'http://192.168.133.101:8055/items/dish?limit=25&fields=*,dish_id.*,dish_id.difficulty_id.*,dish_id.nutritions.*,dish_id.nutritions.nutrition_id.*&sort[]=sort&page=1&filter[status][_neq]=archived');
 }
 
 class MealPlannerScreen extends StatefulWidget {
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
           ),
         ),
         title: const Text(
-          "Meal Planner",
+          "Lập kế hoạch bữa ăn",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -175,7 +175,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "Today Meals",
+                          "Bữa ăn hôm nay",
                           style: TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 16,
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text(
-                                      "No meal found",
+                                      "Không tìm thấy bữa ăn nào",
                                       style: TextStyle(
                                           color: AppColors.blackColor,
                                           fontSize: 16,
@@ -265,18 +265,18 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Daily Meal Schedule",
+                                "Lịch bữa ăn hôm nay",
                                 style: TextStyle(
                                     color: AppColors.blackColor,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700),
                               ),
                               SizedBox(
-                                width: 80,
+                                width: 95,
                                 height: 30,
                                 child: RoundButton(
                                   type: RoundButtonType.primaryBG,
-                                  title: "Check",
+                                  title: "Kiểm tra",
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -295,7 +295,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                         Row(
                           children: [
                             const Text(
-                              "Find Something To Eat",
+                              "Tìm kiểm món ăn",
                               style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 16,
@@ -312,7 +312,7 @@ class _HomeScreenState extends State<MealPlannerScreen> {
                                                 popularDishes: popularArr,
                                               )));
                                 },
-                                child: const Text("View All"))
+                                child: const Text("Xem tất cả"))
                           ],
                         ),
                         const SizedBox(

@@ -55,18 +55,23 @@ class _SignupScreenState extends State<SignupScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
+    if (!isCheck) {
+      showSnackBar('Vui lòng chấp nhận Điều khoản và Chính sách Bảo mật');
+      return;
+    }
+
     if (email.isEmpty || password.isEmpty) {
-      showSnackBar('Email and password are required');
+      showSnackBar('Email và mật khẩu là bắt buộc');
       return;
     }
 
     if (!isValidEmail(email)) {
-      showSnackBar('Invalid email format');
+      showSnackBar('Định dạng email không hợp lệ');
       return;
     }
 
     if (!isValidPassword(password)) {
-      showSnackBar('Password must be at least 8 characters long, including uppercase, lowercase, number, and special character');
+      showSnackBar('Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt');
       return;
     }
 
@@ -74,7 +79,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> registerUser(String email, String password) async {
-    const String url = "http://192.168.133.103:8055/users/register";
+    const String url = "http://192.168.133.101:8055/users/register";
 
     try {
       final response = await http.post(
@@ -87,16 +92,16 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        showSnackBar('Register successfully, check your email to verify your account');
+        showSnackBar('Đăng ký thành công, vui lòng kiểm tra email để xác thực tài khoản');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       } else {
-        showSnackBar('Register failed: ${jsonDecode(response.body)['message'] ?? "Unknown error"}');
+        showSnackBar('Đăng ký thất bại: ${jsonDecode(response.body)['message'] ?? "Lỗi không xác định"}');
       }
     } catch (e) {
-      showSnackBar('Failed to register. Please try again later.');
+      showSnackBar('Không thể đăng ký. Vui lòng thử lại sau.');
     }
   }
 
@@ -111,15 +116,15 @@ class _SignupScreenState extends State<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 15),
-              const Text("Hey there,", style: TextStyle(color: AppColors.blackColor, fontSize: 16)),
+              const Text("Xin chào,", style: TextStyle(color: AppColors.blackColor, fontSize: 16)),
               const SizedBox(height: 5),
-              const Text("Create an Account",
+              const Text("Tạo Tài Khoản",
                   style: TextStyle(color: AppColors.blackColor, fontSize: 20, fontFamily: "Poppins", fontWeight: FontWeight.w700)),
               const SizedBox(height: 15),
 
               RoundTextField(
                 controller: firstNameController,
-                hintText: "First Name",
+                hintText: "Tên",
                 icon: "assets/icons/profile_icon.png",
                 textInputType: TextInputType.name,
               ),
@@ -127,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               RoundTextField(
                 controller: lastNameController,
-                hintText: "Last Name",
+                hintText: "Họ",
                 icon: "assets/icons/profile_icon.png",
                 textInputType: TextInputType.name,
               ),
@@ -143,7 +148,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               RoundTextField(
                 controller: passwordController,
-                hintText: "Password",
+                hintText: "Mật khẩu",
                 icon: "assets/icons/lock_icon.png",
                 textInputType: TextInputType.text,
                 isObscureText: true,
@@ -161,20 +166,20 @@ class _SignupScreenState extends State<SignupScreen> {
                     icon: Icon(isCheck ? Icons.check_box_outline_blank_outlined : Icons.check_box_outlined, color: AppColors.grayColor),
                   ),
                   const Expanded(
-                    child: Text("By continuing you accept our Privacy Policy and\nTerm of Use",
+                    child: Text("Bằng việc tiếp tục, bạn chấp nhận Chính sách Bảo mật và\nĐiều khoản Sử dụng",
                         style: TextStyle(color: AppColors.grayColor, fontSize: 10)),
                   ),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),
 
-              RoundGradientButton(title: "Register", onPressed: onRegisterButtonPressed),
+              RoundGradientButton(title: "Đăng Ký", onPressed: onRegisterButtonPressed),
               const SizedBox(height: 10),
 
               Row(
                 children: [
                   Expanded(child: Divider(color: AppColors.grayColor.withOpacity(0.5))),
-                  const Text("  Or  ", style: TextStyle(color: AppColors.grayColor, fontSize: 12, fontWeight: FontWeight.w400)),
+                  const Text("  Hoặc  ", style: TextStyle(color: AppColors.grayColor, fontSize: 12, fontWeight: FontWeight.w400)),
                   Expanded(child: Divider(color: AppColors.grayColor.withOpacity(0.5))),
                 ],
               ),
@@ -187,8 +192,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   text: const TextSpan(
                     style: TextStyle(color: AppColors.blackColor, fontSize: 14, fontWeight: FontWeight.w400),
                     children: [
-                      TextSpan(text: "Already have an account? "),
-                      TextSpan(text: "Login", style: TextStyle(color: AppColors.secondaryColor1, fontSize: 14, fontWeight: FontWeight.w800)),
+                      TextSpan(text: "Đã có tài khoản? "),
+                      TextSpan(text: "Đăng Nhập", style: TextStyle(color: AppColors.secondaryColor1, fontSize: 14, fontWeight: FontWeight.w800)),
                     ],
                   ),
                 ),

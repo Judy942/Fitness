@@ -4,12 +4,10 @@ import 'dart:async';
 
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
-import "package:flutter_gemini/flutter_gemini.dart";
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
-import 'chat_box/consts.dart';
+import 'presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
 import 'presentation/onboarding_screen/start_screen.dart';
 
 @pragma('vm:entry-point')
@@ -70,6 +68,9 @@ Future<void> main() async {
   );
 
   await flutterLocalNotificationsPlugin.initialize(settings);
+  
+  // Lên lịch thông báo động viên
+  await scheduleMotivationalNotification();
 
   EmailOTP.config(
     appName: 'Fitness App',
@@ -85,9 +86,7 @@ Future<void> main() async {
     username: 'trinhthuc130902@gmail.com',
     password: 'gkkt dvcr sbry mcya',
   );
-  Gemini.init(
-    apiKey: GEMINI_API_KEY,
-  );
+
   runApp(const MyApp());
 }
 

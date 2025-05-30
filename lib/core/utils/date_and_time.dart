@@ -31,11 +31,11 @@ String getDayTitle(String dateStr, {String formatStr = "dd/MM/yyyy hh:mm a"} ) {
   var date = stringToDate(dateStr, formatStr: formatStr);
 
   if (date.isToday) {
-    return "Today";
+    return "Hôm nay";
   } else if (date.isTomorrow) {
-    return "Tomorrow";
+    return "Ngày mai";
   } else if (date.isYesterday) {
-    return "Yesterday";
+    return "Hôm qua";
   } else {
     var outFormat = DateFormat("E");
     return outFormat.format(date) ;

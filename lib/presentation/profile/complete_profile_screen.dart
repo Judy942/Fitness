@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
+import 'package:flutter_application_fitness/services/push_notification/NotificationSyncService.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -11,9 +12,8 @@ import '../../widgets/round_textfield.dart';
 import '../home/home_screen.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
-  bool isBackToProfile;
-  CompleteProfileScreen({Key? key, required this.isBackToProfile})
-      : super(key: key);
+  final bool isBackToProfile;
+  const CompleteProfileScreen({Key? key, required this.isBackToProfile}) : super(key: key);
 
   @override
   State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
@@ -28,7 +28,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     String json = jsonEncode(data);
     print(json);
       final response = await http.patch(
-          Uri.parse('http://192.168.133.103:8055/users/me'),
+          Uri.parse('http://192.168.133.101:8055/users/me'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -61,6 +61,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         userData = data;
       });
     });
+    // Đồng bộ thông báo khi hoàn thành hồ sơ
+    NotificationSyncService.syncAllNotifications();
   }
 
   @override
@@ -87,7 +89,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   height: 15,
                 ),
                 const Text(
-                  "Let’s complete your profile",
+                  "Hãy hoàn thiện hồ sơ của bạn",
                   style: TextStyle(
                       color: AppColors.blackColor,
                       fontSize: 20,
@@ -95,7 +97,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 ),
                 const SizedBox(height: 5),
                 const Text(
-                  "It will help us to know more about you!",
+                  "Điều này sẽ giúp chúng tôi hiểu rõ hơn về bạn!",
                   style: TextStyle(
                     color: AppColors.grayColor,
                     fontSize: 12,
@@ -125,7 +127,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       Expanded(
                           child: DropdownButtonHideUnderline(
                         child: DropdownButton(
-                          items: ["Male", "Female"]
+                          items: ["Nam", "Nữ"]
                               .map((name) => DropdownMenuItem(
                                   value: name,
                                   child: Text(
@@ -136,12 +138,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                   )))
                               .toList(),
                           onChanged: (value) {
-                            userData['gender'] = value!.toUpperCase();
+                            userData['gender'] = value == "Nam" ? "MALE" : "FEMALE";
                             setState(() {});
                           },
                           isExpanded: true,
-                          hint: Text(userData['gender'] ?? (userData['gender'] == 'null'? 'Choose Gender': 'Choose gender'),
-
+                          hint: Text(userData['gender'] == 'MALE' ? 'Nam' : (userData['gender'] == 'FEMALE' ? 'Nữ' : 'Chọn giới tính'),
                               style: const TextStyle(
                                   color: AppColors.grayColor, fontSize: 12)),
                         ),
@@ -156,12 +157,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 RoundTextField(
                   onChanged: (p0) {
                     userData['birthday'] = p0;
-                    setState(() {
-                      
-                    });
+                    setState(() {});
                   },
                   hintText: 
-                   userData['birthday'] ?? (userData['birthday'] == 'null'? 'yyyy-dd-mm': 'yyyy-dd-mm' ),
+                   userData['birthday'] ?? (userData['birthday'] == 'null'? 'yyyy-mm-dd': 'yyyy-mm-dd' ),
                   icon: "assets/icons/calendar_icon.png",
                   textInputType: TextInputType.datetime,
                 ),
@@ -187,7 +186,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 ),
                 const SizedBox(height: 15),
                 RoundGradientButton(
-                  title: "Next >",
+                  title: "Tiếp tục >",
                   onPressed: () {
                     Map<String, String> data = {
                       // 'first_name': usetData['first_name'],

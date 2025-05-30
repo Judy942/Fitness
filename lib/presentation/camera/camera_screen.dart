@@ -127,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.133.103:8055/files'),
+      Uri.parse('http://192.168.133.101:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -150,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.133.103:8055/items/process_tracker'),
+      Uri.parse('http://192.168.133.101:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'
@@ -169,47 +169,47 @@ class _CameraScreenState extends State<CameraScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose your tracker position'),
+          title: const Text('Chọn vị trí theo dõi'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: const Text('Front Facing'),
+                title: const Text('Nhìn thẳng'),
                 onTap: () {
                   addProcessTracker(imagePath, 1);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saved')),
+                    const SnackBar(content: Text('Đã lưu')),
                   );
                 },
               ),
               ListTile(
-                title: const Text('Back Facing'),
+                title: const Text('Nhìn sau'),
                 onTap: () {
                   addProcessTracker(imagePath, 2);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saved')),
+                    const SnackBar(content: Text('Đã lưu')),
                   );
                 },
               ),
               ListTile(
-                title: const Text('Left Facing'),
+                title: const Text('Nhìn trái'),
                 onTap: () {
                   addProcessTracker(imagePath, 3);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saved')),
+                    const SnackBar(content: Text('Đã lưu')),
                   );
                 },
               ),
               ListTile(
-                title: const Text('Right Facing'),
+                title: const Text('Nhìn phải'),
                 onTap: () {
                   addProcessTracker(imagePath, 4);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saved')),
+                    const SnackBar(content: Text('Đã lưu')),
                   );
                 },
               ),
@@ -225,7 +225,7 @@ class _CameraScreenState extends State<CameraScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Selected Image'),
+          title: const Text('Ảnh đã chọn'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -235,7 +235,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 fit: BoxFit.cover,
               ),
               const SizedBox(height: 10),
-              const Text('Do you want to use this image?'),
+              const Text('Bạn có muốn sử dụng ảnh này không?'),
             ],
           ),
           actions: [
@@ -244,13 +244,13 @@ class _CameraScreenState extends State<CameraScreen> {
                 Navigator.of(context).pop();
                 tracker_position(imagePath);
               },
-              child: const Text('Use'),
+              child: const Text('Sử dụng'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text('Hủy'),
             ),
           ],
         );
@@ -265,7 +265,7 @@ class _CameraScreenState extends State<CameraScreen> {
         _showCaptureDialog(image.path);
       }
     } catch (e) {
-      print('Error picking image: $e');
+      print('Lỗi khi chọn ảnh: $e');
     }
   }
 
@@ -273,7 +273,7 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Image'),
+        title: const Text('Chọn ảnh'),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -288,7 +288,7 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Select an image from your gallery',
+              'Chọn ảnh từ thư viện',
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.grey,
@@ -298,7 +298,7 @@ class _CameraScreenState extends State<CameraScreen> {
             ElevatedButton.icon(
               onPressed: _pickImage,
               icon: const Icon(Icons.photo_library),
-              label: const Text('Choose Image'),
+              label: const Text('Chọn ảnh'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),

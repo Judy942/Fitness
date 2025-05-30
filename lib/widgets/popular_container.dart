@@ -19,7 +19,7 @@ class PopularContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Giá trị của wObj trong popular:$wObj');
+    // print('Giá trị của wObj trong popular:$wObj');
     return Container(
       padding: const EdgeInsets.all(5),
       // margin: const EdgeInsets.only(right: 20),
@@ -43,7 +43,7 @@ class PopularContainer extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
                 child: Image.network(
-                  'http://192.168.133.103:8055/assets/${wObj["image"]}',
+                  'http://192.168.133.101:8055/assets/${wObj["image"]}',
                   height: 55,
                   width: 55,
                   fit: BoxFit.fill,

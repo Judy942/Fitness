@@ -12,7 +12,7 @@ import '../meal_schedule/add_meal_schedule.dart';
 
 Future<Map<String, dynamic>> getDishDetails(int id) async {
   String url =
-      'http://192.168.133.103:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
+      'http://192.168.133.101:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
 
   Map<String, dynamic> dishDetails = {};
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -26,10 +26,10 @@ Future<Map<String, dynamic>> getDishDetails(int id) async {
       final jsonResponse = json.decode(response.body);
       dishDetails = jsonResponse['data']; // Trả về dữ liệu
     } else {
-      throw Exception('Failed to load dish details: ${response.statusCode}');
+      throw Exception('Không thể tải thông tin món ăn: ${response.statusCode}');
     }
   } catch (e) {
-    throw Exception('Error fetching dish details: $e');
+    throw Exception('Lỗi khi lấy thông tin món ăn: $e');
   }
 
   return dishDetails; // Trả về thông tin món ăn
@@ -105,7 +105,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
-                  'http://192.168.133.103:8055/assets/${widget.dObj["image"]}',
+                  'http://192.168.133.101:8055/assets/${widget.dObj["image"]}',
                   height: media.width * 0.5,
                   fit: BoxFit.fitHeight,
                   errorBuilder: (context, error, stackTrace) {
@@ -166,7 +166,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                             fontWeight: FontWeight.w700),
                                       ),
                                       Text(
-                                        "${widget.dObj["cooking_time"].toString()} mins | ${dishDetails["nutritions"]?[0]?["value"] ?? '-'} Kcal",
+                                        "${widget.dObj["cooking_time"].toString()} phút | ${dishDetails["nutritions"]?[0]?["value"] ?? '-'} Kcal",
                                         style: const TextStyle(
                                           color: AppColors.grayColor,
                                           fontSize: 12,
@@ -185,7 +185,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Nutrition",
+                                  "Dinh dưỡng",
                                   style: TextStyle(
                                       color: AppColors.blackColor,
                                       fontSize: 16,
@@ -219,7 +219,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                         child: Row(
                                           children: [
                                             Image.network(
-                                              'http://192.168.133.103:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
+                                              'http://192.168.133.101:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
                                               width: 20,
                                               height: 20,
                                               fit: BoxFit.contain,
@@ -243,7 +243,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               height: media.width * 0.05,
                             ),
                             const Text(
-                              "Descriptions",
+                              "Mô tả",
                               style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 16,
@@ -258,8 +258,8 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               trimLines: 2,
                               colorClickableText: AppColors.blackColor,
                               trimMode: TrimMode.Line,
-                              trimCollapsedText: ' Read More ...',
-                              trimExpandedText: ' Read Less',
+                              trimCollapsedText: 'Xem thêm',
+                              trimExpandedText: 'Thu gọn',
                               style: const TextStyle(
                                 color: AppColors.grayColor,
                                 fontSize: 14,
@@ -277,7 +277,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               height: media.width * 0.05,
                             ),
                             const Text(
-                              "Ingredients That You Will Need",
+                              "Nguyên liệu",
                               style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 20,
@@ -314,7 +314,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(15)),
                                             child: Image.network(
-                                              'http://192.168.133.103:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
+                                              'http://192.168.133.101:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
                                               width: 50,
                                               height: 50,
                                               fit: BoxFit.contain,
@@ -349,7 +349,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
-                                  "Step by Step",
+                                  "Các bước thực hiện",
                                   style: TextStyle(
                                       color: AppColors.blackColor,
                                       fontSize: 18,
@@ -358,7 +358,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                 TextButton(
                                   onPressed: () {},
                                   child: Text(
-                                    "${dishDetails["process_steps"].length} Steps",
+                                    "${dishDetails["process_steps"].length} Bước",
                                     style: const TextStyle(
                                         color: AppColors.grayColor,
                                         fontSize: 14),
@@ -392,7 +392,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       RoundGradientButton(
-                          title: "Add to Meal",
+                          title: "Thêm vào lịch bữa ăn",
                           onPressed: () {
                             Navigator.push(
                                 context,

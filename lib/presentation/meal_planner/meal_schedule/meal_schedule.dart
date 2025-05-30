@@ -14,12 +14,13 @@ import '../../../models/workout.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/exercises_row.dart';
 import '../../../widgets/showlog.dart';
+import '../../home/home_screen.dart';
 import 'add_meal_schedule.dart';
 
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   final response = await http.get(
-    Uri.parse('http://192.168.133.103:8055/api/meal_schedule?date=$date'),
+    Uri.parse('http://192.168.133.101:8055/api/meal_schedule?date=$date'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
     return List<Map<String, dynamic>>.from(data);
   } else {
     // Xử lý lỗi ở đây nếu cần
-    throw Exception('Failed to load meal schedule: ${response.statusCode}');
+    throw Exception('Không thể tải lịch bữa ăn: ${response.statusCode}');
   }
 }
 
@@ -51,32 +52,38 @@ class _MealScheduleState extends State<MealSchedule> {
   final CalendarAgendaController _calendarAgendaControllerAppBar =
       CalendarAgendaController();
   late DateTime _selectedDateAppBBar;
+  double userWeight = 0;
+  late double proteinGoal;
 
   List mealScheduleArr = [];
-  List nutritionGoalArr = [
-    {
-      "title": "Calories",
-      "value": "2000 kcal",
-    },
-    {
-      "title": "Protein",
-      "value": "100 g",
-    },
-    {
-      "title": "Carbs",
-      "value": "200 g",
-    },
-    {
-      "title": "Fat",
-      "value": "150 g",
-    },
-  ];
+  List nutritionGoalArr = [];
 
   List selectDayEventArr = [];
 
   @override
   void initState() {
     super.initState();
+    getUserData().then((data) {
+      setState(() {
+        userWeight = data['weight']?.toDouble() ?? 0.0;
+        proteinGoal = userWeight * 0.8;
+
+        nutritionGoalArr = [
+          {
+            "title": "Calo",
+            "value": "2000 kcal",
+          },
+          {
+            "title": "Protein",
+            "value": "${proteinGoal.toStringAsFixed(1)} g",
+          },
+          {
+            "title": "Carb",
+            "value": "130 g",
+          },
+        ];
+      });
+    });
     _selectedDateAppBBar = DateTime.now();
     getMealSchedule(DateFormat('yyyy-MM-dd').format(_selectedDateAppBBar))
         .then((value) {
@@ -84,9 +91,9 @@ class _MealScheduleState extends State<MealSchedule> {
       setDayEventMealSchedule();
       getNutritionData();
       print(mealScheduleArr);
+
       setState(() {});
     });
-    // setDayEventMealSchedule();
   }
 
   void setDayEventMealSchedule() {
@@ -107,13 +114,13 @@ class _MealScheduleState extends State<MealSchedule> {
                   'name': sObj['dish_id']['name'],
                   'description': sObj['dish_id']['description'],
                   'image':
-                      'http://192.168.133.103:8055/assets/${sObj['dish_id']['image']}', //sObj['dish_id']['image'],
+                      'http://192.168.133.101:8055/assets/${sObj['dish_id']['image']}',
                   'nutritions': sObj['dish_id']['nutritions'],
                 },
               };
             })
             .where((meal) => meal != null)
-            .toList(), // Lọc bỏ các món ăn null
+            .toList(),
       };
     }).toList();
   }
@@ -121,11 +128,12 @@ class _MealScheduleState extends State<MealSchedule> {
   int getCalories(List setArr) {
     int calories = 0;
     for (var sObj in setArr) {
-      // calories += int.parse(sObj["nutrition"]["calories"]);
+      print(sObj["dish_id"]["nutritions"]);
       if (sObj["dish_id"] != null &&
           sObj["dish_id"]["nutritions"] != null &&
           sObj["dish_id"]["nutritions"].isNotEmpty) {
-        calories += (sObj["dish_id"]["nutritions"][0]["value"] as int);
+        calories += (sObj["dish_id"]["nutritions"].firstWhere((nutrition) =>
+            nutrition["nutrition_id"]["code"] == "CAL")["value"] as int);
       }
     }
     return calories;
@@ -151,30 +159,18 @@ class _MealScheduleState extends State<MealSchedule> {
     return protein;
   }
 
-  // int sumCarbs() {
-  //   int carbs = 0;
-  //   for (var wObj in selectDayEventArr) {
-  //     wObj["meals"].forEach((sObj) {
-  //       carbs += (sObj["dish_id"]["nutritions"][3]["value"] as int);
-  //     });
-  //   }
-  //   return carbs;
-  // }
-
   int sumCarbs() {
-  int carbs = 0;
-  for (var wObj in selectDayEventArr) {
-    for (var sObj in wObj["meals"]) {
-      var nuts = sObj["dish_id"]["nutritions"] as List;
-      if (nuts.length > 3) {
-        carbs += (nuts[3]["value"] as int);
+    int carbs = 0;
+    for (var wObj in selectDayEventArr) {
+      for (var sObj in wObj["meals"]) {
+        var nuts = sObj["dish_id"]["nutritions"] as List;
+        if (nuts.length > 3) {
+          carbs += (nuts[3]["value"] as int);
+        }
       }
-      // else: bỏ qua, hoặc cộng thêm 0
     }
+    return carbs;
   }
-  return carbs;
-}
-
 
   int sumFat() {
     int fat = 0;
@@ -189,39 +185,28 @@ class _MealScheduleState extends State<MealSchedule> {
   List getNutrition = [0, 0, 0, 0];
 
   int sumByCode(String code) {
-  int total = 0;
-  for (var wObj in selectDayEventArr) {
-    for (var sObj in wObj["meals"]) {
-      var nuts = sObj["dish_id"]["nutritions"] as List<dynamic>;
-      var match = nuts.firstWhere(
-        (n) => n["nutrition_id"]["code"] == code,
-        orElse: () => null
-      );
-      if (match != null) {
-        total += (match["value"] as int);
+    int total = 0;
+    for (var wObj in selectDayEventArr) {
+      for (var sObj in wObj["meals"]) {
+        var nuts = sObj["dish_id"]["nutritions"] as List<dynamic>;
+        var match = nuts.firstWhere((n) => n["nutrition_id"]["code"] == code,
+            orElse: () => null);
+        if (match != null) {
+          total += (match["value"] as int);
+        }
       }
     }
+    return total;
   }
-  return total;
-}
-void getNutritionData() {
-  getNutrition = [
-    sumByCode("CAL"),
-    sumByCode("PROTEINS"),
-    sumByCode("Carbo"),
-    sumByCode("FATS"),
-  ];
-}
 
-
-  // void getNutritionData() {
-  //   getNutrition = [
-  //     sumCalories(), //calories
-  //     sumProtein(), //protein
-  //     sumCarbs(), //carbs
-  //     sumFat(), //fat
-  //   ];
-  // }
+  void getNutritionData() {
+    getNutrition = [
+      sumByCode("CAL"),
+      sumByCode("PROTEINS"),
+      sumByCode("Carbo"),
+      sumByCode("FATS"),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +241,7 @@ void getNutritionData() {
           ),
         ),
         title: const Text(
-          "Meal Schedule",
+          "Lịch bữa ăn",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -310,20 +295,16 @@ void getNutritionData() {
             dayBGColor: Colors.grey.withOpacity(0.15),
             titleSpaceBetween: 15,
             backgroundColor: Colors.transparent,
-            // fullCalendar: false,
             fullCalendarScroll: FullCalendarScroll.horizontal,
             fullCalendarDay: WeekDay.short,
             selectedDateColor: Colors.white,
             dateColor: Colors.black,
             locale: 'en',
-
             initialDate: DateTime.now(),
             calendarEventColor: AppColors.primaryColor2,
             firstDate: DateTime.now().subtract(const Duration(days: 140)),
             lastDate: DateTime.now().add(const Duration(days: 60)),
-
             onDateSelected: (date) {
-              // _selectedDateAppBBar = date;
               DateTime now = DateTime.now();
               _selectedDateAppBBar = DateTime(
                 date.year,
@@ -331,7 +312,7 @@ void getNutritionData() {
                 date.day,
                 now.hour,
                 now.minute,
-                now.second, // Thêm giây nếu cần
+                now.second,
               );
               print("date: $_selectedDateAppBBar");
               getMealSchedule(
@@ -374,7 +355,7 @@ void getNutritionData() {
                                     width: media.width,
                                     height: media.height * 0.35),
                                 const Text(
-                                  "No meal schedule for today",
+                                  "Không có lịch bữa ăn cho hôm nay",
                                   style: TextStyle(
                                       color: AppColors.blackColor,
                                       fontSize: 20,
@@ -384,19 +365,16 @@ void getNutritionData() {
                                   height: 30,
                                 ),
                               ],
-                            ): 
-                          SizedBox(
+                            )
+                          : SizedBox(
                               width: media.width,
-                              // height: media.height * 0.6,
                               child: ListView.builder(
-                                // scrollDirection: Axis.vertical,
                                 physics: const NeverScrollableScrollPhysics(),
                                 padding: const EdgeInsets.only(bottom: 20),
-                                itemCount: 5,
+                                itemCount: selectDayEventArr.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
                                   var slotArr = selectDayEventArr;
-                                  // print(slotArr);
                                   return slotArr[index]['meals'].isEmpty
                                       ? const SizedBox()
                                       : Column(
@@ -406,7 +384,6 @@ void getNutritionData() {
                                                   MainAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  // slotArr[index]["title"],
                                                   slotArr[index]["name"],
                                                   style: const TextStyle(
                                                       color:
@@ -417,8 +394,7 @@ void getNutritionData() {
                                                 ),
                                                 const Spacer(),
                                                 Text(
-                                                  // "${slotArr[index]["set"].length} meals| ${getCalories(slotArr[index]["set"])} calories",
-                                                  "${slotArr[index]["meals"].length} meals| ${getCalories(slotArr[index]["meals"])} calories",
+                                                  "${slotArr[index]["meals"].length} món| ${getCalories(slotArr[index]["meals"])} kcal",
                                                   style: const TextStyle(
                                                       color:
                                                           AppColors.blackColor,
@@ -446,11 +422,17 @@ void getNutritionData() {
                                                   return ExercisesRow(
                                                     ImagePadding: 10,
                                                     eObj: Exercise(
-                                                        title: yObj["dish_id"]["name"],
-                                                        image: yObj["dish_id"]["image"],
-                                                        caloriesBurned: yObj["dish_id"]["nutritions"][0]["value"],
+                                                        title: yObj["dish_id"]
+                                                            ["name"],
+                                                        image: yObj["dish_id"]
+                                                            ["image"],
+                                                        caloriesBurned: yObj[
+                                                                    "dish_id"]
+                                                                ["nutritions"]
+                                                            [0]["value"],
                                                         id: yObj["id"],
-                                                        value: yObj["meal_time"].toString()),
+                                                        value: yObj["meal_time"]
+                                                            .toString()),
                                                     onPressed: () {
                                                       print(yObj);
                                                       showDialog(
@@ -465,12 +447,18 @@ void getNutritionData() {
                                                             try {
                                                               DateTime
                                                                   dateTime =
-                                                                  DateFormat("dd/MM/yyyy hh:mm a").parse(mealTime);
+                                                                  DateFormat(
+                                                                          "dd/MM/yyyy hh:mm a")
+                                                                      .parse(
+                                                                          mealTime);
                                                               formattedMealTime =
-                                                                  DateFormat("dd/MM/yyyy hh:mm a").format(dateTime);
+                                                                  DateFormat(
+                                                                          "dd/MM/yyyy hh:mm a")
+                                                                      .format(
+                                                                          dateTime);
                                                             } catch (e) {
                                                               formattedMealTime =
-                                                                  "Định dạng không hợp lệ"; // Hoặc xử lý lỗi khác
+                                                                  "Định dạng không hợp lệ";
                                                             }
                                                           } else {
                                                             formattedMealTime =
@@ -487,7 +475,7 @@ void getNutritionData() {
                                                                     formattedMealTime,
                                                               }),
                                                             title:
-                                                                "Meal Schedule",
+                                                                "Lịch bữa ăn",
                                                           );
                                                         },
                                                       );
@@ -500,7 +488,7 @@ void getNutritionData() {
                               ),
                             ),
                       const Text(
-                        "Today Meal Nutritions",
+                        "Dinh dưỡng bữa ăn hôm nay",
                         style: TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 18,
@@ -513,7 +501,7 @@ void getNutritionData() {
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: 4,
+                          itemCount: nutritionGoalArr.length,
                           itemBuilder: (context, index) {
                             return Container(
                                 width: media.width,
@@ -534,7 +522,6 @@ void getNutritionData() {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        //text: calories icon: fire
                                         Text(
                                           nutritionGoalArr[index]["title"],
                                           style: const TextStyle(
@@ -562,9 +549,8 @@ void getNutritionData() {
                                       width: media.width * 0.5,
                                       backgroundColor: Colors.grey.shade100,
                                       foregroundColor: Colors.purple,
-                                      // ratio: wObj["progress"] as double? ?? 0.0,
                                       ratio: getNutrition[index] /
-                                          int.parse(nutritionGoalArr[index]
+                                          double.parse(nutritionGoalArr[index]
                                                   ["value"]
                                               .split(" ")[0]),
                                       direction: Axis.horizontal,

@@ -21,7 +21,7 @@ class ShowLog extends StatelessWidget {
     final id = eObj["id"]; // Giả sử eObj chứa id
     String url = "";
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.133.103:8055/items/workout_schedule/$id';
+      url = 'http://192.168.133.101:8055/items/workout_schedule/$id';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -29,7 +29,7 @@ class ShowLog extends StatelessWidget {
         ),
       );
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.133.103:8055/items/meal_schedule/$id?fields=*,dish_id.*';
+      url = 'http://192.168.133.101:8055/items/meal_schedule/$id?fields=*,dish_id.*';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -48,9 +48,9 @@ class ShowLog extends StatelessWidget {
     String url = "";
     //kiểm tra phần tử là exercise hay meal
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.133.103:8055/items/workout_schedule/$id';
+      url = 'http://192.168.133.101:8055/items/workout_schedule/$id';
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.133.103:8055/items/meal_schedule/$id';
+      url = 'http://192.168.133.101:8055/items/meal_schedule/$id';
     } else {
       return;
     }
@@ -64,7 +64,7 @@ class ShowLog extends StatelessWidget {
         response.statusCode == 201) {
           ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Deleted successfully!'),
+        content: Text('Xóa thành công!'),
       ),
       );
       // Navigator.pop(context);
@@ -83,7 +83,7 @@ class ShowLog extends StatelessWidget {
       print("Failed to delete workout: ${response.body}");
       ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Failed to delete workout!'),
+        content: Text('Xóa thất bại!'),
       ),
       );
     }
@@ -188,7 +188,7 @@ class ShowLog extends StatelessWidget {
               height: 15,
             ),
             RoundGradientButton(
-                title: "Mark Done",
+                title: "Hoàn thành",
                 onPressed: () {
                   Navigator.pop(context);
                 }),
@@ -203,22 +203,21 @@ class ShowLog extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Choose an option"),
+          title: const Text("Chọn tùy chọn"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text("Edit"),
+                title: const Text("Chỉnh sửa"),
                 onTap: () {
                   _editEvent(context);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.delete),
-                title: const Text("Delete"),
+                title: const Text("Xóa"),
                 onTap: () {
-                  // Gọi hàm xóa sự kiện ở đây
                   _deleteEvent(context);
                 },
               ),

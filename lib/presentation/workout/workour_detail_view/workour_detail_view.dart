@@ -13,7 +13,7 @@ import 'exercises_step_details.dart';
 
 Future<Map<String, dynamic>> getExerciseDetail(int id) async {
   String url =
-      'http://192.168.133.103:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+      'http://192.168.133.101:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
 
   String? token = await getToken();
 
@@ -174,7 +174,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                       ),
                       IconTitleNextRow(
                           icon: "assets/icons/time_icon.png",
-                          title: "Schedule Workout",
+                          title: "Lên lịch tập",
                           // time: "5/27, 09:00 AM",
                           color: AppColors.primaryColor2.withOpacity(0.3),
                           onPressed: () {
@@ -201,14 +201,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "You'll Need",
+                            "Dụng cụ bạn cần",
                             style: TextStyle(
                                 color: AppColors.blackColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
                           Text(
-                            "${equipmentArr.length} Items",
+                            "${equipmentArr.length} món",
                             style: const TextStyle(
                                 color: AppColors.grayColor, fontSize: 12),
                           ),
@@ -274,14 +274,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "Exercises",
+                            "Bài tập",
                             style: TextStyle(
                                 color: AppColors.blackColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700),
                           ),
                           Text(
-                            "${groupedExercises.length} Days",
+                            "${groupedExercises.length} Ngày",
                             style: const TextStyle(
                                 color: AppColors.grayColor, fontSize: 12),
                           ),
@@ -409,7 +409,7 @@ class CustomCard extends StatelessWidget {
         onTap: () {
           if (!featureCompleted) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('This feature has not been implemented yet')));
+                content: Text('Cái này chưa được triển khai')));
           } else {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => _viewPage));

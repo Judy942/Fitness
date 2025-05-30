@@ -83,7 +83,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20)),
                     child: Image.network(
-                      'http://192.168.133.103:8055/assets/${widget.exerciseDetail["animation"]}',
+                      'http://192.168.133.101:8055/assets/${widget.exerciseDetail["animation"]}',
                       width: media.width,
                       height: media.width * 0.43,
                       fit: BoxFit.contain,
@@ -91,7 +91,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         return Icon(Icons.error, size: 40, color: AppColors.grayColor);
                       },
                     ),
-                    // child: Lottie.network('http://192.168.133.103:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    // child: Lottie.network('http://192.168.133.101:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
                     // child: Lottie.asset(
                     //   'assets/Animation - 1725696475335.json',
                     //   width: media.width,
@@ -122,7 +122,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 4,
               ),
               Text(
-                "${widget.eObj.difficulty} | ${widget.eObj.caloriesBurned} Calories Burn",
+                "${widget.eObj.difficulty} | ${widget.eObj.caloriesBurned} Calo đốt cháy",
                 style: const TextStyle(
                   color: AppColors.grayColor,
                   fontSize: 12,
@@ -132,7 +132,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 15,
               ),
               const Text(
-                "Descriptions",
+                "Mô tả",
                 style: TextStyle(
                     color: AppColors.blackColor,
                     fontSize: 16,
@@ -143,12 +143,12 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               ),
               ReadMoreText(
                 widget.exerciseDetail["description"] ??
-                    "No description available",
+                    "Không có mô tả",
                 trimLines: 4,
                 colorClickableText: AppColors.blackColor,
                 trimMode: TrimMode.Line,
-                trimCollapsedText: ' Read More ...',
-                trimExpandedText: ' Read Less',
+                trimCollapsedText: ' Xem thêm ...',
+                trimExpandedText: ' Thu gọn',
                 style: const TextStyle(
                   color: AppColors.grayColor,
                   fontSize: 14,
@@ -169,7 +169,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "How To Do It",
+                    "Cách thực hiện",
                     style: TextStyle(
                         color: AppColors.blackColor,
                         fontSize: 16,
@@ -178,8 +178,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      "${(widget.exerciseDetail["process_steps"] as List?)?.length ?? 0} Steps",
-
+                      "${(widget.exerciseDetail["process_steps"] as List?)?.length ?? 0} bước",
                       style: const TextStyle(
                           color: AppColors.grayColor, fontSize: 12),
                     ),
@@ -200,7 +199,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     );
                   } else {
                     // Xử lý trường hợp danh sách rỗng
-                    return const Text("No steps available");
+                    return const Text("Không có sẵn");
                   }
                 }),
               ),

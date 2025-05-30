@@ -68,58 +68,65 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     String startDate = "${formattedDate}T00:00:00%2B07:00";
     String endDate = "${formattedDate}T23:59:00%2B07:00";
 
-    return 'http://192.168.133.103:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
+    return 'http://192.168.133.101:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
   }
 
   @override
-void initState() {
-  super.initState();
-  _selectedDateAppBBar = DateTime.now();
+  void initState() {
+    super.initState();
+    _selectedDateAppBBar = DateTime.now();
 
-  getListWorkout().then((workouts) {
-    setState(() {
-      workoutArr = workouts;
+    getListWorkout().then((workouts) {
+      setState(() {
+        workoutArr = workouts;
+        setDayEventWorkoutList();
+      });
+    });
+
+    getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar))
+        .then((_) {
       setDayEventWorkoutList();
     });
-  });
-
-  getWorkoutSchedule(createWorkoutScheduleUrl(_selectedDateAppBBar)).then((_) {
-    setDayEventWorkoutList();
-  });
-}
+  }
 
   String formatScheduledTime(String time) {
     DateTime dateTime = DateTime.parse(time); // Parse từ chuỗi
     return DateFormat('dd/MM/yyyy hh:mm a').format(dateTime); // Định dạng lại
   }
 
-void setDayEventWorkoutList() {
-  if (workoutArr.isEmpty) return; // Thêm kiểm tra này
+  void setDayEventWorkoutList() {
+    if (workoutArr.isEmpty) return; // Thêm kiểm tra này
 
-  var date = dateToStartDate(_selectedDateAppBBar);
+    var date = dateToStartDate(_selectedDateAppBBar);
 
-  selectDayEventArr = eventArr.map((wObj) {
-    DateTime scheduledTime = DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
+    selectDayEventArr = eventArr
+        .map((wObj) {
+          DateTime scheduledTime =
+              DateTime.parse(wObj["scheduled_execution_time"]).toLocal();
 
-    String workoutName = workoutArr.where((w) => w["id"] == wObj["workout_id"]).isNotEmpty
-        ? workoutArr.firstWhere((w) => w["id"] == wObj["workout_id"])["title"]
-        : "Workout";
+          String workoutName =
+              workoutArr.where((w) => w["id"] == wObj["workout_id"]).isNotEmpty
+                  ? workoutArr
+                      .firstWhere((w) => w["id"] == wObj["workout_id"])["title"]
+                  : "Workout";
 
-    return {
-      "id": wObj["id"],
-      "workout_id": wObj["workout_id"],
-      "difficulty_id": wObj["difficulty_id"],
-      "name": workoutName,
-      "start_time": DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
-      "date": scheduledTime,
-    };
-  }).where((wObj) => dateToStartDate(wObj["date"] as DateTime) == date).toList();
+          return {
+            "id": wObj["id"],
+            "workout_id": wObj["workout_id"],
+            "difficulty_id": wObj["difficulty_id"],
+            "name": workoutName,
+            "start_time":
+                DateFormat('dd/MM/yyyy hh:mm a').format(scheduledTime),
+            "date": scheduledTime,
+          };
+        })
+        .where((wObj) => dateToStartDate(wObj["date"] as DateTime) == date)
+        .toList();
 
-  if (mounted) {
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +139,10 @@ void setDayEventWorkoutList() {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            // Navigator.pop(context);
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const DashboardScreen()));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const DashboardScreen()));
           },
           child: Container(
             margin: const EdgeInsets.all(8),
@@ -153,7 +161,7 @@ void setDayEventWorkoutList() {
           ),
         ),
         title: const Text(
-          "Workout Schedule",
+          "Lịch tập luyện",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -280,7 +288,7 @@ void setDayEventWorkoutList() {
                                                   builder: (context) {
                                                     return ShowLog(
                                                       eObj: sObj,
-                                                      title: "Workout Schedule",
+                                                      title: "Lịch tập luyện",
                                                     );
                                                   },
                                                 );

@@ -21,7 +21,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.133.103:8055/users/me'),
+      Uri.parse('http://192.168.133.101:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -110,7 +110,7 @@ class TopBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Welcome Back,",
+              "Chào mừng trở lại,",
               style: TextStyle(
                 color: AppColors.midGrayColor,
                 fontSize: 12,
@@ -245,7 +245,7 @@ class ContainerBmi extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "BMI (Body Mass Index)",
+                    "BMI (Chỉ số khối cơ thể)",
                     style: TextStyle(
                       color: AppColors.whiteColor,
                       fontSize: 14,
@@ -253,7 +253,7 @@ class ContainerBmi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    bmi == "0" ? "No data height and weight" : bmi,
+                    bmi == "0" ? "Chưa có dữ liệu chiều cao và cân nặng" : bmi,
                     style: TextStyle(
                       color: AppColors.whiteColor.withOpacity(0.7),
                       fontSize: 14,
@@ -354,7 +354,7 @@ class TodayTargetSection extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            "Today Target",
+            "Hoạt động hôm nay",
             style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 14,
@@ -362,10 +362,10 @@ class TodayTargetSection extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 75,
+            width: 95,
             height: 30,
             child: RoundButton(
-              title: "Check",
+              title: "Kiểm Tra",
               type: RoundButtonType.primaryBG,
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -399,8 +399,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.133.101:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.133.101:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;
@@ -412,7 +412,7 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Your Activity", style: sectionTitleStyle),
+        const Text("Hoạt Động Của Bạn", style: sectionTitleStyle),
         ListView.builder(
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),

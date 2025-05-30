@@ -34,10 +34,10 @@ class _ResultViewState extends State<ResultView> {
   List statArr = [];
 
   List tracker_position = [
-    "Front Facing",
-    "Back Facing",
-    "Left Facing",
-    "Right Facing",
+    "Mặt trước",
+    "Mặt sau",
+    "Mặt trái",
+    "Mặt phải",
   ];
 
   @override
@@ -89,7 +89,7 @@ class _ResultViewState extends State<ResultView> {
   Future<Map<int, List<dynamic>>> fetchProcessTrackerByMounth(String month, int year) async {
     String? token = await getToken();
     final url = Uri.parse(
-        'http://192.168.133.103:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
+        'http://192.168.133.101:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
 
     print('Fetching data for month: $month, year: $year');
     print('URL: $url');
@@ -129,7 +129,7 @@ class _ResultViewState extends State<ResultView> {
       print('Grouped data: $groupedData');
       return groupedData;
     } else {
-      throw Exception('Failed to load process tracker data');
+      throw Exception('Không thể tải dữ liệu theo dõi tiến trình');
     }
   }
 
@@ -157,7 +157,7 @@ class _ResultViewState extends State<ResultView> {
 
     if (encryptionKey == null || encryptionIv == null) {
       // Handle the case where the key or iv is missing
-      throw Exception("Key or IV is missing in storage");
+      throw Exception("Không tìm thấy khóa hoặc IV trong bộ nhớ");
     }
 
     final key = encrypt.Key.fromBase64(encryptionKey);
@@ -206,7 +206,7 @@ class _ResultViewState extends State<ResultView> {
 
   Future<Uint8List> decryptAndSaveImageFromTextFile(
       String filePath, String fileName) async {
-    final fileUrl = 'http://192.168.133.103:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.133.101:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       // Kiểm tra xem file có tồn tại không
@@ -244,7 +244,7 @@ class _ResultViewState extends State<ResultView> {
       
       // Lấy thông tin ảnh trước khi xóa
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.103:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Xóa file trong storage
         final deleteFileResponse = await http.delete(
-          Uri.parse('http://192.168.133.103:8055/files/$fileId'),
+          Uri.parse('http://192.168.133.101:8055/files/$fileId'),
           headers: {
             'Authorization': 'Bearer $token',
           },
@@ -269,7 +269,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Xóa record trong database
         final deleteResponse = await http.delete(
-          Uri.parse('http://192.168.133.103:8055/items/process_tracker/$imageId'),
+          Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -425,7 +425,7 @@ class _ResultViewState extends State<ResultView> {
       
       // Lấy thông tin ảnh cũ
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.103:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -450,7 +450,7 @@ class _ResultViewState extends State<ResultView> {
             // Tải lên ảnh đã mã hóa
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('http://192.168.133.103:8055/files'),
+              Uri.parse('http://192.168.133.101:8055/files'),
             );
 
             request.headers['Authorization'] = 'Bearer $token';
@@ -463,7 +463,7 @@ class _ResultViewState extends State<ResultView> {
 
               // Xóa file ảnh cũ
               await http.delete(
-                Uri.parse('http://192.168.133.103:8055/files/$oldFileId'),
+                Uri.parse('http://192.168.133.101:8055/files/$oldFileId'),
                 headers: {
                   'Authorization': 'Bearer $token',
                 },
@@ -480,7 +480,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Cập nhật thông tin ảnh trong database
         final updateResponse = await http.patch(
-          Uri.parse('http://192.168.133.103:8055/items/process_tracker/$imageId'),
+          Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -666,7 +666,7 @@ class _ResultViewState extends State<ResultView> {
     String? encryptionIv = keyAndIv['iv'];
 
     if (encryptionKey == null || encryptionIv == null) {
-      throw Exception("Key hoặc IV không tồn tại trong storage");
+      throw Exception("Không tìm thấy khóa hoặc IV trong bộ nhớ");
     }
 
     final key = encrypt.Key.fromBase64(encryptionKey);
@@ -771,7 +771,7 @@ class _ResultViewState extends State<ResultView> {
             ),
           ),
           title: const Text(
-            "Result",
+            "Kết quả",
             style: TextStyle(
                 color: AppColors.blackColor,
                 fontSize: 22,
@@ -810,7 +810,7 @@ class _ResultViewState extends State<ResultView> {
           ),
         ),
         title: const Text(
-          "Result",
+          "Kết quả",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 22,
@@ -933,28 +933,28 @@ class _ResultViewState extends State<ResultView> {
                                   ),
                                   itemCount: items.length,
                                   itemBuilder: (context, i) {
-                                    return FutureBuilder<Uint8List>(
-                                      future: decryptAndSaveImageFromTextFile(
-                                        items[i]['image'],
-                                        'image_$i.png',
-                                      ),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.hasData) {
-                                            return _buildImage(
-                                              snapshot.data!,
-                                              items[i]['id'],
-                                              items[i]['tracker_position_id'],
-                                              DateTime.parse(items[i]['date_upload']),
-                                            );
-                                          } else {
-                                            return const Icon(Icons.error_outline);
-                                          }
-                                        } else {
-                                          return const Center(child: CircularProgressIndicator());
-                                        }
-                                      },
-                                    );
+  return FutureBuilder<Uint8List>(
+    future: decryptAndSaveImageFromTextFile(
+      items[i]['image'],
+      'image_$i.png',
+    ),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
+          return _buildImage(
+            snapshot.data!,
+            items[i]['id'],
+            items[i]['tracker_position_id'],
+            DateTime.parse(items[i]['date_upload']),
+          );
+        } else {
+          return const Icon(Icons.error_outline);
+        }
+      } else {
+        return const Center(child: CircularProgressIndicator());
+      }
+    },
+  );
                                   },
                                 ),
                               ],

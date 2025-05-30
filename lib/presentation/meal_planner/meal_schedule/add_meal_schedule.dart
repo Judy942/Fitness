@@ -12,6 +12,7 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../main.dart';
 import '../../../services/push_notification/NotificationCacheService.dart';
+import '../../../services/push_notification/NotificationSyncService.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
@@ -80,7 +81,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
           ),
         ),
         title: const Text(
-          "Add Schedule",
+          "Thêm lịch bữa ăn",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -118,7 +119,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                       height: 20,
                     ),
                     const Text(
-                      "Time",
+                      "Thời gian",
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 14,
@@ -149,7 +150,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                       height: 20,
                     ),
                     const Text(
-                      "Details meal",
+                      "Chi tiết bữa ăn",
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 14,
@@ -160,7 +161,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                     ),
                     IconTitleNextRow(
                       icon: "assets/icons/difficulity_icon.png",
-                      title: "Meal",
+                      title: "Bữa ăn",
                       time: (recommendationArr.isNotEmpty &&
                               recommendationArr[mealSelected] != null)
                           ? recommendationArr[mealSelected]['name']
@@ -185,7 +186,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
                     ),
                     const Spacer(),
                     RoundGradientButton(
-                        title: "Save",
+                        title: "Lưu",
                         onPressed: () async {
                           setState(() {
                             isLoading = true;
@@ -226,7 +227,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.103:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.133.101:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -249,7 +250,7 @@ Future<void> addMealSchedule(
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Add schedule success'),
+        content: Text('Thêm lịch thành công'),
       ),
     );
     Navigator.pushReplacement(
@@ -272,7 +273,7 @@ Future<void> scheduleMealNotification(
   await flutterLocalNotificationsPlugin.zonedSchedule(
     notificationId,
     "Đến giờ ăn rồi 🍽️",
-    "Hôm nay bạn có bữa $mealName lúc ${mealTime.toLocal().hour}:${mealTime.minute}",
+    "Hôm nay bạn có bữa $mealName lúc ${formatTime(mealTime)}",
     scheduledDate,
     const NotificationDetails(
       android: AndroidNotificationDetails(
@@ -288,7 +289,7 @@ Future<void> scheduleMealNotification(
   );
 }
 
-void scheduleMotivationalNotification() async {
+Future<void> scheduleMotivationalNotification() async {
   final tz.TZDateTime scheduledDate = tz.TZDateTime.local(
     DateTime.now().year,
     DateTime.now().month,

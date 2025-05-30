@@ -59,7 +59,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.103:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.133.101:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -69,7 +69,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.133.103:8055/assets/${item['image']}',
+            'image': 'http://192.168.133.101:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();
@@ -142,7 +142,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
           ),
         ),
         title: const Text(
-          'Meal Planner',
+          'Lập kế hoạch bữa ăn',
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 20,
@@ -205,7 +205,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             var wObj = filteredDishes[index] as Map? ?? {};
                             return ListTile(
                               leading: Image.network(
-                                'http://192.168.133.103:8055/assets/${wObj["image"]}',
+                                'http://192.168.133.101:8055/assets/${wObj["image"]}',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
@@ -213,7 +213,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                                   return Icon(Icons.error);
                                 },
                               ),
-                              title: Text(wObj['name'] ?? 'Unknown'),
+                              title: Text(wObj['name'] ?? 'Món ăn'),
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -232,7 +232,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                       height: 20,
                     ),
                     const Text(
-                      'Category',
+                      'Danh mục',
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 18,
@@ -272,7 +272,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                       height: 20,
                     ),
                     const Text(
-                      'Recommendation for Diet',
+                      'Đề xuất cho bữa ăn',
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 18,
@@ -347,7 +347,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                       height: 10,
                     ),
                     const Text(
-                      'Popular',
+                      'Phổ biến',
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 18,

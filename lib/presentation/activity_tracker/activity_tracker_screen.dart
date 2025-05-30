@@ -130,7 +130,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     try {
       String? token = await getToken();
       final response = await http.get(
-        Uri.parse('http://192.168.133.103:8055/api/activity/latest?limit=15'),
+        Uri.parse('http://192.168.133.101:8055/api/activity/latest?limit=15'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode == 200) {
@@ -171,7 +171,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
             );
           },
         ),
-        title: const Text('Activity Tracker',
+        title: const Text('Theo dõi hoạt động',
             style: TextStyle(color: AppColors.blackColor)),
       ),
       body: Stack(
@@ -190,10 +190,10 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildInfoCard(Icons.directions_walk, 'Steps',
+                      _buildInfoCard(Icons.directions_walk, 'Bước chân',
                           totalStepsToday.toString(), Colors.pink[100],
                           textColor: Colors.pink),
-                      _buildInfoCard(Icons.directions_walk, 'Distance (m)',
+                      _buildInfoCard(Icons.directions_walk, 'Quãng đường (m)',
                           (totalDistance).toStringAsFixed(0), Colors.white),
                     ],
                   ),
@@ -201,7 +201,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildInfoCard(null, 'Total Burn Cal', // Đổi tên
+                      _buildInfoCard(null, 'Calo đốt cháy', // Đổi tên
                           totalBurnCal.toStringAsFixed(0), Colors.grey[300]), // Đổi tên biến
                     ],
                   ),
@@ -217,15 +217,15 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Daily Workout Schedule',
+                        const Text('Kế hoạch ăn uống',
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w700)),
                         SizedBox(
-                          width: 80,
+                          width: 95,
                           height: 30,
                           child: RoundButton(
                             type: RoundButtonType.primaryBG,
-                            title: 'Check',
+                            title: 'Kiểm tra',
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -237,7 +237,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text('Latest Activity',
+                  const Text('Hoạt động gần đây',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   if (isLoadingActivities || isLoadingHealth)
                     const Center(child: CircularProgressIndicator())

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/workout/finish_workout/finish_workout_screen.dart';
 
@@ -26,7 +24,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
   Future<void> _fetchWorkoutHistory() async {
     List<dynamic> workouts = await _userService.fetchData(
-      'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
+      'http://192.168.133.101:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
     );
 
     setState(() {
@@ -60,25 +58,16 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
             itemCount: workoutHistoryArr.length,
             itemBuilder: (context, index) {
               var wObj = workoutHistoryArr[index] as Map? ?? {};
-              List completedExercise = (wObj["completed_exercise"] ?? []).map((exercise) {
-                return {
-                  "id": exercise["id"],
-                  "workout_schedule_id": wObj["id"],
-                  "exercise_id": exercise["exercise_id"]["id"],
-                  "set_completed_in": exercise["set_completed_in"]
-                };
-              }).toList();
+              // List completedExercise = (wObj["completed_exercise"] ?? []).map((exercise) {
+              //   return {
+              //     "id": exercise["id"],
+              //     "workout_schedule_id": wObj["id"],
               return GestureDetector(
                 onTap: () {
-                  log(completedExercise.toString());
+                  // log(completedExercise.toString());
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      // builder: (context) => CompleteWorkoutScreen(
-                      //   workoutSchedule: wObj,
-                      //   completedExercise: completedExercise,
-                      //   onComplete: () {},
-                      // ),
                       builder: (context) => FinishWorkoutScreen()
                     ),
                   );
@@ -96,7 +85,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: Image.network(
-                          'http://192.168.133.103:8055/assets/${wObj["workout_id"]["image"]}',
+                          'http://192.168.133.101:8055/assets/${wObj["workout_id"]["image"]}',
                           width: 60,
                           height: 60,
                           fit: BoxFit.fitHeight,

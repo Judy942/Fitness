@@ -7,12 +7,12 @@ import '../../core/utils/app_colors.dart';
 import '../../widgets/round_button.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/title_cell.dart';
+import '../activity_tracker/statistics_screen.dart';
 import '../home/home_screen.dart';
 import '../login/login_screen.dart';
 import '../meal_planner/meal_history/meal_history_screen.dart';
 import '../workout/workout_history/workout_history_screen.dart';
 import 'complete_profile_screen.dart';
-
 Future<void> logout(BuildContext context) async {
   try {
     // Clear SharedPreferences
@@ -33,7 +33,7 @@ Future<void> logout(BuildContext context) async {
     // Handle errors gracefully
     print("Error during logout: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Error occurred during logout')),
+      const SnackBar(content: Text('Đã xảy ra lỗi khi đăng xuất')),
     );
   }
 }
@@ -79,7 +79,7 @@ class _UserProfileState extends State<UserProfile> {
     } catch (e) {
       print("Error during handleLogout: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error occurred during logout')),
+        const SnackBar(content: Text('Đã xảy ra lỗi khi đăng xuất')),
       );
     }
   }
@@ -112,47 +112,51 @@ class _UserProfileState extends State<UserProfile> {
     {
       "image": "assets/icons/p_activity.png",
       "name": "Lịch sử hoạt động",
-      "tag": "3"
+      "tag": "3",
+      "action": (BuildContext context) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const StatisticsScreen(title: "Lịch sử hoạt động", type: "activity"),
+            ),
+          ),
     },
-    {
-      "image": "assets/icons/p_workout.png",
-      "name": "Workout Progress",
-      "tag": "4"
-    }
+    // {
+    //   "image": "assets/icons/p_workout.png",
+    //   "name": "Workout Progress",
+    //   "tag": "4"
+    // }
   ];
 
   List otherArr = [
-    {"image": "assets/icons/p_contact.png", "name": "Contact Us", "tag": "5"},
+    {"image": "assets/icons/p_contact.png", "name": "Liên hệ chúng tôi", "tag": "5"},
     {
       "image": "assets/icons/p_privacy.png",
-      "name": "Privacy Policy",
+      "name": "Chính sách bảo mật",
       "tag": "6"
     },
-    {"image": "assets/icons/p_setting.png", "name": "Setting", "tag": "7"},
+    {"image": "assets/icons/p_setting.png", "name": "Cài đặt", "tag": "7"},
     {
       "image": "assets/icons/p_personal.png",
-      "name": "Logout",
+      "name": "Đăng xuất",
       "tag": "8",
       "action": (BuildContext context) => showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text("Confirm Logout"),
-              content: const Text("Are you sure you want to log out?"),
+              title: const Text("Xác nhận đăng xuất"),
+              content: const Text("Bạn có chắc chắn muốn đăng xuất?"),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context), // Close the dialog
-                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Hủy"),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-
-                    final state =
-                        context.findAncestorStateOfType<_UserProfileState>();
+                    Navigator.pop(context);
+                    final state = context.findAncestorStateOfType<_UserProfileState>();
                     state?.handleLogout();
                     logout(context);
                   },
-                  child: const Text("Logout"),
+                  child: const Text("Đăng xuất"),
                 ),
               ],
             ),
@@ -169,7 +173,7 @@ class _UserProfileState extends State<UserProfile> {
         centerTitle: true,
         elevation: 0,
         title: const Text(
-          "Profile",
+          "Hồ sơ",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -204,8 +208,7 @@ class _UserProfileState extends State<UserProfile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            userData['last_name'] ?? "you",
-                            // allData['last_name'] ?? "you",
+                            userData['last_name'] ?? "bạn",
                             style: const TextStyle(
                               color: AppColors.blackColor,
                               fontSize: 16,
@@ -219,7 +222,7 @@ class _UserProfileState extends State<UserProfile> {
                       width: 70,
                       height: 25,
                       child: RoundButton(
-                        title: "Edit",
+                        title: "Sửa",
                         type: RoundButtonType.primaryBG,
                         onPressed: () async {
                           final result = await Navigator.pushReplacement(
@@ -250,7 +253,7 @@ class _UserProfileState extends State<UserProfile> {
                     Expanded(
                       child: TitleSubtitleCell(
                         title: userData['height'].toString(),
-                        subtitle: "Height",
+                        subtitle: "Chiều cao",
                       ),
                     ),
                     const SizedBox(
@@ -259,7 +262,7 @@ class _UserProfileState extends State<UserProfile> {
                     Expanded(
                       child: TitleSubtitleCell(
                         title: userData['weight'].toString(),
-                        subtitle: "Weight",
+                        subtitle: "Cân nặng",
                       ),
                     ),
                     const SizedBox(
@@ -267,9 +270,8 @@ class _UserProfileState extends State<UserProfile> {
                     ),
                     Expanded(
                       child: TitleSubtitleCell(
-                        //now-usetData['birthday']
                         title: userData['birthday'] ?? "0",
-                        subtitle: "birthday",
+                        subtitle: "Ngày sinh",
                       ),
                     ),
                   ],
@@ -290,7 +292,7 @@ class _UserProfileState extends State<UserProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Account",
+                        "Tài khoản",
                         style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 16,
@@ -336,7 +338,7 @@ class _UserProfileState extends State<UserProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Notification",
+                        "Thông báo",
                         style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 16,
@@ -358,7 +360,7 @@ class _UserProfileState extends State<UserProfile> {
                               ),
                               const Expanded(
                                 child: Text(
-                                  "Pop-up Notification",
+                                  "Thông báo đẩy",
                                   style: TextStyle(
                                     color: AppColors.blackColor,
                                     fontSize: 12,
@@ -448,7 +450,7 @@ class _UserProfileState extends State<UserProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Other",
+                        "Khác",
                         style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 16,

@@ -13,15 +13,15 @@ class ComparisonView extends StatefulWidget {
 }
 
 class _ComparisonViewState extends State<ComparisonView> {
-  String selectedMonth1 = "Select Month 1";
-  String selectedMonth2 = "Select Month 2";
+  String selectedMonth1 = "Chọn tháng 1";
+  String selectedMonth2 = "Chọn tháng 2";
   int selectedYear1 = DateTime.now().year;
   int selectedYear2 = DateTime.now().year;
 
   final List<String> months = [
-    'January', 'February', 'March', 'April', 'May',
-    'June', 'July', 'August', 'September', 'October',
-    'November', 'December'
+    'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5',
+    'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10',
+    'Tháng 11', 'Tháng 12'
   ];
 
   final List<int> years = List.generate(5, (index) => DateTime.now().year - 2 + index);
@@ -39,7 +39,7 @@ class _ComparisonViewState extends State<ComparisonView> {
               height: MediaQuery.of(context).size.height * 0.7,
               child: Column(
                 children: [
-                  const Text('Select Month and Year', style: TextStyle(fontSize: 18)),
+                  const Text('Chọn tháng và năm', style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
                   // Year Selection
                   Container(
@@ -138,7 +138,7 @@ class _ComparisonViewState extends State<ComparisonView> {
           ),
         ),
         title: const Text(
-          "Comparison",
+          "So sánh",
           style: TextStyle(
               color: AppColors.blackColor, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -151,7 +151,7 @@ class _ComparisonViewState extends State<ComparisonView> {
             IconTitleNextRow(
               
               icon: "assets/icons/date.png",
-              title: "Select Month 1",
+              title: "Chọn tháng 1",
               time: "$selectedMonth1 $selectedYear1",
               onPressed: () => _selectMonth(context, 1),
               color: AppColors.lightGrayColor,
@@ -159,20 +159,20 @@ class _ComparisonViewState extends State<ComparisonView> {
             const SizedBox(height: 15),
             IconTitleNextRow(
               icon: "assets/icons/date.png",
-              title: "Select Month 2",
+              title: "Chọn tháng 2",
               time: "$selectedMonth2 $selectedYear2",
               onPressed: () => _selectMonth(context, 2),
               color: AppColors.lightGrayColor,
             ),
             const Spacer(),
             RoundButton(
-              title: "Compare",
+              title: "So sánh",
               onPressed: () {
-                if (selectedMonth1 == "Select Month 1" ||
-                    selectedMonth2 == "Select Month 2") {
+                if (selectedMonth1 == "Chọn tháng 1" ||
+                    selectedMonth2 == "Chọn tháng 2") {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Please select both months"),
+                      content: Text("Vui lòng chọn cả hai tháng"),
                     ),
                   );
                   return;

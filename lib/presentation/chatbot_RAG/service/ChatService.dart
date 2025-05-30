@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../ChatMessage.dart';
 
 class ChatService {
-  final String baseUrl = 'http://192.168.133.103:8000';
+  final String baseUrl = 'http://192.168.133.101:8000';
 
   Future<String> sendMessage(String message, List<ChatMessage> history) async {
     try {
@@ -64,28 +64,26 @@ class ChatService {
       developer.log('Response status code: ${streamedResponse.statusCode}');
       
       if (streamedResponse.statusCode == 200) {
-        developer.log('Stream started successfully');
+        developer.log('Luồng bắt đầu thành công');
         String buffer = '';
         bool hasData = false;
         String currentWord = '';
         bool isNewWord = true;
         
         await for (var chunk in streamedResponse.stream.transform(utf8.decoder)) {
-          developer.log('Raw chunk received: $chunk');
+          developer.log('Nhận chunk thô: $chunk');
           
           if (chunk.isNotEmpty) {
             buffer += chunk;
-            // developer.log('Current buffer: $buffer');
             
-            // Thử parse JSON trực tiếp từ buffer
             try {
               final jsonData = jsonDecode(buffer);
               if (jsonData is Map && jsonData.containsKey('answer')) {
                 hasData = true;
                 final answer = jsonData['answer'];
-                developer.log('Yielding answer from JSON: $answer');
+                developer.log('Trả về câu trả lời từ JSON: $answer');
                 yield answer;
-                buffer = ''; // Reset buffer sau khi xử lý thành công
+                buffer = ''; // Đặt lại buffer sau khi xử lý thành công
               }
             } catch (e) {
               // Xử lý từng ký tự

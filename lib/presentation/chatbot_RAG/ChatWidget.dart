@@ -206,6 +206,8 @@ class _ChatWidgetState extends State<ChatWidget> {
         children: [
           Chat(
             messages: _messages,
+            hideBackgroundOnEmojiMessages: false,
+            
             onSendPressed: _handleSendPressed,
             user: _user,
             customMessageBuilder: _buildMessage,

@@ -18,27 +18,27 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
 
   List pages = [
     {
-      "title": "Track Your Goal",
+      "title": "Theo dõi mục tiêu",
       "subtitle":
-          "Don't worry if you have trouble determining your goals, We can help you determine your goals and track your goals",
+          "Đừng lo lắng nếu bạn gặp khó khăn trong việc xác định mục tiêu. Chúng tôi có thể giúp bạn xác định và theo dõi mục tiêu của mình",
       "image": "assets/images/on_board1.png"
     },
     {
-      "title": "Get Burn",
+      "title": "Đốt cháy calo",
       "subtitle":
-          "Let’s keep burning, to achive yours goals, it hurts only temporarily, if you give up now you will be in pain forever",
+          "Hãy tiếp tục đốt cháy để đạt được mục tiêu của bạn. Đau đớn chỉ là tạm thời, nếu bạn bỏ cuộc bây giờ, bạn sẽ đau đớn mãi mãi",
       "image": "assets/images/on_board2.png"
     },
     {
-      "title": "Eat Well",
+      "title": "Ăn uống lành mạnh",
       "subtitle":
-          "Let's start a healthy lifestyle with us, we can determine your diet every day. healthy eating is fun",
+          "Hãy bắt đầu lối sống lành mạnh với chúng tôi. Chúng tôi có thể xác định chế độ ăn của bạn mỗi ngày. Ăn uống lành mạnh thật thú vị",
       "image": "assets/images/on_board3.png"
     },
     {
-      "title": "Improve Sleep Quality",
+      "title": "Cải thiện chất lượng giấc ngủ",
       "subtitle":
-          "Improve the quality of your sleep with us, good quality sleep can bring a good mood in the morning",
+          "Cải thiện chất lượng giấc ngủ của bạn với chúng tôi. Giấc ngủ chất lượng tốt có thể mang lại tâm trạng tốt vào buổi sáng",
       "image": "assets/images/on_board4.png"
     }
   ];

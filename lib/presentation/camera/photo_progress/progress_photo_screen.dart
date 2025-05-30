@@ -25,7 +25,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
     String? token = await getToken();
     // Thay $CURRENT_USER bằng userId
     final url = Uri.parse(
-        'http://192.168.133.103:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
+        'http://192.168.133.101:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
 
     final response = await http.get(
       url,
@@ -38,9 +38,10 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
     if (response.statusCode == 200) {
       // Giải mã dữ liệu JSON
       final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
       return jsonResponse['data']; // Trả về danh sách dữ liệu
     } else {
-      throw Exception('Failed to load process tracker data');
+      throw Exception('Không thể tải dữ liệu theo dõi tiến trình');
     }
   }
 
@@ -67,7 +68,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
         leadingWidth: 0,
         leading: const SizedBox(),
         title: const Text(
-          "Progress Photo",
+          "Ảnh tiến trình",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -125,7 +126,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                                 height: 15,
                               ),
                               const Text(
-                                "Track Your Progress Each\nMonth With Photo",
+                                "Theo dõi tiến trình của bạn\nmỗi tháng bằng hình ảnh",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 14,
@@ -139,7 +140,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             ]),
                         Image.asset(
                           "assets/images/progress_each_photo.png",
-                          width: media.width * 0.3,
+                          width: 75,
                           fit: BoxFit.cover,
                         )
                       ],
@@ -161,17 +162,17 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Compare my Photo",
+                        "So sánh hình ảnh của tôi",
                         style: TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
                       ),
                       SizedBox(
-                        width: 100,
-                        height: 25,
+                        width: 90,
+                        height: 28,
                         child: RoundButton(
-                          title: "Compare",
+                          title: "So sánh",
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -192,7 +193,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Gallery",
+                        "Thư viện",
                         style: TextStyle(
                             color: AppColors.blackColor,
                             fontSize: 16,
@@ -208,7 +209,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
                             );
                           },
                           child: const Text(
-                            "See more",
+                            "Xem thêm",
                             style: TextStyle(
                                 color: AppColors.grayColor, fontSize: 12),
                           ))
@@ -284,13 +285,13 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
             );
             if (result != null) {
               // Xử lý đường dẫn ảnh ở đây (nếu cần)
-              print("Ảnh đã chụp: $result");
+              print("Đã chụp ảnh: $result");
             }
           } else if (status.isDenied) {
             // Quyền bị từ chối, hiển thị thông báo
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Camera permission is required to take photos.'),
+                content: Text('Cần quyền truy cập camera để chụp ảnh.'),
               ),
             );
           } else if (status.isPermanentlyDenied) {

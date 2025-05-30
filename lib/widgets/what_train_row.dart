@@ -25,6 +25,7 @@ class WhatTrainRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+                        print(wObj["exercises"]);
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
         decoration: BoxDecoration(
@@ -57,7 +58,7 @@ class WhatTrainRow extends StatelessWidget {
                       height: 4,
                     ),
                     Text(
-                      "${wObj["exercises"].toString()} | ${wObj["time"].toString()}",
+                      "${wObj["exercises"].toString()}",
                       style: const TextStyle(
                         color: AppColors.grayColor,
                         fontSize: 12,
@@ -70,7 +71,7 @@ class WhatTrainRow extends StatelessWidget {
                       width: 100,
                       height: 30,
                       child: RoundButton(
-                          title: "View More",
+                          title: "Xem thêm",
                           onPressed: () {
                             onViewMoreClick(context);
                           }),
@@ -94,17 +95,21 @@ class WhatTrainRow extends StatelessWidget {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
-                    // child: Image.asset(
-                    //   wObj["image"].toString(),
-                    // width: 90,
-                    // height: 90,
-                    // fit: BoxFit.contain,
-                    // ),
+
                     child: Image.network(
-                        'http://192.168.133.103:8055/assets/${wObj["image"]}',
+                        'http://192.168.133.101:8055/assets/${wObj["image"]}',
                         width: 90,
                         height: 90,
-                        fit: BoxFit.contain),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/default_image.png',
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.contain,
+                          );
+                        },
+                      ),
                   ),
                 ],
               ),

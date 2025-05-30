@@ -21,21 +21,21 @@ class GoalsScreen extends StatefulWidget {
 class _GoalsScreenState extends State<GoalsScreen> {
   List pageList = [
     {
-      "title": "Improve Shape",
+      "title": "Cải thiện vóc dáng",
       "subtitle":
-          "I have a low amount of body fat\nand need / want to build more\nmuscle",
+          "Tôi có lượng mỡ thấp\nvà cần / muốn xây dựng\nthêm cơ bắp",
       "image": "assets/images/goal_1.png"
     },
     {
-      "title": "Lean & Tone",
+      "title": "Gọn gàng & Săn chắc",
       "subtitle":
-          "I’m “skinny fat”. look thin but have\nno shape. I want to add learn\nmuscle in the right way",
+          "Tôi là người 'gầy nhưng có mỡ'. Trông gầy nhưng\nkhông có hình dáng. Tôi muốn tăng cơ\nđúng cách",
       "image": "assets/images/goal_2.png"
     },
     {
-      "title": "Lose a Fat",
+      "title": "Giảm mỡ",
       "subtitle":
-          "I have over 20 lbs to lose. I want to\ndrop all this fat and gain muscle\nmass",
+          "Tôi cần giảm hơn 9kg. Tôi muốn\ngiảm hết mỡ và tăng\ncơ bắp",
       "image": "assets/images/goal_3.png"
     }
   ];
@@ -135,7 +135,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       height: 15,
                     ),
                     const Text(
-                      "What is your goal ?",
+                      "Mục tiêu của bạn là gì?",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.blackColor,
@@ -145,7 +145,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     ),
                     const SizedBox(height: 5),
                     const Text(
-                      "It will help us to choose a best\nprogram for you",
+                      "Điều này sẽ giúp chúng tôi chọn\nchương trình tốt nhất cho bạn",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.grayColor,
@@ -156,7 +156,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const Spacer(),
                     SizedBox(height: media.width * 0.05),
                     RoundGradientButton(
-                      title: "Confirm",
+                      title: "Xác nhận",
                       onPressed: () {
                         setGoal(goal);
                         // Navigator.pushReplacementNamed(

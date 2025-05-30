@@ -14,8 +14,8 @@ Future<List> getListWorkout() async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   List whatArr = [];
   final response = await http.get(
-    // Uri.parse('http://192.168.133.103:8055/items/workout?limit=5&page=1&meta=*'),
-        Uri.parse('http://192.168.133.103:8055/items/workout'),
+    // Uri.parse('http://192.168.133.101:8055/items/workout?limit=5&page=1&meta=*'),
+        Uri.parse('http://192.168.133.101:8055/items/workout'),
 
     headers: {'Authorization': 'Bearer $token'},
   );
@@ -29,8 +29,8 @@ Future<List> getListWorkout() async {
         'id': item['id'],
         'image': item['image'],
         "title": item['name'],
-        "exercises": "${item['exercises'].length} Exercises",
-        "time": "${item['time'] ?? 'null'} mins" // Cập nhật để hiển thị 'null' nếu không có thời gian
+        "exercises": "${item['exercises'].length} Bài thể dục",
+        "time": "${item['time'] ?? 'null'} phút" // Cập nhật để hiển thị 'null' nếu không có thời gian
       };
     }).toList();
   } else {
@@ -88,7 +88,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
               centerTitle: true,
               elevation: 0,
               title: Text(
-                "Workout Tracker",
+                "Kế hoạch tập luyện",
                 style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: 16,
@@ -103,7 +103,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
               leading: const SizedBox(),
               expandedHeight: media.height * 0.05,
               flexibleSpace: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 height: media.width * 0.5,
                 width: double.maxFinite,
               ),
@@ -140,7 +140,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 15),
+                            vertical: 15, horizontal: 10),
                         decoration: BoxDecoration(
                           color: AppColors.primaryColor2.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(15),
@@ -149,18 +149,18 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              "Daily Workout Schedule",
+                              "Lịch tập hàng ngày",
                               style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700),
                             ),
                             SizedBox(
-                              width: 80,
+                              width: 95,
                               height: 30,
                               child: RoundButton(
                                 type: RoundButtonType.primaryBG,
-                                title: "Check",
+                                title: "Kiểm tra",
                                 onPressed: () {
                                   Navigator.push(
                                       context,
@@ -180,7 +180,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Workouts for you",
+                            "Bài tập cho bạn",
                             style: TextStyle(
                                 color: AppColors.blackColor,
                                 fontSize: 16,
@@ -206,7 +206,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "All workouts",
+                            "Tất cả bài tập",
                             style: TextStyle(
                                 color: AppColors.blackColor,
                                 fontSize: 16,

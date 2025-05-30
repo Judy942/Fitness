@@ -31,12 +31,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: InkWell(
         onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const ChatWidget(),
-          //   ),
-          // );
               Navigator.push(
       context,
       MaterialPageRoute(

@@ -30,14 +30,14 @@ class LatestActivityRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
                 wObj["type"] == "MEAL"
-                    ? 'http://192.168.133.103:8055/assets/${wObj["dish_id"]["image"]}'
-                    : 'http://192.168.133.103:8055/assets/${wObj["workout_id"]["image"]}',
+                    ? 'http://192.168.133.101:8055/assets/${wObj["dish_id"]["image"]}'
+                    : 'http://192.168.133.101:8055/assets/${wObj["workout_id"]["image"]}',
                 errorBuilder: (BuildContext context, Object error,
                     StackTrace? stackTrace) {
                   return Container(
-                    color: Colors.grey, // Hoặc bất kỳ màu nào bạn muốn
+                    color: Colors.grey,
                     child: const Icon(
-                        Icons.error_outline), // Hiển thị biểu tượng lỗi
+                        Icons.error_outline),
                   );
                 },
                 width: 50,

@@ -26,6 +26,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     'total_burn_calories': [],
   };
   bool isLoading = true;
+  int selectedYear = DateTime.now().year;
+  int selectedMonth = DateTime.now().month;
 
   @override
   void initState() {
@@ -41,9 +43,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Future<void> _loadAllData() async {
     setState(() => isLoading = true);
     try {
-      final now = DateTime.now();
-      final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+      final startOfMonth = DateTime(selectedYear, selectedMonth, 1);
+      final endOfMonth = DateTime(selectedYear, selectedMonth + 1, 0, 23, 59, 59);
 
       // Lấy dữ liệu cho cả 3 loại
       final types = [
@@ -74,7 +75,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       final data = await _health.getHealthDataFromTypes(
         types: types,
         startTime: startOfMonth,
-        endTime: endOfToday,
+        endTime: endOfMonth,
       );
 
       // Xử lý dữ liệu cho từng loại
@@ -129,11 +130,28 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     } catch (e) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
+          SnackBar(content: Text('Lỗi khi tải dữ liệu: $e')),
         );
       });
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+  void _selectMonthYear(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(selectedYear, selectedMonth),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      initialDatePickerMode: DatePickerMode.year,
+    );
+    if (picked != null && (picked.year != selectedYear || picked.month != selectedMonth)) {
+      setState(() {
+        selectedYear = picked.year;
+        selectedMonth = picked.month;
+      });
+      _loadAllData();
     }
   }
 
@@ -153,6 +171,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           'Thống kê hoạt động',
           style: TextStyle(color: AppColors.blackColor),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today, color: AppColors.blackColor),
+            onPressed: () => _selectMonthYear(context),
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -166,7 +190,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         // Biểu đồ Steps
                         if (allData['steps']!.isNotEmpty) ...[
                           const Text(
-                            'Biểu đồ đường - Steps',
+                            'Biểu đồ đường - Số bước chân',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 10),
@@ -235,7 +259,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         // Biểu đồ Distance
                         if (allData['distance']!.isNotEmpty) ...[
                           const Text(
-                            'Biểu đồ cột - Distance',
+                            'Biểu đồ cột - Quãng đường',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 10),
@@ -323,7 +347,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         // Biểu đồ Calories
                         if (allData['total_burn_calories']!.isNotEmpty) ...[
                           const Text(
-                            'Biểu đồ đường - Calories',
+                            'Biểu đồ đường - Calo',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 10),

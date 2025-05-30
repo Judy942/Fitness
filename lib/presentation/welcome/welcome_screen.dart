@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
                   width: media.width * 0.75, fit: BoxFit.fitWidth),
               SizedBox(height: media.width * 0.05),
               const Text(
-                "Welcome, Judy",
+                "Chào mừng, Judy",
                 style: TextStyle(
                     color: AppColors.blackColor,
                     fontSize: 20,
@@ -32,7 +32,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               SizedBox(height: media.width * 0.01),
               const Text(
-                "You are all set now, let’s reach your\ngoals together with us",
+                "Bạn đã sẵn sàng, hãy cùng chúng tôi\nđạt được mục tiêu của bạn",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.grayColor,
@@ -43,7 +43,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const Spacer(),
               RoundGradientButton(
-                title: "Go To Home",
+                title: "Đến Trang Chủ",
                 onPressed: () {
                   // Navigator.pushNamed(context, '/dashboardScreen');
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

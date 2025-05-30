@@ -14,6 +14,7 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../main.dart';
 import '../../../services/push_notification/NotificationCacheService.dart';
+import '../../../services/push_notification/NotificationSyncService.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
@@ -40,7 +41,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://192.168.133.103:8055/items/workout?limit=5&page=1&meta=*'),
+      Uri.parse('http://192.168.133.101:8055/items/workout?limit=5&page=1&meta=*'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -130,7 +131,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
           ),
         ),
         title: const Text(
-          "Add Schedule",
+          "Thêm lịch tập luyện",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -176,7 +177,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       height: 20,
                     ),
                     const Text(
-                      "Time",
+                      "Thời gian",
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 14,
@@ -218,7 +219,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                       height: 20,
                     ),
                     const Text(
-                      "Details Workout",
+                      "Chi tiết bài tập",
                       style: TextStyle(
                           color: AppColors.blackColor,
                           fontSize: 14,
@@ -229,7 +230,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                     ),
                     IconTitleNextRow(
                       icon: "assets/icons/choose_workout.png",
-                      title: "Choose Workout",
+                      title: "Chọn bài tập",
                       time: whatArr.isNotEmpty
                           ? whatArr[workoutSelected]['title']
                           : '',
@@ -247,7 +248,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                   
                     const Spacer(),
                     RoundGradientButton(
-                        title: "Save",
+                        title: "Lưu",
                         onPressed: () {
                           String formattedTime =
                               '${widget.date.toIso8601String()}+07:00';
@@ -274,76 +275,6 @@ class _AddScheduleViewState extends State<AddScheduleView> {
   }
 }
 
-// Future<void> editSchedule(
-//     BuildContext context, Map<String, dynamic> eObj, String url) async {
-//   String? token = await getToken();
-//   final response = await http.patch(
-//     Uri.parse(url),
-//     headers: {
-//       'Authorization': 'Bearer $token',
-//       'Content-Type': 'application/json',
-//     },
-//     body: jsonEncode(eObj),
-//   );
-//   if (response.statusCode == 200 ||
-//       response.statusCode == 204 ||
-//       response.statusCode == 201) {
-//     // Gọi hàm edit ở đây
-//     // print("Edit workout: ${response.body}");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(
-//         content: Text('Edit successfully!'),
-//       ),
-//     );
-//     final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-//     final notificationId = await NotificationCacheService.getNotificationId(
-//         responseData['data']['id'],
-//         isWorkout: true);
-//     if (notificationId != null) {
-//       await flutterLocalNotificationsPlugin.cancel(notificationId);
-//       await NotificationCacheService.removeNotificationId(
-//           responseData['data']['id'],
-//           isWorkout: true);
-//     }
-
-//     if (eObj["workout_id"] != null) {
-//        DateTime workoutTime = DateTime.parse(eObj['scheduled_execution_time']);
-//     int newNotificationId = workoutTime.millisecondsSinceEpoch ~/ 1000;
-//     String workoutName = responseData['data']['workout_id']['name'];
-
-//     await scheduleWorkoutNotification(
-//         workoutTime, workoutName, newNotificationId);
-//     await NotificationCacheService.saveWorkoutNotificationId(
-//         responseData['data']['id'], newNotificationId);
-
-//       Navigator.pushReplacement(context,
-//           MaterialPageRoute(builder: (context) => const WorkoutScheduleView()));
-//     } else {
-//        DateTime mealTime = DateTime.parse( responseData['data']['meal_time']);
-//     int newNotificationId = mealTime.millisecondsSinceEpoch ~/ 1000;
-//     String workoutName = responseData['data']['dish_id']['name'];
-
-//     await scheduleMealNotification(
-//         mealTime, workoutName, newNotificationId);
-//     await NotificationCacheService.saveWorkoutNotificationId(
-//         responseData['data']['id'], newNotificationId);
-
-//       Navigator.pushReplacement(context,
-//           MaterialPageRoute(builder: (context) => const MealSchedule()));
-//     }
-//   } else {
-//     print("Failed to get workout: ${response.body}");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(
-//         content: Text('Failed to edit!'),
-//       ),
-//     );
-//     Navigator.pop(context);
-//     Navigator.pop(context);
-//   }
-// }
-
 Future<void> editSchedule(
     BuildContext context, Map<String, dynamic> eObj, String url) async {
   final token = await getToken();
@@ -360,7 +291,7 @@ Future<void> editSchedule(
       response.statusCode == 201 ||
       response.statusCode == 204) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit successfully!')),
+      const SnackBar(content: Text('Chỉnh sửa thành công!')),
     );
 
     final data = jsonDecode(response.body)['data'];
@@ -400,7 +331,7 @@ Future<void> editSchedule(
   } else {
     debugPrint("Edit failed: ${response.body}");
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Failed to edit!')));
+        .showSnackBar(const SnackBar(content: Text('Chỉnh sửa thất bại!')));
   }
 }
 
@@ -410,7 +341,7 @@ Future<void> addWorkoutSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.103:8055/items/workout_schedule?fields=*,workout_id.*'),
+        'http://192.168.133.101:8055/items/workout_schedule?fields=*,workout_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -432,7 +363,7 @@ Future<void> addWorkoutSchedule(
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Add schedule success'),
+        content: Text('Thêm lịch thành công'),
       ),
     );
     // Navigator.pop(context);
@@ -451,7 +382,7 @@ Future<int?> showWorkoutDialog(BuildContext context, List itemList) async {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Select'),
+        title: const Text('Chọn bài tập'),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.separated(
@@ -484,7 +415,7 @@ Future<void> scheduleWorkoutNotification(
   await flutterLocalNotificationsPlugin.zonedSchedule(
     notificationId,
     "Đến giờ tập rồi 🏋️",
-    "Hôm nay bạn có lịch tập $workoutName lúc ${workoutTime.hour}:${workoutTime.minute}",
+    "Hôm nay bạn có lịch tập $workoutName lúc ${formatTime(workoutTime)}",
     scheduledDate,
     const NotificationDetails(
       android: AndroidNotificationDetails(
