@@ -12,7 +12,7 @@ import '../meal_schedule/add_meal_schedule.dart';
 
 Future<Map<String, dynamic>> getDishDetails(int id) async {
   String url =
-      'http://192.168.133.101:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
+      'http://192.168.133.100:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
 
   Map<String, dynamic> dishDetails = {};
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -105,7 +105,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
-                  'http://192.168.133.101:8055/assets/${widget.dObj["image"]}',
+                  'http://192.168.133.100:8055/assets/${widget.dObj["image"]}',
                   height: media.width * 0.5,
                   fit: BoxFit.fitHeight,
                   errorBuilder: (context, error, stackTrace) {
@@ -219,7 +219,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                         child: Row(
                                           children: [
                                             Image.network(
-                                              'http://192.168.133.101:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
+                                              'http://192.168.133.100:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
                                               width: 20,
                                               height: 20,
                                               fit: BoxFit.contain,
@@ -314,7 +314,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(15)),
                                             child: Image.network(
-                                              'http://192.168.133.101:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
+                                              'http://192.168.133.100:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
                                               width: 50,
                                               height: 50,
                                               fit: BoxFit.contain,

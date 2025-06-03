@@ -83,7 +83,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20)),
                     child: Image.network(
-                      'http://192.168.133.101:8055/assets/${widget.exerciseDetail["animation"]}',
+                      'http://192.168.133.100:8055/assets/${widget.exerciseDetail["animation"]}',
                       width: media.width,
                       height: media.width * 0.43,
                       fit: BoxFit.contain,
@@ -91,7 +91,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                         return Icon(Icons.error, size: 40, color: AppColors.grayColor);
                       },
                     ),
-                    // child: Lottie.network('http://192.168.133.101:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    // child: Lottie.network('http://192.168.133.100:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
                     // child: Lottie.asset(
                     //   'assets/Animation - 1725696475335.json',
                     //   width: media.width,

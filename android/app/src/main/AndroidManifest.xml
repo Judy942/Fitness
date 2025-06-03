@@ -101,4 +101,7 @@
     <uses-permission android:name="android.permission.health.READ_SLEEP_AWAKE" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
 </manifest>

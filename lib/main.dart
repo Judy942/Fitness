@@ -4,9 +4,11 @@ import 'dart:async';
 
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/services/step_notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
+
 import 'presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
 import 'presentation/onboarding_screen/start_screen.dart';
 
@@ -86,6 +88,9 @@ Future<void> main() async {
     username: 'trinhthuc130902@gmail.com',
     password: 'gkkt dvcr sbry mcya',
   );
+
+  // Khởi động service thông báo
+  await StepNotificationService().initialize();
 
   runApp(const MyApp());
 }

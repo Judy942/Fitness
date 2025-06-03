@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
-import 'package:flutter_application_fitness/presentation/notification/notification_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -21,7 +20,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.133.101:8055/users/me'),
+      Uri.parse('http://192.168.133.100:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -127,30 +126,22 @@ class TopBar extends StatelessWidget {
             ),
           ],
         ),
-        IconButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const NotificationScreen();
-              }));
-            },
-            icon: Image.asset(
-              "assets/icons/notification_icon.png",
-              width: 25,
-              height: 25,
-              fit: BoxFit.fitHeight,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.notifications);
-              },
-            )
-            // Image.asset(
-            //   "assets/icons/notification_icon.png",
-            //   width: 25,
-            //   height: 25,
-            //   fit: BoxFit.fitHeight,
-            // ),
-            // icon: Icon(Icons.notifications),
-
-            ),
+        // IconButton(
+        //     onPressed: () {
+        //       Navigator.push(context, MaterialPageRoute(builder: (context) {
+        //         return const NotificationScreen();
+        //       }));
+        //     },
+        //     icon: Image.asset(
+        //       "assets/icons/notification_icon.png",
+        //       width: 25,
+        //       height: 25,
+        //       fit: BoxFit.fitHeight,
+        //       errorBuilder: (context, error, stackTrace) {
+        //         return Icon(Icons.notifications);
+        //       },
+        //     )
+        //     ),
       ],
     );
   }
@@ -178,42 +169,7 @@ class ContainerBmi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // List<PieChartSectionData> showingSections(String bmi) {
-    //   const color0 = AppColors.secondaryColor2;
-    //   const color1 = AppColors.whiteColor;
-    //   return List.generate(
-    //     2,
-    //     (i) {
-    //       switch (i) {
-    //         case 0:
-    //           return PieChartSectionData(
-    //               color: color0,
-    //               value: 33,
-    //               title: '',
-    //               radius: 55,
-    //               titlePositionPercentageOffset: 0.55,
-    //               badgeWidget: Text(
-    //                 bmi,
-    //                 style: const TextStyle(
-    //                     color: AppColors.whiteColor,
-    //                     fontWeight: FontWeight.w700,
-    //                     fontSize: 12),
-    //               ));
-    //         case 1:
-    //           return PieChartSectionData(
-    //             color: color1,
-    //             value: 75,
-    //             title: '',
-    //             radius: 42,
-    //             titlePositionPercentageOffset: 0.55,
-    //           );
-    //         default:
-    //           throw Error();
-    //       }
-    //     },
-    //   );
-    // }
-
+    
     return Container(
         height: MediaQuery.of(context).size.width * 0.38,
         decoration: BoxDecoration(
@@ -399,8 +355,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.133.101:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.133.101:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.133.100:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.133.100:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;

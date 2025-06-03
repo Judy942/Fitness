@@ -66,7 +66,7 @@ class NotificationSyncService {
   // Lấy danh sách lịch tập
   static Future<List<dynamic>> _fetchWorkoutSchedules() async {
     final response = await http.get(
-      Uri.parse('http://192.168.133.101:8055/items/workout_schedule?fields=*,workout_id.*'),
+      Uri.parse('http://192.168.133.100:8055/items/workout_schedule?fields=*,workout_id.*'),
       headers: {
         'Authorization': 'Bearer ${await getToken()}',
         'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ class NotificationSyncService {
   // Lấy danh sách lịch ăn
   static Future<List<dynamic>> _fetchMealSchedules() async {
     final response = await http.get(
-      Uri.parse('http://192.168.133.101:8055/items/meal_schedule?fields=*,dish_id.*'),
+      Uri.parse('http://192.168.133.100:8055/items/meal_schedule?fields=*,dish_id.*'),
       headers: {
         'Authorization': 'Bearer ${await getToken()}',
         'Content-Type': 'application/json'
@@ -138,7 +138,6 @@ class NotificationSyncService {
           icon: 'app_icon',
         ),
       ),
-      matchDateTimeComponents: DateTimeComponents.time,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }

@@ -60,7 +60,7 @@ class _WorkoutRowState extends State<WorkoutRow> {
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
-                'http://192.168.133.101:8055/assets/${widget.wObj["workout_id"]["image"]}',
+                'http://192.168.133.100:8055/assets/${widget.wObj["workout_id"]["image"]}',
                 width: 60,
                 height: 60,
                 fit: BoxFit.fitHeight,

@@ -41,7 +41,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://192.168.133.101:8055/items/workout?limit=5&page=1&meta=*'),
+      Uri.parse('http://192.168.133.100:8055/items/workout?limit=5&page=1&meta=*'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -131,7 +131,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
           ),
         ),
         title: const Text(
-          "Thêm lịch tập luyện",
+          "Lịch tập luyện",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -259,7 +259,7 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                           };
                           print(data);
                           if (widget.isEdit == true) {
-                            editSchedule(context, data, widget.url!);
+                            editSchedule(context, data, '${widget.url}?fields=*,workout_id.*');
                             print("Edit");
                           } else {
                             addWorkoutSchedule(data, context);
@@ -279,7 +279,8 @@ Future<void> editSchedule(
     BuildContext context, Map<String, dynamic> eObj, String url) async {
   final token = await getToken();
   final response = await http.patch(
-    Uri.parse('$url?fields=*,workout_id.*,dish_id.*'),
+    // Uri.parse('$url?fields=*,workout_id.*,dish_id.*'),
+    Uri.parse('$url'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -293,14 +294,14 @@ Future<void> editSchedule(
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Chỉnh sửa thành công!')),
     );
-
+    print("response.body: ${response.body}");
     final data = jsonDecode(response.body)['data'];
     // Huỷ và xóa cache notification cũ
-    final oldId = await NotificationCacheService.getNotificationId(data['id'],
+    final oldId = await NotificationCacheService.getNotificationId(data['id'].toString(),
         isWorkout: eObj.containsKey('workout_id'));
     if (oldId != null) {
       await flutterLocalNotificationsPlugin.cancel(oldId);
-      await NotificationCacheService.removeNotificationId(data['id'],
+      await NotificationCacheService.removeNotificationId(data['id'].toString(),
           isWorkout: eObj.containsKey('workout_id'));
     }
 
@@ -313,7 +314,7 @@ Future<void> editSchedule(
       final workoutName = data['workout_id']['name'];
       await scheduleWorkoutNotification(workoutTime, workoutName, newId);
       await NotificationCacheService.saveWorkoutNotificationId(
-          data['id'], newId);
+          data['id'].toString(), newId);
 
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (_) => const WorkoutScheduleView()));
@@ -323,7 +324,7 @@ Future<void> editSchedule(
       final newId = mealTime.millisecondsSinceEpoch ~/ 1000;
       final mealName = data['dish_id']['name'];
       await scheduleMealNotification(mealTime, mealName, newId);
-      await NotificationCacheService.saveMealNotificationId(data['id'], newId);
+      await NotificationCacheService.saveMealNotificationId(data['id'].toString(), newId);
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const MealSchedule()));
@@ -341,7 +342,7 @@ Future<void> addWorkoutSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.101:8055/items/workout_schedule?fields=*,workout_id.*'),
+        'http://192.168.133.100:8055/items/workout_schedule?fields=*,workout_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

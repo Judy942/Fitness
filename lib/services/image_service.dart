@@ -10,7 +10,7 @@ import 'user_service.dart';
 class ImageService {
   static Future<Uint8List> decryptAndSaveImageFromTextFile(String filePath, String fileName) async {
     print("filePath: $filePath");
-    final fileUrl = 'http://192.168.133.101:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.133.100:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       if (fileContent.isNotEmpty) {

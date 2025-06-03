@@ -95,7 +95,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> _fetchWorkoutNotification() async {
     List<dynamic> workouts = await _userService.fetchData(
-        'http://192.168.133.103:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        'http://192.168.133.100:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     // Duyệt qua từng thông báo và tính toán thời gian nếu có trường scheduled_execution_time
     for (var nObj in workouts) {

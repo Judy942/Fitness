@@ -89,7 +89,7 @@ class _ResultViewState extends State<ResultView> {
   Future<Map<int, List<dynamic>>> fetchProcessTrackerByMounth(String month, int year) async {
     String? token = await getToken();
     final url = Uri.parse(
-        'http://192.168.133.101:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
+        'http://192.168.133.100:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
 
     print('Fetching data for month: $month, year: $year');
     print('URL: $url');
@@ -206,7 +206,7 @@ class _ResultViewState extends State<ResultView> {
 
   Future<Uint8List> decryptAndSaveImageFromTextFile(
       String filePath, String fileName) async {
-    final fileUrl = 'http://192.168.133.101:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.133.100:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       // Kiểm tra xem file có tồn tại không
@@ -244,7 +244,7 @@ class _ResultViewState extends State<ResultView> {
       
       // Lấy thông tin ảnh trước khi xóa
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Xóa file trong storage
         final deleteFileResponse = await http.delete(
-          Uri.parse('http://192.168.133.101:8055/files/$fileId'),
+          Uri.parse('http://192.168.133.100:8055/files/$fileId'),
           headers: {
             'Authorization': 'Bearer $token',
           },
@@ -269,7 +269,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Xóa record trong database
         final deleteResponse = await http.delete(
-          Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
+          Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -425,7 +425,7 @@ class _ResultViewState extends State<ResultView> {
       
       // Lấy thông tin ảnh cũ
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -450,7 +450,7 @@ class _ResultViewState extends State<ResultView> {
             // Tải lên ảnh đã mã hóa
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('http://192.168.133.101:8055/files'),
+              Uri.parse('http://192.168.133.100:8055/files'),
             );
 
             request.headers['Authorization'] = 'Bearer $token';
@@ -463,7 +463,7 @@ class _ResultViewState extends State<ResultView> {
 
               // Xóa file ảnh cũ
               await http.delete(
-                Uri.parse('http://192.168.133.101:8055/files/$oldFileId'),
+                Uri.parse('http://192.168.133.100:8055/files/$oldFileId'),
                 headers: {
                   'Authorization': 'Bearer $token',
                 },
@@ -480,7 +480,7 @@ class _ResultViewState extends State<ResultView> {
 
         // Cập nhật thông tin ảnh trong database
         final updateResponse = await http.patch(
-          Uri.parse('http://192.168.133.101:8055/items/process_tracker/$imageId'),
+          Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'

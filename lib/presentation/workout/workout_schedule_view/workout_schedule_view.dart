@@ -68,7 +68,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
     String startDate = "${formattedDate}T00:00:00%2B07:00";
     String endDate = "${formattedDate}T23:59:00%2B07:00";
 
-    return 'http://192.168.133.101:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
+    return 'http://192.168.133.100:8055/items/workout_schedule?filter[_and][0][_and][0][status][_neq]=archived&filter[_and][0][_and][1][user_id][_eq]=\$CURRENT_USER&filter[_and][0][_and][2][scheduled_execution_time][_gte]=$startDate&filter[_and][0][_and][3][scheduled_execution_time][_lte]=$endDate';
   }
 
   @override

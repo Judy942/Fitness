@@ -5,6 +5,7 @@ import 'package:flutter_application_fitness/presentation/dashboard/dashboard_scr
 import 'package:health/health.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../core/utils/app_colors.dart';
@@ -23,8 +24,9 @@ class ActivityTrackerScreen extends StatefulWidget {
 
 class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   int totalStepsToday = 0;
+  int stepGoal = 5000;
   double totalDistance = 0;
-  double totalBurnCal = 0; // Đổi tên biến
+  double totalBurnCal = 0;
   List latestArr = [];
   bool isLoadingHealth = false;
   bool isLoadingActivities = false;
@@ -32,7 +34,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
   final List<HealthDataType> _dataTypes = [
     HealthDataType.STEPS,
     HealthDataType.DISTANCE_DELTA,
-    HealthDataType.TOTAL_CALORIES_BURNED, // Thêm loại dữ liệu cho calo
+    HealthDataType.TOTAL_CALORIES_BURNED,
   ];
 
   @override
@@ -40,10 +42,64 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     super.initState();
     tz.initializeTimeZones();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadStepGoal();
       await _requestPermissions();
       await _loadHealthDataEnhanced();
       await _loadLatestActivity();
     });
+  }
+
+  Future<void> _loadStepGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      stepGoal = prefs.getInt('stepGoal') ?? 5000;
+    });
+  }
+
+  Future<void> _saveStepGoal(int goal) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('stepGoal', goal);
+    setState(() {
+      stepGoal = goal;
+    });
+  }
+
+  void _showStepGoalDialog() {
+    final TextEditingController controller = TextEditingController(
+      text: stepGoal.toString(),
+    );
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Thiết lập mục tiêu số bước'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Số bước mục tiêu',
+            hintText: 'Nhập số bước mục tiêu trong ngày',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () {
+              final value = controller.text;
+              final goal = int.tryParse(value);
+              if (goal != null && goal > 0) {
+                _saveStepGoal(goal);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _requestPermissions() async {
@@ -87,7 +143,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
       }
       int steps = 0;
       double distance = 0.0;
-      double burnCal = 0.0; // Biến cho calo
+      double burnCal = 0.0;
       var stepsData = dataByType[HealthDataType.STEPS] ?? [];
       for (var point in stepsData) {
         if (point.value is NumericHealthValue) {
@@ -112,7 +168,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
       setState(() {
         totalStepsToday = steps;
         totalDistance = distance;
-        totalBurnCal = burnCal; // Cập nhật calo
+        totalBurnCal = burnCal;
       });
     } catch (e) {
       if (mounted) {
@@ -130,7 +186,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     try {
       String? token = await getToken();
       final response = await http.get(
-        Uri.parse('http://192.168.133.101:8055/api/activity/latest?limit=15'),
+        Uri.parse('http://192.168.133.100:8055/api/activity/latest?limit=15'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode == 200) {
@@ -184,9 +240,53 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Column(
-
                 children: [
-                  
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Mục tiêu số bước',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: _showStepGoalDialog,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        LinearProgressIndicator(
+                          value: totalStepsToday / stepGoal,
+                          backgroundColor: Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            totalStepsToday >= stepGoal
+                                ? Colors.green
+                                : Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '$totalStepsToday / $stepGoal bước',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -201,15 +301,14 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildInfoCard(null, 'Calo đốt cháy', // Đổi tên
-                          totalBurnCal.toStringAsFixed(0), Colors.grey[300]), // Đổi tên biến
+                      _buildInfoCard(null, 'Calo đốt cháy',
+                          totalBurnCal.toStringAsFixed(0), Colors.grey[300]),
                     ],
                   ),
                   const SizedBox(height: 10),
-                   Container(
+                  Container(
                     padding: const EdgeInsets.symmetric(
                         vertical: 15, horizontal: 10),
-                    // margin: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor2.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(15),
@@ -303,8 +402,8 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
         return 'steps';
       case 'distance (m)':
         return 'distance';
-      case 'total burn cal': // Đổi tên
-        return 'total_burn_cal'; // Đổi tên
+      case 'total burn cal':
+        return 'total_burn_cal';
       default:
         return '';
     }

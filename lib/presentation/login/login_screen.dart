@@ -52,7 +52,7 @@ void fetchData() async {
     setState(() {
     isLoading = true;
   });
-  String url = "http://192.168.133.101:8055/auth/login";
+  String url = "http://192.168.133.100:8055/auth/login";
   try {
     print(url);
     final response = await http.post(

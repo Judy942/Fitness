@@ -59,7 +59,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.101:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.133.100:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -69,7 +69,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.133.101:8055/assets/${item['image']}',
+            'image': 'http://192.168.133.100:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();
@@ -205,7 +205,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             var wObj = filteredDishes[index] as Map? ?? {};
                             return ListTile(
                               leading: Image.network(
-                                'http://192.168.133.101:8055/assets/${wObj["image"]}',
+                                'http://192.168.133.100:8055/assets/${wObj["image"]}',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,

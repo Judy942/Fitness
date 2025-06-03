@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -12,7 +13,6 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../main.dart';
 import '../../../services/push_notification/NotificationCacheService.dart';
-import '../../../services/push_notification/NotificationSyncService.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
@@ -81,7 +81,7 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
           ),
         ),
         title: const Text(
-          "Thêm lịch bữa ăn",
+          "Lịch bữa ăn",
           style: TextStyle(
               color: AppColors.blackColor,
               fontSize: 16,
@@ -203,8 +203,16 @@ class _AddMealScheduleState extends State<AddMealSchedule> {
 
                           print(data);
                           if (widget.isEdit == true) {
-                            await editSchedule(context, data, widget.url!);
-                            print("Edit");
+                            // try {
+                              await editSchedule(context, data, widget.url!);
+                              print("Edit");
+                              
+                              
+                            // } on FormatException catch (e) {
+                            //   print('Có lỗi xảy ra khi chỉnh sửa: FormatException: $e');
+                            // } catch (e) {
+                            //   print('Có lỗi xảy ra khi chỉnh sửa: $e');
+                            // }
                           } else {
                             await addMealSchedule(data, context);
                           }
@@ -227,7 +235,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.101:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.133.100:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -270,10 +278,14 @@ Future<void> scheduleMealNotification(
   tz.initializeTimeZones();
   final tz.TZDateTime scheduledDate = tz.TZDateTime.from(mealTime, tz.local)
       .subtract(const Duration(minutes: 30));
+  
+  // Định dạng thời gian theo 12 giờ với AM/PM và chuyển đổi sang giờ địa phương
+  String formattedTime = DateFormat('hh:mm a').format(mealTime.toLocal());
+  
   await flutterLocalNotificationsPlugin.zonedSchedule(
     notificationId,
     "Đến giờ ăn rồi 🍽️",
-    "Hôm nay bạn có bữa $mealName lúc ${formatTime(mealTime)}",
+    "Hôm nay bạn có bữa $mealName lúc $formattedTime",
     scheduledDate,
     const NotificationDetails(
       android: AndroidNotificationDetails(

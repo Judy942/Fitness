@@ -13,7 +13,7 @@ import 'exercises_step_details.dart';
 
 Future<Map<String, dynamic>> getExerciseDetail(int id) async {
   String url =
-      'http://192.168.133.101:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+      'http://192.168.133.100:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
 
   String? token = await getToken();
 

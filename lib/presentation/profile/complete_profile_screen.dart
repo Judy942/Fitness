@@ -28,7 +28,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     String json = jsonEncode(data);
     print(json);
       final response = await http.patch(
-          Uri.parse('http://192.168.133.101:8055/users/me'),
+          Uri.parse('http://192.168.133.100:8055/users/me'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
