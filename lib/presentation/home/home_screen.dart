@@ -20,7 +20,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.133.100:8055/users/me'),
+      Uri.parse('http://192.168.133.102:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -104,44 +104,33 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Chào mừng trở lại,",
-              style: TextStyle(
-                color: AppColors.midGrayColor,
-                fontSize: 12,
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Chào mừng trở lại,",
+                style: TextStyle(
+                  color: AppColors.midGrayColor,
+                  fontSize: 12,
+                ),
               ),
-            ),
-            Text(
-              name,
-              style: const TextStyle(
-                color: AppColors.blackColor,
-                fontSize: 20,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w700,
+              Text(
+                name,
+                style: const TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 20,
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        // IconButton(
-        //     onPressed: () {
-        //       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //         return const NotificationScreen();
-        //       }));
-        //     },
-        //     icon: Image.asset(
-        //       "assets/icons/notification_icon.png",
-        //       width: 25,
-        //       height: 25,
-        //       fit: BoxFit.fitHeight,
-        //       errorBuilder: (context, error, stackTrace) {
-        //         return Icon(Icons.notifications);
-        //       },
-        //     )
-        //     ),
       ],
     );
   }
@@ -169,15 +158,15 @@ class ContainerBmi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Container(
-        height: MediaQuery.of(context).size.width * 0.38,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: AppColors.primary),
-          borderRadius:
-              BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
-        ),
-        child: _buildBMIContent(bmi, context));
+      height: MediaQuery.of(context).size.width * 0.38,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: AppColors.primary),
+        borderRadius:
+            BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
+      ),
+      child: _buildBMIContent(bmi, context),
+    );
   }
 
   Widget _buildBMIContent(String bmi, BuildContext context) {
@@ -193,51 +182,56 @@ class ContainerBmi extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "BMI (Chỉ số khối cơ thể)",
-                    style: TextStyle(
-                      color: AppColors.whiteColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+              // Sử dụng Expanded để tránh tràn
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "BMI (Chỉ số khối cơ thể)",
+                      style: TextStyle(
+                        color: AppColors.whiteColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  Text(
-                    bmi == "0" ? "Chưa có dữ liệu chiều cao và cân nặng" : bmi,
-                    style: TextStyle(
-                      color: AppColors.whiteColor.withOpacity(0.7),
-                      fontSize: 14,
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.w400,
+                    Text(
+                      bmi == "0" ? " Hãy cập nhật thông tin" : bmi,
+                      style: TextStyle(
+                        color: AppColors.whiteColor.withOpacity(0.7),
+                        fontSize: 14,
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.width * 0.05),
-                  Text(
-                    _getBMICategory(bmi).replaceAllMapped(
-                      RegExp(r'(.{1,25})(\s|$)'),
-                      (match) => '${match.group(0)}\n',
+                    SizedBox(height: MediaQuery.of(context).size.width * 0.05),
+                    Text(
+                      _getBMICategory(bmi).replaceAllMapped(
+                        RegExp(r'(.{1,25})(\s|$)'),
+                        (match) => '${match.group(0)}\n',
+                      ),
+                      style: TextStyle(
+                        color: AppColors.whiteColor.withOpacity(0.8),
+                        fontSize: 14,
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    style: TextStyle(
-                      color: AppColors.whiteColor.withOpacity(0.8),
-                      fontSize: 14,
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.w400,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  ],
+                ),
               ),
-              AspectRatio(
-                aspectRatio: 1,
+              SizedBox(width: 10),
+              SizedBox(
+                width: 80,
+                height: 80,
                 child: PieChart(
                   PieChartData(
                     pieTouchData: PieTouchData(
@@ -269,7 +263,7 @@ class ContainerBmi extends StatelessWidget {
           case 0:
             return PieChartSectionData(
                 color: color0,
-                value: double.parse(bmi),
+                value: double.tryParse(bmi) ?? 0,
                 title: '',
                 radius: 55,
                 titlePositionPercentageOffset: 0.55,
@@ -279,11 +273,12 @@ class ContainerBmi extends StatelessWidget {
                       color: AppColors.whiteColor,
                       fontWeight: FontWeight.w700,
                       fontSize: 12),
-                ));
+                ),
+                );
           case 1:
             return PieChartSectionData(
               color: color1,
-              value: 100 - double.parse(bmi),
+              value: 100 - (double.tryParse(bmi) ?? 0),
               title: '',
               radius: 42,
               titlePositionPercentageOffset: 0.55,
@@ -308,13 +303,18 @@ class TodayTargetSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(15)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Hoạt động hôm nay",
-            style: TextStyle(
-              color: AppColors.blackColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          const Expanded(
+            child: Text(
+              "Hoạt động và dinh dưỡng hôm nay",
+              style: TextStyle(
+                color: AppColors.blackColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
           SizedBox(
@@ -355,8 +355,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.133.100:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.133.100:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.133.102:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.133.102:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;
@@ -414,4 +414,4 @@ const TextStyle sectionTitleStyle = TextStyle(
 //       );
 //     }
 //   }
-// }
+// }F

@@ -21,7 +21,7 @@ class ShowLog extends StatelessWidget {
     final id = eObj["id"]; // Giả sử eObj chứa id
     String url = "";
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.133.100:8055/items/workout_schedule/$id';
+      url = 'http://192.168.133.102:8055/items/workout_schedule/$id';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -29,7 +29,7 @@ class ShowLog extends StatelessWidget {
         ),
       );
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.133.100:8055/items/meal_schedule/$id?fields=*,dish_id.*';
+      url = 'http://192.168.133.102:8055/items/meal_schedule/$id?fields=*,dish_id.*';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -48,9 +48,9 @@ class ShowLog extends StatelessWidget {
     String url = "";
     //kiểm tra phần tử là exercise hay meal
     if (eObj["workout_id"] != null) {
-      url = 'http://192.168.133.100:8055/items/workout_schedule/$id';
+      url = 'http://192.168.133.102:8055/items/workout_schedule/$id';
     } else if (eObj["dish_id"] != null) {
-      url = 'http://192.168.133.100:8055/items/meal_schedule/$id';
+      url = 'http://192.168.133.102:8055/items/meal_schedule/$id';
     } else {
       return;
     }
@@ -70,12 +70,23 @@ class ShowLog extends StatelessWidget {
       // Navigator.pop(context);
       // Navigator.pop(context);
       // Navigator.pop(context);
-      Navigator.pushReplacement(
+      if (eObj["workout_id"] != null) {
+        Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
+          builder: (context) => DashboardScreen(initialTab: DashboardTab.workout,),
         ),
       );
+      } else {
+        Navigator.pop(context);
+      }
+
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => DashboardScreen(initialTab: eObj["workout_id"] != null ? DashboardTab.workout : DashboardTab.home,),
+      //   ),
+      // );
 
     } else {
       Navigator.pop(context);

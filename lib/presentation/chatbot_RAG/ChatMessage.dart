@@ -25,3 +25,20 @@ class ChatMessage {
     };
   }
 }
+
+class ChatHistory {
+  final String user;
+  final String assistant;
+
+  ChatHistory({
+    required this.user,
+    required this.assistant,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user': user,
+      'assistant': assistant,
+    };
+  }
+}

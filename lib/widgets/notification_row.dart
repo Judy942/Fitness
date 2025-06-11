@@ -35,8 +35,8 @@ class _NotificationRowState extends State<NotificationRow> {
             borderRadius: BorderRadius.circular(30),
             child: Image.network(
               widget.nObj["type"] == "MEAL"
-                  ? 'http://192.168.133.100:8055/assets/${widget.nObj["dish_id"]["image"]}'
-                  : 'http://192.168.133.100:8055/assets/${widget.nObj["workout_id"]["image"]}',
+                  ? 'http://192.168.133.102:8055/assets/${widget.nObj["dish_id"]["image"]}'
+                  : 'http://192.168.133.102:8055/assets/${widget.nObj["workout_id"]["image"]}',
               errorBuilder:
                   (BuildContext context, Object error, StackTrace? stackTrace) {
                 return Container(

@@ -186,7 +186,7 @@ class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
     try {
       String? token = await getToken();
       final response = await http.get(
-        Uri.parse('http://192.168.133.100:8055/api/activity/latest?limit=15'),
+        Uri.parse('http://192.168.133.102:8055/api/activity/latest?limit=15'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode == 200) {

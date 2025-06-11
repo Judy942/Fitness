@@ -28,7 +28,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     String json = jsonEncode(data);
     print(json);
       final response = await http.patch(
-          Uri.parse('http://192.168.133.100:8055/users/me'),
+          Uri.parse('http://192.168.133.102:8055/users/me'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         print('Update user data success');
         print(response.body);
         if (widget.isBackToProfile) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen(initialTab: DashboardTab.profile,)));
         } else {
           // Navigator.pushNamed(context, '/goalsScreen');
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));

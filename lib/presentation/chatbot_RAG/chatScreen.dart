@@ -9,7 +9,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat với AI'),
+        title: const Text('Trò chuyện với AI'),
       ),
       body: const ChatWidget(),
     );

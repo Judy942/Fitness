@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../services/user_service.dart';
-import '../../../widgets/category_container.dart';
 import '../../../widgets/popular_container.dart';
 import '../../../widgets/round_button.dart';
 import '../../onboarding_screen/start_screen.dart';
@@ -59,7 +58,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.100:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.133.102:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -69,7 +68,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.133.100:8055/assets/${item['image']}',
+            'image': 'http://192.168.133.102:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();
@@ -205,7 +204,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             var wObj = filteredDishes[index] as Map? ?? {};
                             return ListTile(
                               leading: Image.network(
-                                'http://192.168.133.100:8055/assets/${wObj["image"]}',
+                                'http://192.168.133.102:8055/assets/${wObj["image"]}',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
@@ -228,48 +227,48 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                           },
                         ),
                       ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      'Danh mục',
-                      style: TextStyle(
-                          color: AppColors.blackColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    // const SizedBox(
+                    //   height: 20,
+                    // ),
+                    // const Text(
+                    //   'Danh mục',
+                    //   style: TextStyle(
+                    //       color: AppColors.blackColor,
+                    //       fontSize: 18,
+                    //       fontWeight: FontWeight.w700),
+                    // ),
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+                    // SizedBox(
+                    //   height: MediaQuery.of(context).size.width * 0.35,
+                    //   width: MediaQuery.of(context).size.width * 0.9,
+                    //   child: ListView.builder(
+                    //     itemBuilder: (context, position) {
+                    //       if (position % 2 == 0) {
+                    //         var wObj = categoryArr[position] as Map? ?? {};
+                    //         return Container(
+                    //             margin: const EdgeInsets.only(right: 15),
+                    //             width: MediaQuery.of(context).size.width * 0.25,
+                    //             child: CategoryContainer(wObj: wObj));
+                    //       } else {
+                    //         var wObj = categoryArr[position] as Map? ?? {};
+                    //         return Container(
+                    //             margin: const EdgeInsets.only(right: 15),
+                    //             width: MediaQuery.of(context).size.width * 0.25,
+                    //             child: CategoryContainer(
+                    //                 wObj: wObj,
+                    //                 type: RoundButtonType.secondaryBG));
+                    //       }
+                    //     },
+                    //     padding: EdgeInsets.zero,
+                    //     scrollDirection: Axis.horizontal,
+                    //     shrinkWrap: true,
+                    //     itemCount: categoryArr.length,
+                    //   ),
+                    // ),
                     const SizedBox(
                       height: 10,
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.width * 0.35,
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: ListView.builder(
-                        itemBuilder: (context, position) {
-                          if (position % 2 == 0) {
-                            var wObj = categoryArr[position] as Map? ?? {};
-                            return Container(
-                                margin: const EdgeInsets.only(right: 15),
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                child: CategoryContainer(wObj: wObj));
-                          } else {
-                            var wObj = categoryArr[position] as Map? ?? {};
-                            return Container(
-                                margin: const EdgeInsets.only(right: 15),
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                child: CategoryContainer(
-                                    wObj: wObj,
-                                    type: RoundButtonType.secondaryBG));
-                          }
-                        },
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: categoryArr.length,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
                     ),
                     const Text(
                       'Đề xuất cho bữa ăn',

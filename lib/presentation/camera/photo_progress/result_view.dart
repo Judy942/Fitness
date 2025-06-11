@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/utils/app_colors.dart';
+import '../../../services/image_service.dart';
 import '../../../services/user_service.dart';
 import '../camera_screen.dart';
 
@@ -21,7 +22,6 @@ class ResultView extends StatefulWidget {
 }
 
 class _ResultViewState extends State<ResultView> {
-  final UserService _userService = UserService();
   Map<int, List<dynamic>> groupedData = {};
   Map<int, List<dynamic>> groupedData2 = {};
   bool isLoading = true;
@@ -34,18 +34,20 @@ class _ResultViewState extends State<ResultView> {
   List statArr = [];
 
   List tracker_position = [
-    "Mặt trước",
-    "Mặt sau",
-    "Mặt trái",
-    "Mặt phải",
+    "Đằng trước",
+    "Đằng sau",
+    "Đằng trái",
+    "Đằng phải",
   ];
 
   @override
   void initState() {
     super.initState();
     print('Initializing with date1: ${widget.date1}, date2: ${widget.date2}');
-    
-    fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+
+    fetchProcessTrackerByMounth(
+            widget.date1.month.toString(), widget.date1.year)
+        .then((value) {
       print('Received data for date1: $value');
       setState(() {
         groupedData = value;
@@ -59,7 +61,9 @@ class _ResultViewState extends State<ResultView> {
       });
     });
 
-    fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+    fetchProcessTrackerByMounth(
+            widget.date2.month.toString(), widget.date2.year)
+        .then((value) {
       print('Received data for date2: $value');
       setState(() {
         groupedData2 = value;
@@ -86,10 +90,11 @@ class _ResultViewState extends State<ResultView> {
 
   // Phần code tải ảnh, giải mã và lưu lại
 
-  Future<Map<int, List<dynamic>>> fetchProcessTrackerByMounth(String month, int year) async {
+  Future<Map<int, List<dynamic>>> fetchProcessTrackerByMounth(
+      String month, int year) async {
     String? token = await getToken();
     final url = Uri.parse(
-        'http://192.168.133.100:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
+        'http://192.168.133.102:8055/items/process_tracker?fields[]=*&sort[]=date_upload&filter[user_id][_eq]=\$CURRENT_USER&filter[month(date_upload)][_eq]=$month&filter[year(date_upload)][_eq]=$year');
 
     print('Fetching data for month: $month, year: $year');
     print('URL: $url');
@@ -109,13 +114,13 @@ class _ResultViewState extends State<ResultView> {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'];
       print('Data received: $data');
-      
+
       // Lọc dữ liệu theo ngày chính xác
       final filteredData = data.where((item) {
         final dateUpload = DateTime.parse(item['date_upload']);
         return dateUpload.month == int.parse(month) && dateUpload.year == year;
       }).toList();
-      
+
       // Nhóm dữ liệu theo tracker_position_id
       Map<int, List<dynamic>> groupedData = {};
       for (var item in filteredData) {
@@ -125,7 +130,7 @@ class _ResultViewState extends State<ResultView> {
         }
         groupedData[positionId]!.add(item);
       }
-      
+
       print('Grouped data: $groupedData');
       return groupedData;
     } else {
@@ -204,31 +209,6 @@ class _ResultViewState extends State<ResultView> {
     return '';
   }
 
-  Future<Uint8List> decryptAndSaveImageFromTextFile(
-      String filePath, String fileName) async {
-    final fileUrl = 'http://192.168.133.100:8055/assets/$filePath';
-    String fileContent = await fetchFileContent(fileUrl);
-    try {
-      // Kiểm tra xem file có tồn tại không
-      if (fileContent.isNotEmpty) {
-        // Giải mã Base64 từ nội dung file
-        final decryptedBytes = await decryptImageFromBase64(fileContent);
-        print("giải mã thành công!!!!");
-        if (decryptedBytes.isEmpty) {
-          throw Exception("Giải mã thất bại: Dữ liệu sau khi giải mã rỗng.");
-        }
-        return decryptedBytes;
-        // Lưu ảnh vào tệp
-        // return await saveImageToFile(decryptedBytes, fileName);
-      } else {
-        throw Exception("File không tồn tại tại đường dẫn: $filePath");
-      }
-    } catch (e) {
-      print("Lỗi khi giải mã hoặc lưu ảnh: $e");
-      rethrow;
-    }
-  }
-
   Future<void> _deleteImage(String imageId) async {
     try {
       // Hiển thị loading
@@ -241,10 +221,10 @@ class _ResultViewState extends State<ResultView> {
       );
 
       String? token = await getToken();
-      
+
       // Lấy thông tin ảnh trước khi xóa
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.102:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -257,19 +237,21 @@ class _ResultViewState extends State<ResultView> {
 
         // Xóa file trong storage
         final deleteFileResponse = await http.delete(
-          Uri.parse('http://192.168.133.100:8055/files/$fileId'),
+          Uri.parse('http://192.168.133.102:8055/files/$fileId'),
           headers: {
             'Authorization': 'Bearer $token',
           },
         );
 
-        if (deleteFileResponse.statusCode != 200 && deleteFileResponse.statusCode != 204) {
+        if (deleteFileResponse.statusCode != 200 &&
+            deleteFileResponse.statusCode != 204) {
           throw Exception('Xóa file thất bại');
         }
 
         // Xóa record trong database
         final deleteResponse = await http.delete(
-          Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
+          Uri.parse(
+              'http://192.168.133.102:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -279,18 +261,23 @@ class _ResultViewState extends State<ResultView> {
         // Đóng loading
         Navigator.pop(context);
 
-        if (deleteResponse.statusCode == 200 || deleteResponse.statusCode == 204) {
+        if (deleteResponse.statusCode == 200 ||
+            deleteResponse.statusCode == 204) {
           // Cập nhật lại dữ liệu sau khi xóa
           setState(() {
             isLoading = true;
           });
-          await fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+          await fetchProcessTrackerByMounth(
+                  widget.date1.month.toString(), widget.date1.year)
+              .then((value) {
             setState(() {
               groupedData = value;
               isLoading = false;
             });
           });
-          await fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+          await fetchProcessTrackerByMounth(
+                  widget.date2.month.toString(), widget.date2.year)
+              .then((value) {
             setState(() {
               groupedData2 = value;
               isLoading = false;
@@ -324,7 +311,7 @@ class _ResultViewState extends State<ResultView> {
         builder: (context) {
           int selectedPosition = positionId;
           DateTime selectedDate = date;
-          
+
           return AlertDialog(
             title: const Text('Chỉnh sửa thông tin ảnh'),
             content: StatefulBuilder(
@@ -422,10 +409,10 @@ class _ResultViewState extends State<ResultView> {
       );
 
       String? token = await getToken();
-      
+
       // Lấy thông tin ảnh cũ
       final getResponse = await http.get(
-        Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
+        Uri.parse('http://192.168.133.102:8055/items/process_tracker/$imageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json'
@@ -441,20 +428,22 @@ class _ResultViewState extends State<ResultView> {
         // Chỉ thay đổi ảnh nếu người dùng chọn
         if (result['changeImage'] == true) {
           final ImagePicker picker = ImagePicker();
-          final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-          
+          final XFile? image =
+              await picker.pickImage(source: ImageSource.gallery);
+
           if (image != null) {
             // Mã hóa ảnh mới
             final encryptedFilePath = await encryptImage(image.path);
-            
+
             // Tải lên ảnh đã mã hóa
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('http://192.168.133.100:8055/files'),
+              Uri.parse('http://192.168.133.102:8055/files'),
             );
 
             request.headers['Authorization'] = 'Bearer $token';
-            request.files.add(await http.MultipartFile.fromPath('file', encryptedFilePath));
+            request.files.add(
+                await http.MultipartFile.fromPath('file', encryptedFilePath));
 
             var response = await request.send();
             if (response.statusCode == 200) {
@@ -463,7 +452,7 @@ class _ResultViewState extends State<ResultView> {
 
               // Xóa file ảnh cũ
               await http.delete(
-                Uri.parse('http://192.168.133.100:8055/files/$oldFileId'),
+                Uri.parse('http://192.168.133.102:8055/files/$oldFileId'),
                 headers: {
                   'Authorization': 'Bearer $token',
                 },
@@ -480,7 +469,8 @@ class _ResultViewState extends State<ResultView> {
 
         // Cập nhật thông tin ảnh trong database
         final updateResponse = await http.patch(
-          Uri.parse('http://192.168.133.100:8055/items/process_tracker/$imageId'),
+          Uri.parse(
+              'http://192.168.133.102:8055/items/process_tracker/$imageId'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
@@ -495,18 +485,23 @@ class _ResultViewState extends State<ResultView> {
         // Đóng loading
         Navigator.pop(context);
 
-        if (updateResponse.statusCode == 200 || updateResponse.statusCode == 204) {
+        if (updateResponse.statusCode == 200 ||
+            updateResponse.statusCode == 204) {
           // Cập nhật lại dữ liệu sau khi sửa
           setState(() {
             isLoading = true;
           });
-          await fetchProcessTrackerByMounth(widget.date1.month.toString(), widget.date1.year).then((value) {
+          await fetchProcessTrackerByMounth(
+                  widget.date1.month.toString(), widget.date1.year)
+              .then((value) {
             setState(() {
               groupedData = value;
               isLoading = false;
             });
           });
-          await fetchProcessTrackerByMounth(widget.date2.month.toString(), widget.date2.year).then((value) {
+          await fetchProcessTrackerByMounth(
+                  widget.date2.month.toString(), widget.date2.year)
+              .then((value) {
             setState(() {
               groupedData2 = value;
               isLoading = false;
@@ -532,7 +527,8 @@ class _ResultViewState extends State<ResultView> {
     }
   }
 
-  void _showImageOptions(BuildContext context, String imageId, int positionId, DateTime date) {
+  void _showImageOptions(
+      BuildContext context, String imageId, int positionId, DateTime date) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -556,7 +552,8 @@ class _ResultViewState extends State<ResultView> {
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Xóa ảnh', style: TextStyle(color: Colors.red)),
+                title:
+                    const Text('Xóa ảnh', style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _showDeleteConfirmation(context, imageId);
@@ -636,7 +633,8 @@ class _ResultViewState extends State<ResultView> {
     );
   }
 
-  Widget _buildImage(Uint8List imageData, String imageId, int positionId, DateTime date) {
+  Widget _buildImage(
+      Uint8List imageData, String imageId, int positionId, DateTime date) {
     return GestureDetector(
       onTap: () => _showFullScreenImage(context, imageData),
       onLongPress: () => _showImageOptions(context, imageId, positionId, date),
@@ -672,7 +670,8 @@ class _ResultViewState extends State<ResultView> {
     final key = encrypt.Key.fromBase64(encryptionKey);
     final iv = encrypt.IV.fromBase64(encryptionIv);
 
-    final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+    final encrypter =
+        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
 
     // Mã hóa dữ liệu hình ảnh đã được padding
     final encrypted = encrypter.encryptBytes(paddedImageBytes, iv: iv);
@@ -872,32 +871,38 @@ class _ResultViewState extends State<ResultView> {
                                 GridView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 1,
                                     mainAxisSpacing: imageSpacing,
                                     childAspectRatio: imageWidth / imageHeight,
                                   ),
-                                  itemCount: items2.length,
+                                  itemCount: items.length,
                                   itemBuilder: (context, i) {
                                     return FutureBuilder<Uint8List>(
-                                      future: decryptAndSaveImageFromTextFile(
-                                        items2[i]['image'],
+                                      future: ImageService.decryptAndSaveImageFromTextFile(
+                                        items[i]['image'],
                                         'image_$i.png',
                                       ),
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.done) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
                                           if (snapshot.hasData) {
                                             return _buildImage(
                                               snapshot.data!,
-                                              items2[i]['id'],
-                                              items2[i]['tracker_position_id'],
-                                              DateTime.parse(items2[i]['date_upload']),
+                                              items[i]['id'],
+                                              items[i]['tracker_position_id'],
+                                              DateTime.parse(
+                                                  items[i]['date_upload']),
                                             );
                                           } else {
-                                            return const Icon(Icons.error_outline);
+                                            return const Icon(
+                                                Icons.error_outline);
                                           }
                                         } else {
-                                          return const Center(child: CircularProgressIndicator());
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
                                         }
                                       },
                                     );
@@ -926,35 +931,41 @@ class _ResultViewState extends State<ResultView> {
                                 GridView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 1,
                                     mainAxisSpacing: imageSpacing,
                                     childAspectRatio: imageWidth / imageHeight,
                                   ),
-                                  itemCount: items.length,
+                                  itemCount: items2.length,
                                   itemBuilder: (context, i) {
-  return FutureBuilder<Uint8List>(
-    future: decryptAndSaveImageFromTextFile(
-      items[i]['image'],
-      'image_$i.png',
-    ),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        if (snapshot.hasData) {
-          return _buildImage(
-            snapshot.data!,
-            items[i]['id'],
-            items[i]['tracker_position_id'],
-            DateTime.parse(items[i]['date_upload']),
-          );
-        } else {
-          return const Icon(Icons.error_outline);
-        }
-      } else {
-        return const Center(child: CircularProgressIndicator());
-      }
-    },
-  );
+                                    return FutureBuilder<Uint8List>(
+                                      future: ImageService.decryptAndSaveImageFromTextFile(
+                                        items2[i]['image'],
+                                        'image_$i.png',
+                                      ),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          if (snapshot.hasData) {
+                                            return _buildImage(
+                                              snapshot.data!,
+                                              items2[i]['id'],
+                                              items2[i]['tracker_position_id'],
+                                              DateTime.parse(
+                                                  items2[i]['date_upload']),
+                                            );
+                                          } else {
+                                            return const Icon(
+                                                Icons.error_outline);
+                                          }
+                                        } else {
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        }
+                                      },
+                                    );
                                   },
                                 ),
                               ],

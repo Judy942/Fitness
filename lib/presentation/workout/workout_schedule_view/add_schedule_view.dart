@@ -35,13 +35,14 @@ class AddScheduleView extends StatefulWidget {
 class _AddScheduleViewState extends State<AddScheduleView> {
   List whatArr = [];
   bool isLoading = true; // Biến để theo dõi trạng thái tải dữ liệu
+  bool _isSaving = false;
   int workoutSelected = 0;
 
   Future<void> getListWorkout() async {
     String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
 
     final response = await http.get(
-      Uri.parse('http://192.168.133.100:8055/items/workout?limit=5&page=1&meta=*'),
+      Uri.parse('http://192.168.133.102:8055/items/workout?limit=5&page=1&meta=*'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -139,9 +140,10 @@ class _AddScheduleViewState extends State<AddScheduleView> {
         ),
       ),
       backgroundColor: AppColors.whiteColor,
-      body: isLoading
+      body: isLoading || _isSaving
           ? const Center(
-              child: CircularProgressIndicator()) // Hiển thị khi đang tải
+              child:
+                  CircularProgressIndicator()) // Hiển thị khi đang tải hoặc lưu
           : Container(
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
               child: Column(
@@ -249,7 +251,10 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                     const Spacer(),
                     RoundGradientButton(
                         title: "Lưu",
-                        onPressed: () {
+                        onPressed: () async {
+                          setState(() {
+                            _isSaving = true;
+                          });
                           String formattedTime =
                               '${widget.date.toIso8601String()}+07:00';
                           Map<String, dynamic> data = {
@@ -259,11 +264,18 @@ class _AddScheduleViewState extends State<AddScheduleView> {
                           };
                           print(data);
                           if (widget.isEdit == true) {
-                            editSchedule(context, data, '${widget.url}?fields=*,workout_id.*');
+                            await editSchedule(context, data,
+                                '${widget.url}?fields=*,workout_id.*');
                             print("Edit");
                           } else {
-                            addWorkoutSchedule(data, context);
+                            await addWorkoutSchedule(data, context);
                             print("Add");
+                          }
+
+                          if (mounted) {
+                            setState(() {
+                              _isSaving = false;
+                            });
                           }
                         }),
                     const SizedBox(
@@ -312,7 +324,8 @@ Future<void> editSchedule(
       // String formattedTime = '${workoutTime.toIso8601String()}-07:00';
       final newId = workoutTime.millisecondsSinceEpoch ~/ 1000;
       final workoutName = data['workout_id']['name'];
-      await scheduleWorkoutNotification(workoutTime, workoutName, newId);
+      // await scheduleWorkoutNotification(workoutTime, workoutName, newId);
+      await NotificationSyncService.scheduleWorkoutNotification(workoutTime, workoutName, newId);
       await NotificationCacheService.saveWorkoutNotificationId(
           data['id'].toString(), newId);
 
@@ -323,7 +336,7 @@ Future<void> editSchedule(
       final mealTime = DateTime.parse(data['meal_time']);
       final newId = mealTime.millisecondsSinceEpoch ~/ 1000;
       final mealName = data['dish_id']['name'];
-      await scheduleMealNotification(mealTime, mealName, newId);
+      await NotificationSyncService.scheduleMealNotification(mealTime, mealName, newId);
       await NotificationCacheService.saveMealNotificationId(data['id'].toString(), newId);
 
       Navigator.pushReplacement(
@@ -342,7 +355,7 @@ Future<void> addWorkoutSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.100:8055/items/workout_schedule?fields=*,workout_id.*'),
+        'http://192.168.133.102:8055/items/workout_schedule?fields=*,workout_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -358,7 +371,7 @@ Future<void> addWorkoutSchedule(
     int notificationId = workoutTime.millisecondsSinceEpoch ~/ 1000;
     String workoutName = responseData['workout_id']
         ['name']; // nếu server trả về tên, hoặc lưu sẵn ở client
-    await scheduleWorkoutNotification(workoutTime, workoutName, notificationId);
+      await NotificationSyncService.scheduleWorkoutNotification(workoutTime, workoutName, notificationId);
     await NotificationCacheService.saveWorkoutNotificationId(
         responseData['id'], notificationId);
 
@@ -408,24 +421,24 @@ Future<int?> showWorkoutDialog(BuildContext context, List itemList) async {
   return selectedId;
 }
 
-Future<void> scheduleWorkoutNotification(
-    DateTime workoutTime, String workoutName, int notificationId) async {
-  print("workoutTime: $workoutTime");
-  final tz.TZDateTime scheduledDate = tz.TZDateTime.from(workoutTime, tz.local)
-      .subtract(const Duration(minutes: 30));
-  await flutterLocalNotificationsPlugin.zonedSchedule(
-    notificationId,
-    "Đến giờ tập rồi 🏋️",
-    "Hôm nay bạn có lịch tập $workoutName lúc ${formatTime(workoutTime)}",
-    scheduledDate,
-    const NotificationDetails(
-      android: AndroidNotificationDetails(
-          'workout_channel_id', 'Nhắc nhở tập luyện',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: 'app_icon'),
-    ),
-    matchDateTimeComponents: DateTimeComponents.time,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-  );
-}
+// Future<void> scheduleWorkoutNotification(
+//     DateTime workoutTime, String workoutName, int notificationId) async {
+//   print("workoutTime: $workoutTime");
+//   final tz.TZDateTime scheduledDate = tz.TZDateTime.from(workoutTime, tz.local)
+//       .subtract(const Duration(minutes: 30));
+//   await flutterLocalNotificationsPlugin.zonedSchedule(
+//     notificationId,
+//     "Đến giờ tập rồi 🏋️",
+//     "Hôm nay bạn có lịch tập $workoutName sau 30 phút nữa",
+//     scheduledDate,
+//     const NotificationDetails(
+//       android: AndroidNotificationDetails(
+//           'workout_channel_id', 'Nhắc nhở tập luyện',
+//           importance: Importance.high,
+//           priority: Priority.high,
+//           icon: 'app_icon'),
+//     ),
+//     matchDateTimeComponents: DateTimeComponents.time,
+//     androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+//   );
+// }

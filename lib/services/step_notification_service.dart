@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'step_background_service.dart';
+
 class StepNotificationService {
   static final StepNotificationService _instance = StepNotificationService._internal();
   factory StepNotificationService() => _instance;
@@ -14,6 +16,7 @@ class StepNotificationService {
 
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   final Health _health = Health();
+  final StepBackgroundService _backgroundService = StepBackgroundService();
   Timer? _updateTimer;
   int _lastStepCount = 0;
   int _stepGoal = 5000;
@@ -38,11 +41,11 @@ class StepNotificationService {
     // Kiểm tra và yêu cầu quyền
     await _checkAndRequestPermissions();
     
+    // Khởi tạo background service
+    await _backgroundService.initialize();
+    
     // Thiết lập thông báo định kỳ
     await _scheduleNotifications();
-    
-    // Bắt đầu cập nhật số bước mỗi 15 phút
-    _startPeriodicUpdate();
   }
 
   Future<void> _checkAndRequestPermissions() async {
@@ -55,6 +58,13 @@ class StepNotificationService {
     if (await Permission.scheduleExactAlarm.isDenied) {
       await Permission.scheduleExactAlarm.request();
     }
+
+    // Kiểm tra và yêu cầu quyền Health
+    final types = [HealthDataType.STEPS];
+    final authorized = await _health.requestAuthorization(types);
+    if (!authorized) {
+      print('Không có quyền truy cập dữ liệu sức khỏe');
+    }
   }
 
   Future<void> _loadStepGoal() async {
@@ -62,43 +72,26 @@ class StepNotificationService {
     _stepGoal = prefs.getInt('stepGoal') ?? 5000;
   }
 
-  Future<void> _startPeriodicUpdate() async {
-    // Cập nhật ngay lập tức
-    await _updateStepCount();
-    
-    // Cập nhật mỗi 5 phút
-    _updateTimer = Timer.periodic(const Duration(minutes: 5), (timer) async {
-      await _updateStepCount();
-    });
-  }
-
-  Future<void> _updateStepCount() async {
-    try {
-      final currentSteps = await _getCurrentSteps();
-
-      // Nếu số bước tăng lên và đạt mục tiêu
-      if (currentSteps > _lastStepCount && currentSteps >= _stepGoal) {
-        await _sendGoalAchievedNotification(currentSteps);
-      }
-
-      _lastStepCount = currentSteps;
-    } catch (e) {
-      print('Lỗi cập nhật số bước: $e');
+  void _handleStepsUpdate(int currentSteps) {
+    // Nếu số bước tăng lên và đạt mục tiêu
+    if (currentSteps > _lastStepCount && currentSteps >= _stepGoal) {
+      _sendGoalAchievedNotification(currentSteps);
     }
+    _lastStepCount = currentSteps;
   }
 
   Future<void> _scheduleNotifications() async {
     await _notifications.cancelAll();
 
-    // Thông báo 12h
+    // Thông báo 12:00
     await _scheduleNotification(
       id: 1,
-      hour: 13,
-      minute: 10,
+      hour: 12,
+      minute: 0,
       title: 'Cập nhật số bước buổi sáng',
     );
 
-    // Thông báo 22h
+    // Thông báo 22:00
     await _scheduleNotification(
       id: 2,
       hour: 22,
@@ -127,8 +120,8 @@ class StepNotificationService {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
 
-      // Lấy số bước mới nhất
-      final currentSteps = await _getCurrentSteps();
+      // Lấy số bước từ background service
+      final currentSteps = _backgroundService.currentSteps;
       final message = 'Bạn đã đi được $currentSteps bước. Mục tiêu: $_stepGoal bước. Cố gắng tiếp tục nhé!';
 
       // Kiểm tra quyền đặt báo thức chính xác
@@ -175,7 +168,7 @@ class StepNotificationService {
     } catch (e) {
       print('Lỗi khi lên lịch thông báo: $e');
       // Thử gửi thông báo ngay lập tức nếu lên lịch thất bại
-      final currentSteps = await _getCurrentSteps();
+      final currentSteps = _backgroundService.currentSteps;
       await _notifications.show(
         id,
         title,
@@ -191,30 +184,6 @@ class StepNotificationService {
           iOS: const DarwinNotificationDetails(),
         ),
       );
-    }
-  }
-
-  Future<int> _getCurrentSteps() async {
-    try {
-      final now = DateTime.now();
-      final startOfDay = DateTime(now.year, now.month, now.day);
-      
-      final steps = await _health.getHealthDataFromTypes(
-        types: [HealthDataType.STEPS],
-        startTime: startOfDay,
-        endTime: now,
-      );
-
-      int currentSteps = 0;
-      for (var data in steps) {
-        if (data.value is NumericHealthValue) {
-          currentSteps += (data.value as NumericHealthValue).numericValue.toInt();
-        }
-      }
-      return currentSteps;
-    } catch (e) {
-      print('Lỗi khi lấy số bước: $e');
-      return _lastStepCount; // Trả về giá trị cũ nếu có lỗi
     }
   }
 
@@ -238,5 +207,6 @@ class StepNotificationService {
 
   void dispose() {
     _updateTimer?.cancel();
+    _backgroundService.dispose();
   }
 } 

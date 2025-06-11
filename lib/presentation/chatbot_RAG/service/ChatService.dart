@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import '../ChatMessage.dart';
 
 class ChatService {
-  final String baseUrl = 'http://192.168.133.100:8000';
+  final String baseUrl = 'http://192.168.133.102:8000';
 
-  Future<String> sendMessage(String message, List<ChatMessage> history) async {
+  Future<String> sendMessage(String message, List<ChatHistory> history) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/query'),
@@ -18,10 +18,7 @@ class ChatService {
         },
         body: jsonEncode({
           'query': message,
-          'chat_history': history.map((msg) => {
-            'role': msg.isUser ? 'user' : 'assistant',
-            'content': msg.text,
-          }).toList(),
+          'chat_history': history.map((h) => h.toJson()).toList(),
         }),
       );
 
@@ -36,7 +33,7 @@ class ChatService {
     }
   }
 
-  Stream<String> streamMessage(String message, List<ChatMessage> history) async* {
+  Stream<String> streamMessage(String message, List<ChatHistory> history) async* {
     try {
       developer.log('Preparing stream request...');
       final url = Uri.parse('$baseUrl/query/stream');
@@ -50,10 +47,7 @@ class ChatService {
       
       final body = {
         'query': message,
-        'chat_history': history.map((msg) => {
-          'role': msg.isUser ? 'user' : 'assistant',
-          'content': msg.text,
-        }).toList(),
+        'chat_history': history.map((h) => h.toJson()).toList(),
       };
       request.body = jsonEncode(body);
       

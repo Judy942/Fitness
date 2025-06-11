@@ -7,7 +7,6 @@ import 'package:flutter_application_fitness/presentation/meal_planner/meal_plann
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../models/workout.dart';
@@ -20,7 +19,7 @@ import 'add_meal_schedule.dart';
 Future<List<Map<String, dynamic>>> getMealSchedule(String date) async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   final response = await http.get(
-    Uri.parse('http://192.168.133.100:8055/api/meal_schedule?date=$date'),
+    Uri.parse('http://192.168.133.102:8055/api/meal_schedule?date=$date'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -114,7 +113,7 @@ class _MealScheduleState extends State<MealSchedule> {
                   'name': sObj['dish_id']['name'],
                   'description': sObj['dish_id']['description'],
                   'image':
-                      'http://192.168.133.100:8055/assets/${sObj['dish_id']['image']}',
+                      'http://192.168.133.102:8055/assets/${sObj['dish_id']['image']}',
                   'nutritions': sObj['dish_id']['nutritions'],
                 },
               };
@@ -346,25 +345,27 @@ class _MealScheduleState extends State<MealSchedule> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       getNutrition[0] == 0
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Lottie.asset("assets/food.json",
-                                    width: media.width,
-                                    height: media.height * 0.35),
-                                const Text(
-                                  "Không có lịch bữa ăn cho hôm nay",
-                                  style: TextStyle(
-                                      color: AppColors.blackColor,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700),
+                          ? SizedBox(
+                              height: 250,
+                              child: Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Lottie.asset("assets/food.json", height: 150),
+                                    const Text(
+                                      "Không có lịch bữa ăn cho hôm nay",
+                                      style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                              ],
+                              ),
                             )
                           : SizedBox(
                               width: media.width,
@@ -536,7 +537,7 @@ class _MealScheduleState extends State<MealSchedule> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          nutritionGoalArr[index]["value"],
+                                          "${getNutrition[index]} ${nutritionGoalArr[index]["value"].toString().split(" ").length > 1 ? nutritionGoalArr[index]["value"].toString().split(" ")[1] : ""}",
                                           style: const TextStyle(
                                               color: AppColors.grayColor,
                                               fontSize: 14,
@@ -544,24 +545,24 @@ class _MealScheduleState extends State<MealSchedule> {
                                         ),
                                       ],
                                     ),
-                                    SimpleAnimationProgressBar(
-                                      height: 15,
-                                      width: media.width * 0.5,
-                                      backgroundColor: Colors.grey.shade100,
-                                      foregroundColor: Colors.purple,
-                                      ratio: getNutrition[index] /
-                                          double.parse(nutritionGoalArr[index]
-                                                  ["value"]
-                                              .split(" ")[0]),
-                                      direction: Axis.horizontal,
-                                      curve: Curves.fastLinearToSlowEaseIn,
-                                      duration: const Duration(seconds: 3),
-                                      borderRadius: BorderRadius.circular(7.5),
-                                      gradientColor: LinearGradient(
-                                          colors: AppColors.primary,
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight),
-                                    ),
+                                    // SimpleAnimationProgressBar(
+                                    //   height: 15,
+                                    //   width: media.width * 0.5,
+                                    //   backgroundColor: Colors.grey.shade100,
+                                    //   foregroundColor: Colors.purple,
+                                    //   ratio: getNutrition[index] /
+                                    //       double.parse(nutritionGoalArr[index]
+                                    //               ["value"]
+                                    //           .split(" ")[0]),
+                                    //   direction: Axis.horizontal,
+                                    //   curve: Curves.fastLinearToSlowEaseIn,
+                                    //   duration: const Duration(seconds: 3),
+                                    //   borderRadius: BorderRadius.circular(7.5),
+                                    //   gradientColor: LinearGradient(
+                                    //       colors: AppColors.primary,
+                                    //       begin: Alignment.centerLeft,
+                                    //       end: Alignment.centerRight),
+                                    // ),
                                   ],
                                 ));
                           }),

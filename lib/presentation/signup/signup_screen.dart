@@ -79,7 +79,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> registerUser(String email, String password) async {
-    const String url = "http://192.168.133.100:8055/users/register";
+    const String url = "http://192.168.133.102:8055/users/register";
 
     try {
       final response = await http.post(
@@ -115,9 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 15),
-              const Text("Xin chào,", style: TextStyle(color: AppColors.blackColor, fontSize: 16)),
-              const SizedBox(height: 5),
+              const SizedBox(height: 20),
               const Text("Tạo Tài Khoản",
                   style: TextStyle(color: AppColors.blackColor, fontSize: 20, fontFamily: "Poppins", fontWeight: FontWeight.w700)),
               const SizedBox(height: 15),
@@ -163,7 +161,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   IconButton(
                     onPressed: () => setState(() => isCheck = !isCheck),
-                    icon: Icon(isCheck ? Icons.check_box_outline_blank_outlined : Icons.check_box_outlined, color: AppColors.grayColor),
+                    icon: Icon(!isCheck ? Icons.check_box_outline_blank_outlined : Icons.check_box_outlined, color: AppColors.grayColor),
                   ),
                   const Expanded(
                     child: Text("Bằng việc tiếp tục, bạn chấp nhận Chính sách Bảo mật và\nĐiều khoản Sử dụng",

@@ -8,17 +8,43 @@ import '../presentation/camera/camera_screen.dart';
 import 'user_service.dart';
 
 class ImageService {
-  static Future<Uint8List> decryptAndSaveImageFromTextFile(String filePath, String fileName) async {
-    print("filePath: $filePath");
-    final fileUrl = 'http://192.168.133.100:8055/assets/$filePath';
+  // static Future<Uint8List> decryptAndSaveImageFromTextFile(String filePath, String fileName) async {
+  //   print("filePath: $filePath");
+  //   final fileUrl = 'http://192.168.133.102:8055/assets/$filePath';
+  //   String fileContent = await fetchFileContent(fileUrl);
+  //   try {
+  //     if (fileContent.isNotEmpty) {
+  //       final decryptedBytes = await decryptImageFromBase64(fileContent);
+  //       if (decryptedBytes.isEmpty) {
+  //         throw Exception("Giải mã thất bại: Dữ liệu sau khi giải mã rỗng.");
+  //       }
+  //       return decryptedBytes;
+  //     } else {
+  //       throw Exception("File không tồn tại tại đường dẫn: $filePath");
+  //     }
+  //   } catch (e) {
+  //     print("Lỗi khi giải mã hoặc lưu ảnh: $e");
+  //     rethrow;
+  //   }
+  // }
+
+  
+  static Future<Uint8List> decryptAndSaveImageFromTextFile(
+      String filePath, String fileName) async {
+    final fileUrl = 'http://192.168.133.102:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
+      // Kiểm tra xem file có tồn tại không
       if (fileContent.isNotEmpty) {
+        // Giải mã Base64 từ nội dung file
         final decryptedBytes = await decryptImageFromBase64(fileContent);
+        print("giải mã thành công!!!!");
         if (decryptedBytes.isEmpty) {
           throw Exception("Giải mã thất bại: Dữ liệu sau khi giải mã rỗng.");
         }
         return decryptedBytes;
+        // Lưu ảnh vào tệp
+        // return await saveImageToFile(decryptedBytes, fileName);
       } else {
         throw Exception("File không tồn tại tại đường dẫn: $filePath");
       }
@@ -27,6 +53,7 @@ class ImageService {
       rethrow;
     }
   }
+
 
   static Uint8List removePadding(Uint8List input) {
     int paddingLength = input.last;

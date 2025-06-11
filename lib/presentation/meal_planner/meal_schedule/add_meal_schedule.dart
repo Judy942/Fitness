@@ -13,6 +13,7 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
 import '../../../main.dart';
 import '../../../services/push_notification/NotificationCacheService.dart';
+import '../../../services/push_notification/NotificationSyncService.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_gradient_button.dart';
@@ -235,7 +236,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.100:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.133.102:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -251,7 +252,7 @@ Future<void> addMealSchedule(
     DateTime mealTime = DateTime.parse(data['meal_time']);
     int notificationId = mealTime.millisecondsSinceEpoch ~/ 1000;
     String mealName = responseData['data']['dish_id']['name'];
-    await scheduleMealNotification(
+    await NotificationSyncService.scheduleMealNotification(
         mealTime, mealName, notificationId); // hoặc workout
     await NotificationCacheService.saveMealNotificationId(
         responseData['data']['id'].toString(), notificationId);
@@ -270,69 +271,33 @@ Future<void> addMealSchedule(
   }
 }
 
-Future<void> scheduleMealNotification(
-  DateTime mealTime,
-  String mealName,
-  int notificationId,
-) async {
-  tz.initializeTimeZones();
-  final tz.TZDateTime scheduledDate = tz.TZDateTime.from(mealTime, tz.local)
-      .subtract(const Duration(minutes: 30));
+// Future<void> scheduleMealNotification(
+//   DateTime mealTime,
+//   String mealName,
+//   int notificationId,
+// ) async {
+//   tz.initializeTimeZones();
+//   final tz.TZDateTime scheduledDate = tz.TZDateTime.from(mealTime, tz.local)
+//       .subtract(const Duration(minutes: 30));
   
-  // Định dạng thời gian theo 12 giờ với AM/PM và chuyển đổi sang giờ địa phương
-  String formattedTime = DateFormat('hh:mm a').format(mealTime.toLocal());
+//   // Định dạng thời gian theo 12 giờ với AM/PM và chuyển đổi sang giờ địa phương
+//   String formattedTime = DateFormat('hh:mm a').format(mealTime.toLocal());
   
-  await flutterLocalNotificationsPlugin.zonedSchedule(
-    notificationId,
-    "Đến giờ ăn rồi 🍽️",
-    "Hôm nay bạn có bữa $mealName lúc $formattedTime",
-    scheduledDate,
-    const NotificationDetails(
-      android: AndroidNotificationDetails(
-        'meal_channel_id',
-        'Nhắc nhở ăn uống',
-        importance: Importance.high,
-        priority: Priority.high,
-        icon: 'app_icon',
-      ),
-    ),
-    matchDateTimeComponents: DateTimeComponents.time,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-  );
-}
-
-Future<void> scheduleMotivationalNotification() async {
-  final tz.TZDateTime scheduledDate = tz.TZDateTime.local(
-    DateTime.now().year,
-    DateTime.now().month,
-    DateTime.now().day,
-    21,
-    0,
-  ).add(const Duration(days: 1)); // Lên lịch cho ngày mai
-
-  const motivationalMessages = [
-    "Hôm nay bạn đã cố gắng rất nhiều! 💪",
-    "Hãy nghỉ ngơi sớm để ngày mai thật năng lượng 🌙",
-    "Bạn đang tiến bộ từng ngày, đừng bỏ cuộc nhé! 🚀",
-  ];
-
-  final random =
-      motivationalMessages[DateTime.now().day % motivationalMessages.length];
-
-  await flutterLocalNotificationsPlugin.zonedSchedule(
-    88888,
-    "💡 Lời nhắc động viên",
-    random,
-    scheduledDate,
-    const NotificationDetails(
-      android: AndroidNotificationDetails(
-        'motivation_channel',
-        'Lời động viên',
-        importance: Importance.high,
-        priority: Priority.high,
-      ),
-    ),
-    matchDateTimeComponents: DateTimeComponents.time,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-  );
-}
+//   await flutterLocalNotificationsPlugin.zonedSchedule(
+//     notificationId,
+//     "Đến giờ ăn rồi 🍽️",
+//     "Hôm nay bạn có bữa $mealName sau 30 phút nữa",
+//     scheduledDate,
+//     const NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         'meal_channel_id',
+//         'Nhắc nhở ăn uống',
+//         importance: Importance.high,
+//         priority: Priority.high,
+//         icon: 'app_icon',
+//       ),
+//     ),
+//     matchDateTimeComponents: DateTimeComponents.time,
+//     androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+//   );
+// }

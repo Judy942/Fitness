@@ -17,6 +17,7 @@ class ChatWidget extends StatefulWidget {
 
 class _ChatWidgetState extends State<ChatWidget> {
   final List<types.Message> _messages = [];
+  final List<ChatHistory> _chatHistory = [];
   final _user = const types.User(id: '1');
   final _chatService = ChatService();
   final _textController = TextEditingController();
@@ -119,11 +120,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       
       await for (String chunk in _chatService.streamMessage(
         message.text,
-        _messages.map((m) => ChatMessage(
-          text: (m as types.TextMessage).text,
-          isUser: m.author.id == _user.id,
-          timestamp: DateTime.fromMillisecondsSinceEpoch(m.createdAt!),
-        )).toList(),
+        _chatHistory,
       )) {
         debugPrint('Processing chunk: $chunk');
         fullResponse += chunk;
@@ -157,6 +154,14 @@ class _ChatWidgetState extends State<ChatWidget> {
           });
         }
       }
+      
+      // Thêm vào lịch sử chat sau khi hoàn thành
+      setState(() {
+        _chatHistory.add(ChatHistory(
+          user: message.text,
+          assistant: fullResponse,
+        ));
+      });
       
       // Đảm bảo loading được dừng khi stream hoàn thành
       if (_isLoading) {

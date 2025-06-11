@@ -23,7 +23,7 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
 
   Future<void> _fetchMealHistory() async {
     List<dynamic> response = await _userService.fetchData(
-      'http://192.168.133.100:8055/items/meal_schedule?fields=*,dish_id.*&filter[_and][1][status][_neq]=archived&sort=-meal_time'
+      'http://192.168.133.102:8055/items/meal_schedule?fields=*,dish_id.*&filter[_and][1][status][_neq]=archived&sort=-meal_time'
     );
 
     setState(() {

@@ -23,7 +23,7 @@ Future<String> getBmi() async {
   try {
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.100:8055/api/users/bmi'), // Thay đổi URL nếu cần
+          'http://192.168.133.102:8055/api/users/bmi'), // Thay đổi URL nếu cần
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -59,7 +59,7 @@ class _StartScreenState extends State<StartScreen> {
     if (token != null) {
       // Gọi API để lấy thông tin người dùng
       final response = await http.get(
-        Uri.parse('http://192.168.133.100:8055/users/me'),
+        Uri.parse('http://192.168.133.102:8055/users/me'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -144,7 +144,7 @@ class _StartScreenState extends State<StartScreen> {
                   //   ),
                   // ),
                   const Text(
-                    "Everybody Can Train",
+                    "Chào mừng bạn đến với Fitness App",
                     style: TextStyle(
                       color: Color(0xff7b6f72),
                       fontSize: 18,

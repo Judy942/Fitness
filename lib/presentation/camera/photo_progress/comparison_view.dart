@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/core/utils/app_colors.dart';
+import 'package:flutter_application_fitness/presentation/dashboard/dashboard_screen.dart';
 
 import '../../../widgets/icon_title_next_row.dart';
 import '../../../widgets/round_button.dart';
@@ -119,7 +120,7 @@ class _ComparisonViewState extends State<ComparisonView> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen(initialTab: DashboardTab.camera,)));
           },
           child: Container(
             margin: const EdgeInsets.all(8),

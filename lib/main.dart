@@ -9,8 +9,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
-import 'presentation/meal_planner/meal_schedule/add_meal_schedule.dart';
 import 'presentation/onboarding_screen/start_screen.dart';
+import 'services/push_notification/NotificationSyncService.dart';
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
@@ -31,6 +31,9 @@ void initializeNotifications() async {
   );
 
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+  
+  // Khởi tạo NotificationSyncService
+  await NotificationSyncService.initialize();
 }
 
 void configureLocalNotification() {
@@ -72,14 +75,15 @@ Future<void> main() async {
   await flutterLocalNotificationsPlugin.initialize(settings);
   
   // Lên lịch thông báo động viên
-  await scheduleMotivationalNotification();
+  await NotificationSyncService.scheduleMotivationalNotification();
 
   EmailOTP.config(
     appName: 'Fitness App',
+    appEmail: 'trinhthuc130902@gmail.com',
     otpType: OTPType.numeric,
     emailTheme: EmailTheme.v1,
-    expiry: 50000,
-    otpLength: 6,
+    expiry: 100000,
+    otpLength: 5,
   );
   EmailOTP.setSMTP(
     host: 'smtp.gmail.com',

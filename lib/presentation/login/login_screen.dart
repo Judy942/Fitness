@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/camera/camera_screen.dart';
 import 'package:flutter_application_fitness/presentation/profile/complete_profile_screen.dart';
 import 'package:flutter_application_fitness/presentation/signup/signup_screen.dart';
+import 'package:flutter_application_fitness/services/email_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,12 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final EmailOTP myAuth = EmailOTP();
   bool isLoading = false;
 
-
 void fetchData() async {
     setState(() {
     isLoading = true;
   });
-  String url = "http://192.168.133.100:8055/auth/login";
+  String url = "http://192.168.133.102:8055/auth/login";
   try {
     print(url);
     final response = await http.post(
@@ -74,7 +74,7 @@ void fetchData() async {
         await storage.write(key: 'encryption_key', value: keyAndIv['key']);
         await storage.write(key: 'encryption_iv', value: keyAndIv['iv']);
         
-        bool otpSent = await EmailOTP.sendOTP(email: email);
+        bool otpSent = await EmailService.sendOTPEmail(email);
 
         if (otpSent) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -193,22 +193,19 @@ void fetchData() async {
                                 size: 20,
                               ))),
                     ),
-                    SizedBox(height: media.width * 0.03),
-                    const Text("Quên mật khẩu?",
-                        style: TextStyle(
-                          color: AppColors.grayColor,
-                          fontSize: 10,
-                        )),
-                    SizedBox(height: media.width * 0.65),
+                    
+                    SizedBox(height: media.height * 0.5),
+                    // Spacer(),
                     RoundGradientButton(
                       title: "Đăng Nhập",
                       onPressed: () {
                         _onLoginButtonPressed();
                       },
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    // const SizedBox(
+
+                    //   height: 2,
+                    // ),
                     TextButton(
                         onPressed: () {
                           Navigator.push(context,
@@ -289,7 +286,7 @@ class OtpVerificationScreen extends StatelessWidget {
             // Resend OTP Button
             ElevatedButton(
               onPressed: () async {
-                bool otpSent = await EmailOTP.sendOTP(email: email);
+                bool otpSent = await EmailService.sendOTPEmail(email);
                 if (otpSent) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("OTP đã được gửi lại")));
@@ -304,7 +301,10 @@ class OtpVerificationScreen extends StatelessWidget {
             // Verify OTP Button
             ElevatedButton(
               onPressed: () async {
-                bool isVerified = EmailOTP.verifyOTP(otp: otpController.text);
+                print('Đang verify OTP: ${otpController.text}');
+                bool isVerified = await EmailService.verifyOTP(email, otpController.text);
+                print('Kết quả verify: $isVerified');
+                
                 if (isVerified) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Xác thực OTP thành công")),
@@ -321,7 +321,7 @@ class OtpVerificationScreen extends StatelessWidget {
                               )));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Mã OTP không hợp lệ")),
+                    const SnackBar(content: Text("Mã OTP không hợp lệ hoặc đã hết hạn")),
                   );
                 }
               },
@@ -333,3 +333,4 @@ class OtpVerificationScreen extends StatelessWidget {
     );
   }
 }
+

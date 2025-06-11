@@ -61,6 +61,10 @@ dependencies:
   google_sign_in: ^6.2.2
   timezone: ^0.10.1
   crypto: ^3.0.6
+  flutter_email_sender: ^7.0.0
+  workmanager: ^0.5.2
+  mailer: ^6.1.0
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -100,7 +104,6 @@ dependencies:
   # dash_chat_2: ^0.0.20
   # encrypt: ^5.0.3
   # flutter_secure_storage: ^9.2.4
-  # email_otp: ^3.0.2
   # android_intent_plus: ^5.3.0
   # firebase_core: ^2.0.0
   # firebase_messaging: ^14.0.0

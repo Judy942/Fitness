@@ -7,15 +7,26 @@ import '../home/home_screen.dart';
 import '../profile/user_profile.dart';
 import '../workout/workout_tracker/workout_tracker_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
+enum DashboardTab { home, workout, camera, profile }
 
-  const DashboardScreen({Key? key}) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  final DashboardTab? initialTab;
+
+  const DashboardScreen({Key? key, this.initialTab}) : super(key: key);
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int selectTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialTab != null) {
+      selectTab = widget.initialTab!.index;
+    }
+  }
 
   final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
