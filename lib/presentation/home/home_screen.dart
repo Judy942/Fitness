@@ -1,0 +1,469 @@
+// ignore_for_file: must_be_immutable
+
+import 'dart:convert';
+
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/add_schedule_view.dart';
+import 'package:http/http.dart' as http;
+
+import '../../core/utils/app_colors.dart';
+import '../../services/user_service.dart';
+import '../../widgets/round_button.dart';
+import '../../widgets/workout_row.dart';
+import '../onboarding_screen/start_screen.dart';
+
+Future<Map<String, dynamic>> getUserData() async {
+  String? token = await getToken();
+  Map<String, dynamic> userData = {};
+
+  if (token != null) {
+    // Gọi API để lấy thông tin người dùng
+    final response = await http.get(
+      Uri.parse('http://192.168.102.186:8055/users/me'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      userData = responseData['data'];
+      return userData;
+    } else {
+      await clearLocalData();
+      return userData;
+    }
+  } else {
+    return userData;
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic> userData = {};
+  String bmi = '0';
+
+  Future<void> refreshData() async {
+    final data = await getUserData();
+    final bmiValue = await getBmi();
+    setState(() {
+      userData = data;
+      bmi = bmiValue == "null" ? '0' : bmiValue;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refreshData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: AppColors.whiteColor,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: refreshData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TopBar(userData['last_name'] ?? ""),
+                  SizedBox(height: media.width * 0.05),
+                  ContainerBmi(bmi: bmi),
+                  SizedBox(height: media.width * 0.05),
+                  const TodayTargetSection(),
+                  SizedBox(height: media.width * 0.05),
+                  const LatestWorkoutSection(),
+                  SizedBox(height: media.width * 0.1),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TopBar extends StatelessWidget {
+  final String name;
+  const TopBar(this.name, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Chào mừng trở lại,",
+                style: TextStyle(
+                  color: AppColors.midGrayColor,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 20,
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ContainerBmi extends StatelessWidget {
+  String bmi;
+  ContainerBmi({super.key, required this.bmi});
+
+  String _getBMICategory(String bmiValue) {
+    if (bmiValue == "0") return "Chưa có dữ liệu";
+
+    double bmiDouble;
+    try {
+      bmiDouble = double.parse(bmiValue);
+    } catch (e) {
+      return "Không hợp lệ";
+    }
+
+    if (bmiDouble < 18.5) return "Bạn nên tăng cân";
+    if (bmiDouble < 23) return "Nên duy trì chế độ ăn uống và tập luyện";
+    if (bmiDouble < 30) return "Bạn nên giảm cân";
+    return "Bạn cần giảm cân";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.width * 0.38,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: AppColors.primary),
+        borderRadius:
+            BorderRadius.circular(MediaQuery.of(context).size.width * 0.065),
+      ),
+      child: _buildBMIContent(bmi, context),
+    );
+  }
+
+  Widget _buildBMIContent(String bmi, BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          "assets/icons/bg_dots.png",
+          height: MediaQuery.of(context).size.width * 0.4,
+          width: double.maxFinite,
+          fit: BoxFit.fitHeight,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "BMI (Chỉ số khối cơ thể)",
+                        style: TextStyle(
+                          color: AppColors.whiteColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        bmi == "0" ? " Hãy cập nhật thông tin" : bmi,
+                        style: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.7),
+                          fontSize: 14,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.width * 0.05),
+                      Text(
+                        _getBMICategory(bmi),
+                        style: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.8),
+                          fontSize: 14,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 10),
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: PieChart(
+                    PieChartData(
+                      pieTouchData: PieTouchData(
+                        touchCallback: (FlTouchEvent event, pieTouchResponse) {},
+                      ),
+                      startDegreeOffset: 250,
+                      borderData: FlBorderData(show: false),
+                      sectionsSpace: 1,
+                      centerSpaceRadius: 0,
+                      sections: showingSections(bmi),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<PieChartSectionData> showingSections(String bmi) {
+    return List.generate(
+      2,
+      (i) {
+        const color0 = AppColors.secondaryColor2;
+        const color1 = AppColors.whiteColor;
+
+        switch (i) {
+          case 0:
+            return PieChartSectionData(
+              color: color0,
+              value: double.tryParse(bmi) ?? 0,
+              title: '',
+              radius: 55,
+              titlePositionPercentageOffset: 0.55,
+              badgeWidget: Text(
+                bmi,
+                style: const TextStyle(
+                    color: AppColors.whiteColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12),
+              ),
+            );
+          case 1:
+            return PieChartSectionData(
+              color: color1,
+              value: 100 - (double.tryParse(bmi) ?? 0),
+              title: '',
+              radius: 42,
+              titlePositionPercentageOffset: 0.55,
+            );
+          default:
+            throw Error();
+        }
+      },
+    );
+  }
+}
+
+class TodayTargetSection extends StatelessWidget {
+  const TodayTargetSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+          color: AppColors.primaryColor1.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(15)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Expanded(
+            child: Text(
+              "Hoạt động và dinh dưỡng hôm nay",
+              style: TextStyle(
+                color: AppColors.blackColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          SizedBox(
+            width: 95,
+            height: 30,
+            child: RoundButton(
+              title: "Kiểm Tra",
+              type: RoundButtonType.primaryBG,
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const ActivityTrackerScreen();
+                }));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LatestWorkoutSection extends StatefulWidget {
+  const LatestWorkoutSection({super.key});
+
+  @override
+  State<LatestWorkoutSection> createState() => _LatestWorkoutSectionState();
+}
+
+class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
+  final UserService _userService = UserService(); // Create an instance
+  List lastWorkoutArr = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWorkoutData();
+  }
+
+  Future<void> _fetchWorkoutData() async {
+    List<dynamic> workouts = await _userService.fetchData(
+        // 'http://192.168.102.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.102.186:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+
+    setState(() {
+      lastWorkoutArr = workouts;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Lịch luyện tập của bạn", style: sectionTitleStyle),
+        lastWorkoutArr.isEmpty
+            ? Container(
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Bạn chưa có lịch tập nào, thiết lập ngay nhé!",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: 150,
+                      height: 36,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor1.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Chuyển sang màn hình thêm lịch tập
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AddScheduleView(date: DateTime.now()),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Thêm lịch tập",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: lastWorkoutArr.length,
+                itemBuilder: (context, index) {
+                  var wObj = lastWorkoutArr[index] as Map? ?? {};
+                  return WorkoutRow(wObj: wObj);
+                },
+              ),
+      ],
+    );
+  }
+}
+
+const TextStyle sectionTitleStyle = TextStyle(
+  color: AppColors.blackColor,
+  fontSize: 16,
+  fontWeight: FontWeight.w600,
+);
+
+// Future<void> _requestPermissions() async {
+//   print('Requesting permissions...');
+//   try {
+//     // Kiểm tra và cài đặt Health Connect nếu cần
+//     bool isAvailable = await _health.isHealthConnectAvailable();
+//     if (!isAvailable) {
+//       bool installed = await _health.installHealthConnect();
+//       if (!installed) {
+//         throw Exception('Vui lòng cài đặt Google Health Connect để sử dụng tính năng này');
+//       }
+//     }
+
+//     // Code yêu cầu quyền hiện tại...
+//     final activityStatus = await Permission.activityRecognition.request();
+//     final sensorsStatus = await Permission.sensors.request();
+//     // ...
+//   } catch (e) {
+//     print('Error requesting permissions: $e');
+//     if (mounted) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Lỗi: $e')),
+//       );
+//     }
+//   }
+// }F

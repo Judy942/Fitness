@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+
+import '../../core/utils/app_colors.dart';
+import '../camera/photo_progress/progress_photo_screen.dart';
+import '../chatbot_RAG/chatScreen.dart';
+import '../home/home_screen.dart';
+import '../profile/user_profile.dart';
+import '../workout/workout_tracker/workout_tracker_screen.dart';
+
+enum DashboardTab { home, workout, camera, profile }
+
+class DashboardScreen extends StatefulWidget {
+  final DashboardTab? initialTab;
+  final Map<String, dynamic>? userData;
+
+  const DashboardScreen({Key? key, this.initialTab, this.userData}) : super(key: key);
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int selectTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialTab != null) {
+      selectTab = widget.initialTab!.index;
+    }
+  }
+
+  final List<Widget> _widgetOptions = <Widget>[
+    const HomeScreen(),
+    const WorkoutTrackerScreen(),
+    const ProgressPhotoScreen(),
+    const UserProfile()
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.whiteColor,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: InkWell(
+        onTap: () {
+              Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(userData: widget.userData),
+      ),
+    );
+        },
+        child: SizedBox(
+          width: 70,
+          height: 70,
+          child: Container(
+            width: 65,
+            height: 65,
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: AppColors.primary),
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 2)
+                ]),
+            child: const Icon(Icons.message_rounded,
+                color: AppColors.whiteColor, size: 32),
+          ),
+        ),
+      ),
+      body: IndexedStack(
+        index: selectTab,
+        children: _widgetOptions,
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.transparent,
+        padding: const EdgeInsets.all(0),
+        child: Container(
+          decoration: const BoxDecoration(
+              color: AppColors.whiteColor,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 2,
+                    offset: Offset(0, -2))
+              ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TabButton(
+                  icon: "assets/icons/home_icon.png",
+                  selectIcon: "assets/icons/home_select_icon.png",
+                  isActive: selectTab == 0,
+                  onTap: () {
+                    if (mounted) {
+                      setState(() {
+                        selectTab = 0;
+                      });
+                    }
+                  }),
+              TabButton(
+                  icon: "assets/icons/activity_icon.png",
+                  selectIcon: "assets/icons/activity_select_icon.png",
+                  isActive: selectTab == 1,
+                  onTap: () {
+                    if (mounted) {
+                      setState(() {
+                        selectTab = 1;
+                      });
+                    }
+                  }),
+              const SizedBox(width: 30),
+              TabButton(
+                  icon: "assets/icons/camera_icon.png",
+                  selectIcon: "assets/icons/camera_select_icon.png",
+                  isActive: selectTab == 2,
+                  onTap: () {
+                    if (mounted) {
+                      setState(() {
+                        selectTab = 2;
+                      });
+                    }
+                  }),
+              TabButton(
+                  icon: "assets/icons/user_icon.png",
+                  selectIcon: "assets/icons/user_select_icon.png",
+                  isActive: selectTab == 3,
+                  onTap: () {
+                    if (mounted) {
+                      setState(() {
+                        selectTab = 3;
+                      });
+                    }
+                  }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TabButton extends StatelessWidget {
+  final String icon;
+  final String selectIcon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const TabButton(
+      {Key? key,
+      required this.icon,
+      required this.selectIcon,
+      required this.isActive,
+      required this.onTap})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            isActive ? selectIcon : icon,
+            width: 25,
+            height: 25,
+            fit: BoxFit.fitWidth,
+          ),
+          SizedBox(height: isActive ? 8 : 12),
+          Visibility(
+            visible: isActive,
+            child: Container(
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: AppColors.secondary),
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}

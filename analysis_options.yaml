@@ -7,6 +7,18 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
+analyzer:
+  errors:
+    depend_on_referenced_packages: ignore ignore
+    avoid_print: ignore
+    use_build_context_synchronously: ignore
+    library_private_types_in_public_api: ignore
+    must_be_immutable: ignore
+    constant_identifier_names: ignore
+    file_names: ignore
+    non_constant_identifier_names: ignore
+    deprecated_member_use: ignore
+    use_full_hex_values_for_flutter_colors: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:

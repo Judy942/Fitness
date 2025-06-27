@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+
+import '../core/utils/app_colors.dart';
+import '../presentation/meal_planner/meal_planner_detail/meal_details_screen.dart';
+import 'round_button.dart';
+
+class RecommendationContainer extends StatelessWidget {
+  final Map wObj;
+  final RoundButtonType type;
+
+  const RecommendationContainer(
+      {Key? key, required this.wObj, this.type = RoundButtonType.primaryBG})
+      : super(key: key);
+
+  void onViewMoreClick(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MealDetailsScreen(
+                  dObj: wObj,
+                )));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // print('Giá trị của difficulty trong wObj: ${wObj["difficulty"]}');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+          color: type == RoundButtonType.secondaryBG
+              ? AppColors.secondaryColor2.withOpacity(0.2)
+              : AppColors.primaryColor2.withOpacity(0.2),
+          borderRadius: const BorderRadius.all(Radius.circular(20))),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 10,),
+            Image.network(
+              'http://192.168.102.186:8055/assets/${wObj["image"]}',
+              height: 60,
+              width: 60,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              wObj["name"].toString(),
+              style: const TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              wObj["description"].toString(),
+              style: const TextStyle(
+                color: AppColors.grayColor,
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis,
+                fontWeight: FontWeight.w400),
+              maxLines: 3,
+            ),
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: SizedBox(
+                height: 30,
+                width: 100,
+                child: RoundButton(
+                  type: RoundButtonType.primaryBG,
+                  title: "Xem",
+                  onPressed: () {
+                    onViewMoreClick(context);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
