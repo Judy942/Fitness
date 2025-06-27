@@ -6,32 +6,32 @@ import 'package:http/http.dart' as http;
 import '../ChatMessage.dart';
 
 class ChatService {
-  final String baseUrl = 'http://192.168.133.102:8000';
+  final String baseUrl = 'http://192.168.102.186:8000';
 
-  Future<String> sendMessage(String message, List<ChatHistory> history) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/query'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json; charset=utf-8',
-        },
-        body: jsonEncode({
-          'query': message,
-          'chat_history': history.map((h) => h.toJson()).toList(),
-        }),
-      );
+  // Future<String> sendMessage(String message, List<ChatHistory> history) async {
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('$baseUrl/query'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Accept': 'application/json; charset=utf-8',
+  //       },
+  //       body: jsonEncode({
+  //         'query': message,
+  //         'chat_history': history.map((h) => h.toJson()).toList(),
+  //       }),
+  //     );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        return data['answer'];
-      } else {
-        throw Exception('Failed to send message: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(utf8.decode(response.bodyBytes));
+  //       return data['answer'];
+  //     } else {
+  //       throw Exception('Failed to send message: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error: $e');
+  //   }
+  // }
 
   Stream<String> streamMessage(String message, List<ChatHistory> history) async* {
     try {

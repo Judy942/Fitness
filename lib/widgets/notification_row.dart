@@ -35,15 +35,17 @@ class _NotificationRowState extends State<NotificationRow> {
             borderRadius: BorderRadius.circular(30),
             child: Image.network(
               widget.nObj["type"] == "MEAL"
-                  ? 'http://192.168.133.102:8055/assets/${widget.nObj["dish_id"]["image"]}'
-                  : 'http://192.168.133.102:8055/assets/${widget.nObj["workout_id"]["image"]}',
+                  ? 'http://192.168.102.186:8055/assets/${widget.nObj["dish_id"]["image"]}'
+                  : 'http://192.168.102.186:8055/assets/${widget.nObj["workout_id"]["image"]}',
               errorBuilder:
                   (BuildContext context, Object error, StackTrace? stackTrace) {
-                return Container(
-                  color: Colors.grey, // Màu nền mặc định
-                  child: const Icon(
-                      Icons.error_outline), // Hiển thị biểu tượng lỗi
-                );
+                return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );
               },
               width: 40,
               height: 40,

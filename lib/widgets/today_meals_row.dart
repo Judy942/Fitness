@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../core/utils/app_colors.dart';
+import '../core/utils/date_and_time.dart';
 import '../services/user_service.dart';
 
 class TodayMealsRow extends StatefulWidget {
@@ -31,13 +32,18 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
           children: [
             ClipRRect(
               child: Image.network(
-                'http://192.168.133.102:8055/assets/${widget.wObj['dish_id']["image"]}',
+                'http://192.168.102.186:8055/assets/${widget.wObj['dish_id']["image"]}',
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error, size: 40, color: AppColors.grayColor);
-                      },
+return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );                      },
               ),
             ),
             const SizedBox(
@@ -54,12 +60,24 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
                       fontSize: 16,
                       fontWeight: FontWeight.w500),
                 ),
-                Text(
-                  'Hôm nay | ${DateFormat('hh:mm a').format(DateTime.parse(widget.wObj["meal_time"]).toLocal())}',
-                  style: const TextStyle(
-                    color: AppColors.grayColor,
-                    fontSize: 12,
-                  ),
+                // Hiển thị dayTitle | day | time theo cấu hình trong date_and_time.dart
+                Builder(
+                  builder: (context) {
+                    DateTime mealTime = DateTime.parse(widget.wObj["meal_time"]).toLocal();
+                    String dayTitle = getDayTitle(
+                      DateFormat("dd/MM/yyyy hh:mm a").format(mealTime),
+                      formatStr: "dd/MM/yyyy hh:mm a",
+                    );
+                    String day = DateFormat('dd/MM/yyyy').format(mealTime);
+                    String time = DateFormat('HH:mm').format(mealTime);
+                    return Text(
+                      '$dayTitle | $day | $time',
+                      style: const TextStyle(
+                        color: AppColors.grayColor,
+                        fontSize: 12,
+                      ),
+                    );
+                  },
                 ),
               ],
             )),
@@ -72,7 +90,7 @@ class _TodayMealsRowState extends State<TodayMealsRow> {
                 // Cập nhật lại giá trị trên server
                 String? token = await getToken();
                 final response = await http.patch(
-                  Uri.parse('http://192.168.133.102:8055/items/meal_schedule/${widget.wObj['id']}'),
+                  Uri.parse('http://192.168.102.186:8055/items/meal_schedule/${widget.wObj['id']}'),
                   headers: {
                     'Authorization': 'Bearer $token',
                     'Content-Type': 'application/json'

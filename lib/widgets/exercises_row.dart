@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/models/workout.dart';
 
@@ -14,7 +16,9 @@ class ExercisesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("eObj: ${eObj.value} - ${eObj.title} - ${eObj.unit} - ${eObj.excercise_time} ");
     return Container(
+      
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
@@ -50,7 +54,8 @@ class ExercisesRow extends StatelessWidget {
                   ),
                   Text(
                     // eObj["value"].toString(),
-                    eObj.value.toString(),
+                    eObj.unit == "TIME" ? "${eObj.excercise_time} phút" : "${eObj.value}",
+                    // eObj.value.toString(),
                     style: const TextStyle(
                       color: AppColors.grayColor,
                       fontSize: 12,

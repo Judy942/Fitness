@@ -56,9 +56,10 @@ class Exercise {
   final int caloriesBurned;
   final String? difficulty;
   final String? value;
+  final String? excercise_time;
   final int id;
 
-  Exercise({
+  Exercise({  
     required this.title,
     this.description,
     this.setNumber,
@@ -68,6 +69,7 @@ class Exercise {
     this.difficulty,
     this.value,
     required this.id,
+    this.excercise_time,
   });
   }
 
@@ -100,7 +102,7 @@ class Equipment {
 
 
 Future<Workout> getWorkoutDetail(int id) async {
-  String url = 'http://192.168.133.102:8055/api/workouts/$id?difficulity=EASY';
+  String url = 'http://192.168.102.186:8055/api/workouts/$id?difficulity=EASY';
   String? token = await getToken();
 
   try {
@@ -121,7 +123,7 @@ Future<Workout> getWorkoutDetail(int id) async {
           description: exerciseId['description'],
           setNumber: exercise['set_number'],
           unit: exercise['unit'].toString(),
-          image: 'http://192.168.133.102:8055/assets/${exerciseId['image']}',
+          image: 'http://192.168.102.186:8055/assets/${exerciseId['image']}',
           caloriesBurned: exerciseDifficulties.isNotEmpty
               ? exerciseDifficulties[0]['calories_burn'] ?? 0 // Gán giá trị mặc định nếu null
               : 0,
@@ -132,6 +134,9 @@ Future<Workout> getWorkoutDetail(int id) async {
               ? exerciseDifficulties[0]['value'].toString() // Sử dụng toán tử ? để tránh lỗi
               : '0',
           id: exerciseId['id'] ?? 0,
+          excercise_time: exerciseDifficulties.isNotEmpty
+              ? exerciseDifficulties[0]['excercise_time'].toString() // Sử dụng toán tử ? để tránh lỗi
+              : '0', // Gán giá trị mặc định nếu null
         );
         
       }).toList();
@@ -140,7 +145,7 @@ Future<Workout> getWorkoutDetail(int id) async {
         return Equipment(
           name: equipmentId['name'] ?? 'Unknown Equipment', // Gán giá trị mặc định nếu null
           code: equipmentId['code'] ?? 'Unknown Code', // Gán giá trị mặc định nếu null
-          image: 'http://192.168.133.102:8055/assets/${equipmentId['image']}',
+          image: 'http://192.168.102.186:8055/assets/${equipmentId['image']}',
         );
       }).toList();
       return Workout(

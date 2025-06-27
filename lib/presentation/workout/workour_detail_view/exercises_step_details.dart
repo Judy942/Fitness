@@ -80,18 +80,23 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                   Container(
                     width: media.width,
                     height: media.width * 0.43,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20)),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(20)),
                     child: Image.network(
-                      'http://192.168.133.102:8055/assets/${widget.exerciseDetail["animation"]}',
+                      'http://192.168.102.186:8055/assets/${widget.exerciseDetail["animation"]}',
                       width: media.width,
                       height: media.width * 0.43,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error, size: 40, color: AppColors.grayColor);
+                        return const Image(
+                          image: AssetImage("assets/images/default.png"),
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.contain,
+                        );
                       },
                     ),
-                    // child: Lottie.network('http://192.168.133.102:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
+                    // child: Lottie.network('http://192.168.102.186:8055/assets/${widget.exerciseDetail["animation"]}', width: media.width, height: media.width * 0.43, fit: BoxFit.contain),
                     // child: Lottie.asset(
                     //   'assets/Animation - 1725696475335.json',
                     //   width: media.width,
@@ -121,16 +126,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
               const SizedBox(
                 height: 4,
               ),
-              Text(
-                "${widget.eObj.difficulty} | ${widget.eObj.caloriesBurned} Calo đốt cháy",
-                style: const TextStyle(
-                  color: AppColors.grayColor,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
+              
               const Text(
                 "Mô tả",
                 style: TextStyle(
@@ -142,8 +138,7 @@ class _ExercisesStepDetailsState extends State<ExercisesStepDetails> {
                 height: 4,
               ),
               ReadMoreText(
-                widget.exerciseDetail["description"] ??
-                    "Không có mô tả",
+                widget.exerciseDetail["description"] ?? "Không có mô tả",
                 trimLines: 4,
                 colorClickableText: AppColors.blackColor,
                 trimMode: TrimMode.Line,

@@ -166,8 +166,7 @@ class StepNotificationService {
         );
       }
     } catch (e) {
-      print('Lỗi khi lên lịch thông báo: $e');
-      // Thử gửi thông báo ngay lập tức nếu lên lịch thất bại
+      // Xử lý lỗi một cách im lặng
       final currentSteps = _backgroundService.currentSteps;
       await _notifications.show(
         id,

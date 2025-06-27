@@ -47,7 +47,7 @@ class StepBackgroundService {
     // Khởi tạo Workmanager
     await _workmanager.initialize(
       callbackDispatcher,
-      isInDebugMode: true,
+      isInDebugMode: false,
     );
 
     // Đăng ký task định kỳ

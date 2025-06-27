@@ -14,6 +14,7 @@ class MealHistoryScreen extends StatefulWidget {
 class _MealHistoryScreenState extends State<MealHistoryScreen> {
   final UserService _userService = UserService();
   List mealHistoryArr = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -22,12 +23,15 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
   }
 
   Future<void> _fetchMealHistory() async {
+    setState(() {
+      isLoading = true;
+    });
     List<dynamic> response = await _userService.fetchData(
-      'http://192.168.133.102:8055/items/meal_schedule?fields=*,dish_id.*&filter[_and][1][status][_neq]=archived&sort=-meal_time'
-    );
+        'http://192.168.102.186:8055/items/meal_schedule?fields=*,dish_id.*&filter[_and][1][status][_neq]=archived&sort=-meal_time');
 
     setState(() {
       mealHistoryArr = response;
+      isLoading = false;
     });
   }
 
@@ -47,25 +51,31 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
           ),
         ),
       ),
-      body: mealHistoryArr.isEmpty 
-      ? const Center(
-          child: Text("Chưa có dữ liệu bữa ăn"),
-        )
-      : ListView.builder(
-        padding: const EdgeInsets.all(15),
-        itemCount: mealHistoryArr.length,
-        itemBuilder: (context, index) {
-          var meal = mealHistoryArr[index] as Map? ?? {};
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 1,
-            itemBuilder: (context, mealIndex) {
-              return TodayMealsRow(wObj: meal); // Sử dụng TodayMealsRow để hiển thị món ăn
-            },
-          );
-        },
-      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : mealHistoryArr.isEmpty
+              ? const Center(
+                  child: Text("Chưa có lịch sử nào"),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(15),
+                  itemCount: mealHistoryArr.length,
+                  itemBuilder: (context, index) {
+                    var meal = mealHistoryArr[index] as Map? ?? {};
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 1,
+                      itemBuilder: (context, mealIndex) {
+                        return TodayMealsRow(
+                            wObj:
+                                meal); // Sử dụng TodayMealsRow để hiển thị món ăn
+                      },
+                    );
+                  },
+                ),
     );
   }
-} 
+}

@@ -23,7 +23,7 @@ Future<String> getBmi() async {
   try {
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.102:8055/api/users/bmi'), // Thay đổi URL nếu cần
+          'http://192.168.102.186:8055/api/users/bmi'), // Thay đổi URL nếu cần
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -59,27 +59,34 @@ class _StartScreenState extends State<StartScreen> {
     if (token != null) {
       // Gọi API để lấy thông tin người dùng
       final response = await http.get(
-        Uri.parse('http://192.168.133.102:8055/users/me'),
+        Uri.parse('http://192.168.102.186:8055/users/me'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
-        // final responseData = json.decode(response.body);
-        // Navigator.pushReplacementNamed(context, AppRoutes.dashboardScreen);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-          return const DashboardScreen();
-        }));
+        // Lấy dữ liệu user từ response
+        final responseData = json.decode(response.body);
+        final userData = responseData['data'];
+
+        // Truyền thông tin user sang DashboardScreen qua constructor
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(
+              // Giả sử DashboardScreen có nhận userData, bạn cần sửa DashboardScreen để nhận tham số này
+              userData: userData,
+            ),
+          ),
+        );
       } else {
         // Lỗi, xóa dữ liệu local và yêu cầu đăng nhập lại
         await clearLocalData();
-        // Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
           return const LoginScreen();
         }));
       }
     } else {
-      // Không có token, chuyển đến Login
-      // Navigator.pushReplacementNamed(context, AppRoutes.onboardingScreen);
+      // Không có token, chuyển đến Onboarding
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return const OnboardingScreen();
       }));

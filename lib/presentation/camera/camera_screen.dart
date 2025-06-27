@@ -127,7 +127,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Now use the encrypted file for upload
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.133.102:8055/files'),
+      Uri.parse('http://192.168.102.186:8055/files'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -150,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String? id = await uploadFile(filePath);
     print(id);
     var request = http.post(
-      Uri.parse('http://192.168.133.102:8055/items/process_tracker'),
+      Uri.parse('http://192.168.102.186:8055/items/process_tracker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json'
@@ -174,7 +174,7 @@ class _CameraScreenState extends State<CameraScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: const Text('Nhìn thẳng'),
+                title: const Text('Tổng thể phía trước'),
                 onTap: () {
                   addProcessTracker(imagePath, 1);
                   Navigator.of(context).pop();
@@ -184,7 +184,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 },
               ),
               ListTile(
-                title: const Text('Nhìn sau'),
+                title: const Text('Tổng thể phía sau'),
                 onTap: () {
                   addProcessTracker(imagePath, 2);
                   Navigator.of(context).pop();
@@ -194,7 +194,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 },
               ),
               ListTile(
-                title: const Text('Nhìn trái'),
+                title: const Text('Tổng thể phía trái'),
                 onTap: () {
                   addProcessTracker(imagePath, 3);
                   Navigator.of(context).pop();
@@ -204,9 +204,79 @@ class _CameraScreenState extends State<CameraScreen> {
                 },
               ),
               ListTile(
-                title: const Text('Nhìn phải'),
+                title: const Text('Tổng thể phía phải'),
                 onTap: () {
                   addProcessTracker(imagePath, 4);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Phần cánh tay'),
+                onTap: () {
+                  addProcessTracker(imagePath, 5);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Phần đùi'),
+                onTap: () {
+                  addProcessTracker(imagePath, 6);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Phần chân'),
+                onTap: () {
+                  addProcessTracker(imagePath, 7);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Vùng bụng'),
+                onTap: () {
+                  addProcessTracker(imagePath, 8);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Vùng mông'),
+                onTap: () {
+                  addProcessTracker(imagePath, 9);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Vùng ngực'),
+                onTap: () {
+                  addProcessTracker(imagePath, 10);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu')),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Vùng lưng'),
+                onTap: () {
+                  addProcessTracker(imagePath, 11);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Đã lưu')),

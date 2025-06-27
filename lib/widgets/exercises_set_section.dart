@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/models/workout.dart';
 
@@ -12,7 +14,7 @@ class ExercisesSetSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // var exercisesArr = sObj["set"] as List? ?? [];
-
+    log ("sObj: ${sObj.exercises} - ${sObj.exercises.length}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

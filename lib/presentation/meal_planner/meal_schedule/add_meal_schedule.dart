@@ -3,15 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/meal_planner/meal_schedule/meal_schedule.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/date_and_time.dart';
-import '../../../main.dart';
 import '../../../services/push_notification/NotificationCacheService.dart';
 import '../../../services/push_notification/NotificationSyncService.dart';
 import '../../../services/user_service.dart';
@@ -236,7 +231,7 @@ Future<void> addMealSchedule(
   String json = jsonEncode(data);
   final response = await http.post(
     Uri.parse(
-        'http://192.168.133.102:8055/items/meal_schedule?fields=*,dish_id.*'),
+        'http://192.168.102.186:8055/items/meal_schedule?fields=*,dish_id.*'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -265,9 +260,11 @@ Future<void> addMealSchedule(
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const MealSchedule()));
   } else {
-    print(response.body);
-
-    print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Có lỗi xảy ra, vui lòng thử lại sau'),
+      ),
+    );
   }
 }
 

@@ -32,12 +32,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   void initState() {
     super.initState();
+    _loadAllData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadAllData();
   }
 
   Future<void> _loadAllData() async {

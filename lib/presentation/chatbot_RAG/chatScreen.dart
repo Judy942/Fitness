@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'ChatWidget.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  final Map<String, dynamic>? userData;
+  const ChatScreen({super.key, this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,7 @@ class ChatScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Trò chuyện với AI'),
       ),
-      body: const ChatWidget(),
+      body: ChatWidget(userData: userData),
     );
   }
 } 

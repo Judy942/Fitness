@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_fitness/presentation/activity_tracker/activity_tracker_screen.dart';
+import 'package:flutter_application_fitness/presentation/workout/workout_schedule_view/add_schedule_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/utils/app_colors.dart';
@@ -20,7 +21,7 @@ Future<Map<String, dynamic>> getUserData() async {
   if (token != null) {
     // Gọi API để lấy thông tin người dùng
     final response = await http.get(
-      Uri.parse('http://192.168.133.102:8055/users/me'),
+      Uri.parse('http://192.168.102.186:8055/users/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -181,71 +182,69 @@ class ContainerBmi extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Sử dụng Expanded để tránh tràn
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "BMI (Chỉ số khối cơ thể)",
-                      style: TextStyle(
-                        color: AppColors.whiteColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "BMI (Chỉ số khối cơ thể)",
+                        style: TextStyle(
+                          color: AppColors.whiteColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    Text(
-                      bmi == "0" ? " Hãy cập nhật thông tin" : bmi,
-                      style: TextStyle(
-                        color: AppColors.whiteColor.withOpacity(0.7),
-                        fontSize: 14,
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.w400,
+                      Text(
+                        bmi == "0" ? " Hãy cập nhật thông tin" : bmi,
+                        style: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.7),
+                          fontSize: 14,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.width * 0.05),
-                    Text(
-                      _getBMICategory(bmi).replaceAllMapped(
-                        RegExp(r'(.{1,25})(\s|$)'),
-                        (match) => '${match.group(0)}\n',
+                      SizedBox(height: MediaQuery.of(context).size.width * 0.05),
+                      Text(
+                        _getBMICategory(bmi),
+                        style: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.8),
+                          fontSize: 14,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
                       ),
-                      style: TextStyle(
-                        color: AppColors.whiteColor.withOpacity(0.8),
-                        fontSize: 14,
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.w400,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 10),
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: PieChart(
-                  PieChartData(
-                    pieTouchData: PieTouchData(
-                      touchCallback: (FlTouchEvent event, pieTouchResponse) {},
-                    ),
-                    startDegreeOffset: 250,
-                    borderData: FlBorderData(show: false),
-                    sectionsSpace: 1,
-                    centerSpaceRadius: 0,
-                    sections: showingSections(bmi),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                SizedBox(width: 10),
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: PieChart(
+                    PieChartData(
+                      pieTouchData: PieTouchData(
+                        touchCallback: (FlTouchEvent event, pieTouchResponse) {},
+                      ),
+                      startDegreeOffset: 250,
+                      borderData: FlBorderData(show: false),
+                      sectionsSpace: 1,
+                      centerSpaceRadius: 0,
+                      sections: showingSections(bmi),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -262,19 +261,19 @@ class ContainerBmi extends StatelessWidget {
         switch (i) {
           case 0:
             return PieChartSectionData(
-                color: color0,
-                value: double.tryParse(bmi) ?? 0,
-                title: '',
-                radius: 55,
-                titlePositionPercentageOffset: 0.55,
-                badgeWidget: Text(
-                  bmi,
-                  style: const TextStyle(
-                      color: AppColors.whiteColor,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12),
-                ),
-                );
+              color: color0,
+              value: double.tryParse(bmi) ?? 0,
+              title: '',
+              radius: 55,
+              titlePositionPercentageOffset: 0.55,
+              badgeWidget: Text(
+                bmi,
+                style: const TextStyle(
+                    color: AppColors.whiteColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12),
+              ),
+            );
           case 1:
             return PieChartSectionData(
               color: color1,
@@ -355,8 +354,8 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
 
   Future<void> _fetchWorkoutData() async {
     List<dynamic> workouts = await _userService.fetchData(
-        // 'http://192.168.133.102:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
-        'http://192.168.133.102:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
+        // 'http://192.168.102.186:8055/items/workout_schedule?fields=*,completed_exercise.exercise_id.*,workout_id.*&sort=-scheduled_execution_time'
+        'http://192.168.102.186:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time');
 
     setState(() {
       lastWorkoutArr = workouts;
@@ -368,17 +367,70 @@ class _LatestWorkoutSectionState extends State<LatestWorkoutSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Hoạt Động Của Bạn", style: sectionTitleStyle),
-        ListView.builder(
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: lastWorkoutArr.length,
-          itemBuilder: (context, index) {
-            var wObj = lastWorkoutArr[index] as Map? ?? {};
-            return WorkoutRow(wObj: wObj);
-          },
-        ),
+        const Text("Lịch luyện tập của bạn", style: sectionTitleStyle),
+        lastWorkoutArr.isEmpty
+            ? Container(
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Bạn chưa có lịch tập nào, thiết lập ngay nhé!",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: 150,
+                      height: 36,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor1.withOpacity(0.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Chuyển sang màn hình thêm lịch tập
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AddScheduleView(date: DateTime.now()),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Thêm lịch tập",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: lastWorkoutArr.length,
+                itemBuilder: (context, index) {
+                  var wObj = lastWorkoutArr[index] as Map? ?? {};
+                  return WorkoutRow(wObj: wObj);
+                },
+              ),
       ],
     );
   }

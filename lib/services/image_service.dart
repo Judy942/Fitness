@@ -10,7 +10,7 @@ import 'user_service.dart';
 class ImageService {
   // static Future<Uint8List> decryptAndSaveImageFromTextFile(String filePath, String fileName) async {
   //   print("filePath: $filePath");
-  //   final fileUrl = 'http://192.168.133.102:8055/assets/$filePath';
+  //   final fileUrl = 'http://192.168.102.186:8055/assets/$filePath';
   //   String fileContent = await fetchFileContent(fileUrl);
   //   try {
   //     if (fileContent.isNotEmpty) {
@@ -31,7 +31,7 @@ class ImageService {
   
   static Future<Uint8List> decryptAndSaveImageFromTextFile(
       String filePath, String fileName) async {
-    final fileUrl = 'http://192.168.133.102:8055/assets/$filePath';
+    final fileUrl = 'http://192.168.102.186:8055/assets/$filePath';
     String fileContent = await fetchFileContent(fileUrl);
     try {
       // Kiểm tra xem file có tồn tại không

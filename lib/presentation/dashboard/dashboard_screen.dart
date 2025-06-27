@@ -11,8 +11,9 @@ enum DashboardTab { home, workout, camera, profile }
 
 class DashboardScreen extends StatefulWidget {
   final DashboardTab? initialTab;
+  final Map<String, dynamic>? userData;
 
-  const DashboardScreen({Key? key, this.initialTab}) : super(key: key);
+  const DashboardScreen({Key? key, this.initialTab, this.userData}) : super(key: key);
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -45,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ChatScreen(),
+        builder: (context) => ChatScreen(userData: widget.userData),
       ),
     );
         },

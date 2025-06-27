@@ -13,7 +13,7 @@ import 'exercises_step_details.dart';
 
 Future<Map<String, dynamic>> getExerciseDetail(int id) async {
   String url =
-      'http://192.168.133.102:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
+      'http://192.168.102.186:8055/items/exercise/$id?fields=*,process_steps.*,exercise_difficulties.difficulty_id.code,exercise_difficulties.value,exercise_difficulties.calories_burn,exercise_difficulties.excercise_time&deep[exercise_difficulties][_filter][difficulty_id][code][_eq]=EASY';
 
   String? token = await getToken();
 
@@ -151,7 +151,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                       fontWeight: FontWeight.w700),
                                 ),
                                 Text(
-                                  "${widget.dObj["exercises"].toString()} | ${widget.dObj["time"].toString()}",
+                                  "${widget.dObj["exercises"].toString()}",
                                   style: const TextStyle(
                                       color: AppColors.grayColor, fontSize: 12),
                                 ),
@@ -181,7 +181,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const WorkoutScheduleView(),
+                                builder: (context) =>
+                                    const WorkoutScheduleView(),
                               ),
                             );
                           }),
@@ -214,8 +215,19 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           ),
                         ],
                       ),
+
                       equipmentArr.isEmpty
-                          ? const SizedBox()
+                          ? const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Không cần dụng cụ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: AppColors.grayColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            )
                           : SizedBox(
                               height: media.width > 400
                                   ? media.width * 0.48
@@ -248,6 +260,16 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                                                 width: media.width * 0.2,
                                                 height: media.width * 0.2,
                                                 fit: BoxFit.contain,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );
+                                                },
                                               ),
                                               // Image.asset(
                                               //   yObj["image"].toString(),
@@ -298,12 +320,6 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                               sObj: sObj,
                               onPressed: (obj) {
                                 onExercisePressed(context, obj);
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => ExercisesStepDetails(eObj: obj,),
-                                //   ),
-                                // );
                               },
                             );
                           }),
@@ -313,24 +329,6 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     ],
                   ),
                 ),
-                // SafeArea(
-                //   child: Column(
-                //     mainAxisSize: MainAxisSize.max,
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: [
-                //       RoundGradientButton(
-                //           title: "Start Workout",
-                //           onPressed: () {
-                //             // Navigator.push(
-                //             //   context,
-                //             //   MaterialPageRoute(
-                //             //     builder: (context) => const AiHome(),
-                //             //   ),
-                //             // );
-                //           })
-                //     ],
-                //   ),
-                // )
               ],
             ),
           ),
@@ -353,46 +351,13 @@ Future<void> onExercisePressed(BuildContext context, Exercise obj) async {
   );
 }
 
-// class AiHome extends StatelessWidget {
-//   const AiHome({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Finess App'),
-//         centerTitle: true,
-//         elevation: 0,
-//       ),
-//       body: const SafeArea(
-//         child: Center(
-//           child: SingleChildScrollView(
-//             child: Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 16),
-//               child: Column(
-//                 children: [
-//                   ExpansionTile(
-//                     title: Text('Gyms'),
-//                     children: [
-//                       CustomCard('PushUpDetector', PoseDetectorView()),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class CustomCard extends StatelessWidget {
   final String _label;
   final Widget _viewPage;
   final bool featureCompleted;
 
-  const CustomCard(this._label, this._viewPage, {super.key, this.featureCompleted = true});
+  const CustomCard(this._label, this._viewPage,
+      {super.key, this.featureCompleted = true});
 
   @override
   Widget build(BuildContext context) {
@@ -408,8 +373,8 @@ class CustomCard extends StatelessWidget {
         ),
         onTap: () {
           if (!featureCompleted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Cái này chưa được triển khai')));
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Cái này chưa được triển khai')));
           } else {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => _viewPage));

@@ -25,7 +25,7 @@ class _ProgressPhotoScreenState extends State<ProgressPhotoScreen> {
     String? token = await getToken();
     // Thay $CURRENT_USER bằng userId
     final url = Uri.parse(
-        'http://192.168.133.102:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
+        'http://192.168.102.186:8055/items/process_tracker?limit=15&fields[]=*&sort[]=date_upload&page=1&filter[user_id][_eq]=\$CURRENT_USER');
 
     final response = await http.get(
       url,

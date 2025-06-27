@@ -58,7 +58,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.133.102:8055/items/dish_category?filter[status][_neq]=archived'),
+          'http://192.168.102.186:8055/items/dish_category?filter[status][_neq]=archived'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -68,7 +68,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
         categoryArr = (jsonResponse['data'] as List).map((item) {
           return {
             'id': item['id'],
-            'image': 'http://192.168.133.102:8055/assets/${item['image']}',
+            'image': 'http://192.168.102.186:8055/assets/${item['image']}',
             "name": item['name'],
           };
         }).toList();
@@ -204,12 +204,18 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                             var wObj = filteredDishes[index] as Map? ?? {};
                             return ListTile(
                               leading: Image.network(
-                                'http://192.168.133.102:8055/assets/${wObj["image"]}',
+                                'http://192.168.102.186:8055/assets/${wObj["image"]}',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.error);
+                                  return const Image(
+                                    image:
+                                        AssetImage("assets/images/default.png"),
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.contain,
+                                  );
                                 },
                               ),
                               title: Text(wObj['name'] ?? 'Món ăn'),
@@ -302,17 +308,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                                       recommendationArr[position] as Map? ?? {};
                                   return Container(
                                       margin: const EdgeInsets.only(right: 15),
-                                      width:
-                                          MediaQuery.of(context).size.width >
-                                                  400
-                                              ? MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.45
-                                              : MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.55,
+                                      width: 200,
                                       child:
                                           RecommendationContainer(wObj: wObj));
                                 } else {
@@ -320,17 +316,7 @@ class _MealPlannerDetailScreenState extends State<MealPlannerDetailScreen> {
                                       recommendationArr[position] as Map? ?? {};
                                   return Container(
                                       margin: const EdgeInsets.only(right: 15),
-                                      width:
-                                          MediaQuery.of(context).size.width >
-                                                  400
-                                              ? MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.45
-                                              : MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.55,
+                                      width: 200,
                                       child: RecommendationContainer(
                                           wObj: wObj,
                                           type: RoundButtonType.secondaryBG));

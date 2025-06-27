@@ -60,13 +60,18 @@ class _WorkoutRowState extends State<WorkoutRow> {
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
-                'http://192.168.133.102:8055/assets/${widget.wObj["workout_id"]["image"]}',
+                'http://192.168.102.186:8055/assets/${widget.wObj["workout_id"]["image"]}',
                 width: 60,
                 height: 60,
                 fit: BoxFit.fitHeight,
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error_outline);
-                },
+return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );                },
               ),
             ),
             const SizedBox(

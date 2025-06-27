@@ -37,7 +37,7 @@ class RecommendationContainer extends StatelessWidget {
           children: [
             SizedBox(height: 10,),
             Image.network(
-              'http://192.168.133.102:8055/assets/${wObj["image"]}',
+              'http://192.168.102.186:8055/assets/${wObj["image"]}',
               height: 60,
               width: 60,
             ),
@@ -50,15 +50,17 @@ class RecommendationContainer extends StatelessWidget {
                   color: AppColors.blackColor,
                   fontSize: 15,
                   fontWeight: FontWeight.w500),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               wObj["description"].toString(),
               style: const TextStyle(
-                  color: AppColors.grayColor,
-                  fontSize: 14,
-                  overflow: TextOverflow.ellipsis,
-                  fontWeight: FontWeight.w400),
-              maxLines: 4,
+                color: AppColors.grayColor,
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis,
+                fontWeight: FontWeight.w400),
+              maxLines: 3,
             ),
             Spacer(),
             Padding(

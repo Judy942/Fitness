@@ -24,7 +24,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
   Future<void> _fetchWorkoutHistory() async {
     List<dynamic> workouts = await _userService.fetchData(
-      'http://192.168.133.102:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
+      'http://192.168.102.186:8055/items/workout_schedule?fields=*,completed_exercise.*,workout_id.*&sort=-scheduled_execution_time'
     );
 
     setState(() {
@@ -53,7 +53,23 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            )
+          else if (workoutHistoryArr.isEmpty)
+            Center(
+              child: Text(
+                "Chưa có lịch sử nào",
+                style: const TextStyle(
+                  color: AppColors.grayColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            )
+          else
+            ListView.builder(
             padding: const EdgeInsets.all(15),
             itemCount: workoutHistoryArr.length,
             itemBuilder: (context, index) {
@@ -85,7 +101,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: Image.network(
-                          'http://192.168.133.102:8055/assets/${wObj["workout_id"]["image"]}',
+                          'http://192.168.102.186:8055/assets/${wObj["workout_id"]["image"]}',
                           width: 60,
                           height: 60,
                           fit: BoxFit.fitHeight,
@@ -121,10 +137,6 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
               );
             },
           ),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
         ],
       ),
     );

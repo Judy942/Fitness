@@ -14,9 +14,7 @@ Future<List> getListWorkout() async {
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
   List whatArr = [];
   final response = await http.get(
-    // Uri.parse('http://192.168.133.102:8055/items/workout?limit=5&page=1&meta=*'),
-        Uri.parse('http://192.168.133.102:8055/items/workout'),
-
+    Uri.parse('http://192.168.102.186:8055/items/workout'),
     headers: {'Authorization': 'Bearer $token'},
   );
 
@@ -30,11 +28,10 @@ Future<List> getListWorkout() async {
         'image': item['image'],
         "title": item['name'],
         "exercises": "${item['exercises'].length} Bài thể dục",
-        "time": "${item['time'] ?? 'null'} phút" // Cập nhật để hiển thị 'null' nếu không có thời gian
+        "time": "${item['time'] ?? 'null'} phút"
       };
     }).toList();
   } else {
-    // Xử lý lỗi
     print('Có lỗi xảy ra: ${response.statusCode} - ${response.reasonPhrase}');
   }
   return whatArr;
@@ -50,12 +47,16 @@ class WorkoutTrackerScreen extends StatefulWidget {
 class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
   List whatArr = [];
   List workoutSuggestion = [];
+  bool isLoading = false;
 
   Future<void> refreshData() async {
+    setState(() {
+      isLoading = true;
+    });
     final value = await getListWorkout();
     String? bmi = await getBmi();
     double bmiValue = double.tryParse(bmi) ?? 0.0;
-    
+
     setState(() {
       whatArr = value;
       if (bmiValue < 18.5) {
@@ -65,6 +66,7 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
       } else {
         workoutSuggestion = whatArr.where((item) => item['type'] == 2).toList();
       }
+      isLoading = false;
     });
   }
 
@@ -121,7 +123,14 @@ class _WorkoutTrackerScreenState extends State<WorkoutTrackerScreen> {
               backgroundColor: Colors.transparent,
               body: RefreshIndicator(
                 onRefresh: refreshData,
-                child: SingleChildScrollView(
+                child: isLoading
+                    ? SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     children: [

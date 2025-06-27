@@ -52,7 +52,7 @@ void fetchData() async {
     setState(() {
     isLoading = true;
   });
-  String url = "http://192.168.133.102:8055/auth/login";
+  String url = "http://192.168.102.186:8055/auth/login";
   try {
     print(url);
     final response = await http.post(
@@ -67,13 +67,6 @@ void fetchData() async {
       final accessToken = responseBody["data"]?["access_token"];
 
       if (accessToken != null) {
-        await saveToken(accessToken);
-        
-        // Tạo và lưu key/iv từ mật khẩu
-        final keyAndIv = await generateKeyAndIvFromPassword(password);
-        await storage.write(key: 'encryption_key', value: keyAndIv['key']);
-        await storage.write(key: 'encryption_iv', value: keyAndIv['iv']);
-        
         bool otpSent = await EmailService.sendOTPEmail(email);
 
         if (otpSent) {
@@ -86,6 +79,8 @@ void fetchData() async {
             MaterialPageRoute(
               builder: (context) => OtpVerificationScreen(
                 email: email,
+                password: password,
+                accessToken: accessToken,
                 responseBody: {"data": responseBody["data"]},
               ),
             ),
@@ -252,9 +247,17 @@ void fetchData() async {
 
 class OtpVerificationScreen extends StatelessWidget {
   final String email;
+  final String password;
+  final String accessToken;
   final Map<String, dynamic> responseBody;
 
-  OtpVerificationScreen({super.key, required this.email, required this.responseBody});
+  OtpVerificationScreen({
+    super.key, 
+    required this.email, 
+    required this.password,
+    required this.accessToken,
+    required this.responseBody
+  });
 
   final TextEditingController otpController = TextEditingController();
 
@@ -306,12 +309,17 @@ class OtpVerificationScreen extends StatelessWidget {
                 print('Kết quả verify: $isVerified');
                 
                 if (isVerified) {
+                  // Lưu token và tạo key, iv sau khi verify OTP thành công
+                  await saveToken(accessToken);
+                  
+                  // Tạo và lưu key/iv từ mật khẩu
+                  final keyAndIv = await generateKeyAndIvFromPassword(password);
+                  await storage.write(key: 'encryption_key', value: keyAndIv['key']);
+                  await storage.write(key: 'encryption_iv', value: keyAndIv['iv']);
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Xác thực OTP thành công")),
                   );
-
-                  final accessToken = responseBody["data"]["access_token"];
-                  await saveToken(accessToken);
 
                   Navigator.pushReplacement(
                       context,

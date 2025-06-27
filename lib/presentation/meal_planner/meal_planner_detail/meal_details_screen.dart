@@ -12,7 +12,7 @@ import '../meal_schedule/add_meal_schedule.dart';
 
 Future<Map<String, dynamic>> getDishDetails(int id) async {
   String url =
-      'http://192.168.133.102:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
+      'http://192.168.102.186:8055/items/dish/$id?fields=*,difficulty_id.*,nutritions.*,nutritions.nutrition_id.*,ingredients.*,ingredients.ingredient_id.*,process_steps.*&filter[status][_neq]=archived';
 
   Map<String, dynamic> dishDetails = {};
   String? token = await getToken(); // Giả định bạn đã định nghĩa hàm getToken()
@@ -105,16 +105,16 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
-                  'http://192.168.133.102:8055/assets/${widget.dObj["image"]}',
+                  'http://192.168.102.186:8055/assets/${widget.dObj["image"]}',
                   height: media.width * 0.5,
                   fit: BoxFit.fitHeight,
                   errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.error,
-                    color: AppColors.grayColor,
-                    size: 50,
-
+                    return const Image(
+                      image: AssetImage("assets/images/default.png"),
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.contain,
                     );
-
                   },
                 ),
               ),
@@ -193,59 +193,79 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 50,
-                              child: ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemCount: dishDetails["nutritions"].length,
-                                  itemBuilder: (context, index) {
-                                    var yObj = dishDetails["nutritions"][index]
-                                            as Map? ??
-                                        {};
-                                    return InkWell(
-                                      onTap: () {},
-                                      child: Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 15),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primaryColor1
-                                                .withOpacity(0.3),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Row(
-                                          children: [
-                                            Image.network(
-                                              'http://192.168.133.102:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
-                                              width: 20,
-                                              height: 20,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return Icon(
-                                                  Icons.error,
-                                                  color: AppColors.grayColor,
-                                                  size: 20,
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(
-                                              "${yObj["value"].toString()} ${yObj["unit"].toString()}",
-                                              style: const TextStyle(
-                                                  color: AppColors.blackColor,
-                                                  fontSize: 14),
-                                            ),
-                                          ],
-                                        ),
+                            dishDetails["nutritions"] == null ||
+                                    dishDetails["nutritions"].isEmpty
+                                ? const Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      "Chưa cập nhật thông tin",
+                                      style: TextStyle(
+                                        color: AppColors.grayColor,
+                                        fontSize: 14,
                                       ),
-                                    );
-                                  }),
-                            ),
+                                    ),
+                                  )
+                                : SizedBox(
+                                    height: 50,
+                                    child: ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        scrollDirection: Axis.horizontal,
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            dishDetails["nutritions"].length,
+                                        itemBuilder: (context, index) {
+                                          var yObj = dishDetails["nutritions"]
+                                                  [index] as Map? ??
+                                              {};
+                                          return InkWell(
+                                            onTap: () {},
+                                            child: Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 15),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 5),
+                                              decoration: BoxDecoration(
+                                                  color: AppColors.primaryColor1
+                                                      .withOpacity(0.3),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: Row(
+                                                children: [
+                                                  Image.network(
+                                                    'http://192.168.102.186:8055/assets/${yObj["nutrition_id"]["image"].toString()}',
+                                                    width: 20,
+                                                    height: 20,
+                                                    fit: BoxFit.contain,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                     return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );
+                                                    },
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    "${yObj["value"].toString()} ${yObj["unit"].toString()}",
+                                                    style: const TextStyle(
+                                                        color: AppColors
+                                                            .blackColor,
+                                                        fontSize: 14),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
                             SizedBox(
                               height: media.width * 0.05,
                             ),
@@ -260,26 +280,38 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                               height: 10,
                             ),
                             //description read more
-                            ReadMoreText(
-                              dishDetails["description"].toString(),
-                              trimLines: 2,
-                              colorClickableText: AppColors.blackColor,
-                              trimMode: TrimMode.Line,
-                              trimCollapsedText: 'Xem thêm',
-                              trimExpandedText: 'Thu gọn',
-                              style: const TextStyle(
-                                color: AppColors.grayColor,
-                                fontSize: 14,
-                              ),
-                              moreStyle: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primaryColor1),
-                              lessStyle: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primaryColor1),
-                            ),
+                            dishDetails["description"] == null ||
+                                    dishDetails["description"].isEmpty
+                                ? const Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      "Không có mô tả",
+                                      style: TextStyle(
+                                        color: AppColors.grayColor,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                : ReadMoreText(
+                                    dishDetails["description"].toString(),
+                                    trimLines: 2,
+                                    colorClickableText: AppColors.blackColor,
+                                    trimMode: TrimMode.Line,
+                                    trimCollapsedText: 'Xem thêm',
+                                    trimExpandedText: 'Thu gọn',
+                                    style: const TextStyle(
+                                      color: AppColors.grayColor,
+                                      fontSize: 14,
+                                    ),
+                                    moreStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryColor1),
+                                    lessStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryColor1),
+                                  ),
                             SizedBox(
                               height: media.width * 0.05,
                             ),
@@ -291,73 +323,95 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                   fontWeight: FontWeight.w700),
                             ),
 
-                            SizedBox(
-                              height: 162,
-                              child: ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemCount: dishDetails["ingredients"].length,
-                                  itemBuilder: (context, index) {
-                                    var yObj = dishDetails["ingredients"][index]
-                                            as Map? ??
-                                        {};
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 15),
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                          color: AppColors.lightGrayColor
-                                              .withOpacity(0.3),
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                                color: AppColors.lightGrayColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Image.network(
-                                              'http://192.168.133.102:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
-                                              width: 50,
-                                              height: 50,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return Icon(
-                                                  Icons.error,
-                                                  color: AppColors.grayColor,
-                                                  size: 50,
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            yObj['ingredient_id']["name"]
-                                                .toString(),
-                                            style: const TextStyle(
-                                                color: AppColors.blackColor,
-                                                fontSize: 15),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            "${yObj["value"]} ${yObj["unit"]}",
-                                            style: const TextStyle(
-                                                color: AppColors.grayColor,
-                                                fontSize: 14),
-                                          ),
-                                        ],
+                            dishDetails["ingredients"] == null ||
+                                    dishDetails["ingredients"].isEmpty
+                                ? const Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      "Chưa cập nhật thông tin",
+                                      style: TextStyle(
+                                        color: AppColors.grayColor,
+                                        fontSize: 14,
                                       ),
-                                    );
-                                  }),
-                            ),
+                                    ),
+                                  )
+                                : SizedBox(
+                                    height: 162,
+                                    child: ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        scrollDirection: Axis.horizontal,
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            dishDetails["ingredients"].length,
+                                        itemBuilder: (context, index) {
+                                          var yObj = dishDetails["ingredients"]
+                                                  [index] as Map? ??
+                                              {};
+                                          return Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 15),
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                                color: AppColors.lightGrayColor
+                                                    .withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(5),
+                                                  decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .lightGrayColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15)),
+                                                  child: Image.network(
+                                                    'http://192.168.102.186:8055/assets/${yObj["ingredient_id"]["image"].toString()}',
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                     return const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/default.png"),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  );
+                                                    },
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  yObj['ingredient_id']["name"]
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color:
+                                                          AppColors.blackColor,
+                                                      fontSize: 15),
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  "${yObj["value"]} ${yObj["unit"]}",
+                                                  style: const TextStyle(
+                                                      color:
+                                                          AppColors.grayColor,
+                                                      fontSize: 14),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }),
+                                  ),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -380,23 +434,45 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                                 )
                               ],
                             ),
-                            ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 80),
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: dishDetails["process_steps"].length,
-                              itemBuilder: ((context, index) {
-                                var sObj = dishDetails["process_steps"][index]
-                                        as Map? ??
-                                    {};
+                            dishDetails["process_steps"] == null ||
+                                    dishDetails["process_steps"].isEmpty
+                                ? const Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      "Chưa có hướng dẫn",
+                                      style: TextStyle(
+                                        color: AppColors.grayColor,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                : dishDetails["process_steps"].length == 1
+                                    ? StepDetailRow(
+                                        sObj: dishDetails["process_steps"][0],
+                                        isLast: true,
+                                      )
+                                    : ListView.builder(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 80),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            dishDetails["process_steps"].length,
+                                        itemBuilder: ((context, index) {
+                                          var sObj =
+                                              dishDetails["process_steps"]
+                                                      [index] as Map? ??
+                                                  {};
 
-                                return StepDetailRow(
-                                  sObj: sObj,
-                                  isLast:
-                                      dishDetails["process_steps"].last == sObj,
-                                );
-                              }),
-                            ),
+                                          return StepDetailRow(
+                                            sObj: sObj,
+                                            isLast: dishDetails["process_steps"]
+                                                    .last ==
+                                                sObj,
+                                          );
+                                        }),
+                                      ),
                           ],
                         ),
                 ),
